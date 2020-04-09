@@ -1,0 +1,5 @@
+1. somatic AP peak, half-width and spike count (during somatic injection only)
+2. BAP amplitude at 620 and 800 micrometer
+3. somatic AHP depth, AP peak, ISI
+4. Calcium spike height and width
+5. somatic spike count (during BAC firing)

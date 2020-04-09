@@ -1,0 +1,130 @@
+//Author: Etay Hay, 2011
+//  Models of Neocortical Layer 5b Pyramidal Cells Capturing a Wide Range of
+//  Dendritic and Perisomatic Active Properties
+//  (Hay et al., PLoS Computational Biology, 2011)
+//
+// A simulation of L5 Pyramidal Cell under a train of somatic pulses
+
+load_file("nrngui.hoc")
+
+objref cvode
+cvode = new CVode()
+cvode.active(1)
+
+//======================== settings ===================================
+
+v_init = -80
+tstop = 1000
+
+//=================== creating cell object ===========================
+load_file("import3d.hoc")
+objref L5PC
+
+strdef morphology_file
+morphology_file = "../morphologies/cell1.asc"
+
+load_file("../models/L5PCbiophys3.hoc")
+load_file("../models/L5PCtemplate.hoc")
+L5PC = new L5PCtemplate(morphology_file)
+
+//==================== stimulus settings ===========================
+
+stimdist = 830 //distance of apical dendrite recording site
+pulsenum = 5
+freqs = 120
+durs = 5
+
+// Note: this pulse amplitude yields the correct behaviour in 64 bit NEURON environment.
+// In 32 bit NEURON environements, due to difference in float precision, this amplitude may need to be
+// modified slightly (amps = 1.94 nA).
+amps = 1.99
+
+access L5PC.soma
+objref stim1
+stim1 = new List()
+
+for(i=0;i<pulsenum;i+=1) {
+  stim1.append(new IClamp(0.5))
+  stim1.o[i].amp = amps
+  stim1.o[i].del = tstop/4 + i*1000/freqs
+  stim1.o[i].dur = durs
+}
+
+//==================== recording settings ===========================
+
+objref vdend,vsoma,vsoma_t
+
+vsoma = new Vector()
+vdend = new Vector()
+vsoma_t = new Vector()
+
+access L5PC.soma
+cvode.record(&v(0.5),vsoma,vsoma_t)
+
+objref istim
+istim = new List()
+
+for(i2=0;i2<pulsenum;i2+=1) {
+ istim.append(new Vector())
+ cvode.record(&stim1.o[i2].i,istim.o[i2],vsoma_t)
+}
+
+objref sl
+sl = new List()
+double siteVec[2]
+sl = L5PC.locateSites("apic",stimdist)
+
+maxdiam = 0
+for(i=0;i<sl.count();i+=1){
+	dd1 = sl.o[i].x[1]
+  dd = L5PC.apic[sl.o[i].x[0]].diam(dd1)
+  if (dd > maxdiam) {
+    j = i
+    maxdiam = dd 
+  }
+}
+
+siteVec[0] = sl.o[j].x[0]
+siteVec[1] = sl.o[j].x[1]
+
+access L5PC.apic[siteVec[0]] 
+cvode.record(&v(siteVec[1]),vdend,vsoma_t)
+
+//======================= plot settings ============================
+
+objref gV
+
+gV = new Graph()
+gV.size(0,tstop,-85,50)
+graphList[0].append(gV)
+gV.addvar("distal apical","v(0.5)",2,1)
+access L5PC.soma
+gV.addvar("soma","v(0.5)",1,1)
+
+objref gI
+
+gI = new Graph()
+gI.size(0,tstop,-3,3)
+graphList[0].append(gI)
+
+objref s
+
+s = new Shape(L5PC.all)
+//fictive stimulus to visualize recording site
+access L5PC.apic[siteVec[0]] 
+objref stim2
+stim2 = new IClamp(siteVec[1])
+stim2.amp = 0
+stim2.del = 0
+stim2.dur = 0
+s.point_mark(stim2,2)
+s.show(0)
+
+//============================= simulation ================================
+init()
+run()
+
+for(i2=0;i2<pulsenum;i2+=1) {
+  istim.o[i2].plot(gI,vsoma_t)
+}
+

@@ -1,0 +1,14 @@
+NaTa_t.soma.gNaTa_tbar      0        4       
+Nap_Et2.soma.gNap_Et2bar    0        0.01    
+K_Pst.soma.gK_Pstbar        0        1       
+K_Tst.soma.gK_Tstbar        0        0.1     
+SK_E2.soma.gSK_E2bar        0        0.1     
+SKv3_1.soma.gSKv3_1bar      0        2       
+Ca_HVA.soma.gCabar          0        0.001   
+Ca_LVAst.soma.gCa_LVAstbar  0        0.01    
+CaDynamics_E2.soma.gamma    0.0005   0.05    
+CaDynamics_E2.soma.decay    20       1e+03   
+none.soma.g_pas             2e-05    5e-05   
+none.axon.g_pas             2e-05    5e-05   
+none.dend.g_pas             3e-05    0.0001  
+none.apic.g_pas             3e-05    0.0001  

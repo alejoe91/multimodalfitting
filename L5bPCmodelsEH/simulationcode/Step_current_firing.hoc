@@ -1,0 +1,80 @@
+//Author: Etay Hay, 2011
+//  Models of Neocortical Layer 5b Pyramidal Cells Capturing a Wide Range of
+//  Dendritic and Perisomatic Active Properties
+//  (Hay et al., PLoS Computational Biology, 2011) 
+//
+// A simulation of L5 Pyramidal Cell under a prolonged step current
+
+load_file("nrngui.hoc")
+
+objref cvode
+cvode = new CVode()
+cvode.active(1)
+
+//======================== settings ===================================
+
+v_init = -80
+
+//step 1: 0.619
+//step 2: 0.793
+//step 3: 1.507
+step_amp = 0.793
+tstop = 3000
+
+//=================== creating cell object ===========================
+load_file("import3d.hoc")
+objref L5PC
+
+strdef morphology_file
+morphology_file = "../morphologies/cell1.asc"
+
+load_file("../models/L5PCbiophys3.hoc")
+load_file("../models/L5PCtemplate.hoc")
+L5PC = new L5PCtemplate(morphology_file)
+
+//==================== stimulus settings ===========================
+
+objref st1
+
+st1 = new IClamp(0.5)
+st1.dur = 2000
+st1.del = 700
+st1.amp = step_amp
+
+L5PC.soma st1
+
+//==================== recording settings ==========================
+objref vvec, tvec
+
+vvec = new Vector()
+tvec = new Vector()
+
+access L5PC.soma
+cvode.record(&v(0.5),vvec,tvec)
+
+objref apcvec, apc
+apcvec = new Vector()
+apc = new APCount(0.5)
+apc.thresh= -10
+apc.record(apcvec)
+
+//======================= plot settings ============================
+
+objref gV
+
+gV = new Graph()
+gV.size(0,tstop,-80,40)
+graphList[0].append(gV)
+access L5PC.axon
+access L5PC.soma
+gV.addvar("soma","v(0.5)",1,1)
+
+//============================= simulation ================================
+init()
+run()
+
+print "spike count = ", apcvec.size()
+
+
+
+

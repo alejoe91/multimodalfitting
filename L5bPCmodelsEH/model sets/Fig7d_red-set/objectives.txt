@@ -1,0 +1,8 @@
+1. spike frequency
+2. adaptation index, ISIcv
+3. initial burst ISI
+4. AP peak
+5. first spike latency
+6. fast and slow AHP depths
+7. slow AHP time
+8. AP half-width
