@@ -16,6 +16,7 @@
 import bluepyopt as bpopt
 import bluepyopt.ephys as ephys
 
+import matplotlib
 import matplotlib.pyplot as plt
 import MEAutility as mu
 import json
@@ -25,6 +26,8 @@ import numpy as np
 import LFPy
 import pandas as pd
 from pathlib import Path
+
+matplotlib.use('agg')
 
 import l5pc_model
 import l5pc_evaluator
@@ -41,8 +44,6 @@ mea_positions[:, 1] = np.linspace(-500, 1000, 20)
 probe = mu.return_mea(info={'pos': list([list(p) for p in mea_positions]), 'center': False, 'plane': 'xy'})
 electrode = LFPy.RecExtElectrode(probe=probe, method='linesource')
 
-ax = mu.plot_probe(probe)
-
 # Compute features
 #
 # Features for the different feature sets ('bap', 'soma', 'extra') are listed in the `config/feature_list.json` file.
@@ -52,7 +53,6 @@ ax = mu.plot_probe(probe)
 
 random_params_file = 'config/params/random.csv'
 random_params = pd.read_csv(random_params_file, index_col='index')
-params = random_params.iloc[0].to_dict()
 
 feature_sets = ["soma", "bap", "extra"]  # 'soma'/'bap'
 channels = None

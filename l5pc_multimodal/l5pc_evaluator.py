@@ -27,9 +27,11 @@ from pathlib import Path
 
 import l5pc_model  # NOQA
 
+import bluepyopt as bpopt
 import bluepyopt.ephys as ephys
 
 import LFPy
+import time
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, 'config')
@@ -200,7 +202,8 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
         for feat in featlist:
             prot, location, name = feat.name.split('.')
             val = feat.calculate_feature(responses)
-            if val is not None:
+            # remove features with mean = 0
+            if val is not None and val != 0:
                 if isinstance(feat, ephys.efeatures.eFELFeature):
                     feat_name = name
                 else:
@@ -300,17 +303,94 @@ def define_fitness_calculator(protocols, feature_file=None, feature_set=None, ch
     return fitcalc
 
 
-def define_electrode():
+def define_electrode(probe_json=None):
     """Define electrode"""
     import MEAutility as mu
 
-    sq_mea = mu.return_mea('SqMEA-10-15')
-    sq_mea.rotate([0, 1, 0], 90)
-    sq_mea.move([0, 0, -50])
+    if probe_json is None:
+        probe = mu.return_mea('SqMEA-10-15')
+        probe.rotate([0, 1, 0], 90)
+        probe.move([0, 0, -50])
+        electrode = LFPy.RecExtElectrode(probe=sq_mea)
+    else:
+        with probe_json.open('r') as f:
+            info = json.load(f)
+        probe = mu.return_mea(info=info)
+        electrode = LFPy.RecExtElectrode(probe=probe)
+    return probe, electrode
 
-    electrode = LFPy.RecExtElectrode(probe=sq_mea)
 
-    return electrode
+def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path='config',
+                         channels=None, map_function=None):
+    config_path = Path(config_path)
+    morphology = ephys.morphologies.NrnFileMorphology('morphology/C060114A7.asc', do_replace_axon=True)
+    parameters = l5pc_model.define_parameters()
+    mechanisms = l5pc_model.define_mechanisms()
+
+    cell = ephys.models.LFPyCellModel('l5pc', v_init=-65., morph=morphology, mechs=mechanisms, params=parameters)
+
+    param_names = [param.name for param in cell.params.values() if not param.frozen]
+
+    if feature_set == "extra":
+        probe_file = config_path / 'features' / f'random_{sample_id}' / 'probe.json'
+        probe, electrode = define_electrode(probe_file)
+        if channels is None:
+            print(f"MEA z positions:\n{probe.positions[:, 1]}")
+
+        else:
+            print(f"MEA z positions:\n{probe.positions[channels, 1]}")
+    else:
+        probe = None
+        electrode = None
+
+    fitness_protocols = define_protocols(electrode=electrode)
+    sim = ephys.simulators.LFPySimulator(LFPyCellModel=cell, cvode_active=True, electrode=electrode)
+
+    feature_file = config_path / 'features' / f'random_{sample_id}' / f'{feature_set}.json'
+    fitness_calculator = define_fitness_calculator(protocols=fitness_protocols,
+                                                   feature_file=feature_file,
+                                                   probe=probe, channels=channels)
+
+    print(f'Number of features: {len(fitness_calculator.objectives)}')
+
+    evaluator = ephys.evaluators.CellEvaluator(cell_model=cell,
+                                               param_names=param_names,
+                                               fitness_protocols=fitness_protocols,
+                                               fitness_calculator=fitness_calculator,
+                                               sim=sim)
+
+    opt = bpopt.optimisations.DEAPOptimisation(evaluator=evaluator,
+                                               offspring_size=offspring_size,
+                                               map_function=map_function)
+
+    output = {'optimisation': opt, 'evaluator': evaluator, 'objectives_calculator': fitness_calculator,
+              'protocols': fitness_protocols}
+
+    return output
+
+
+def run_optimization(feature_set, sample_id, channels, opt, max_ngen):
+    if channels is None:
+        nchannels = 'all'
+    else:
+        nchannels = len(channels)
+    cp_filename = Path('checkpoints') / f'random_{sample_id}' / f'{feature_set}_off{opt.offspring_size}_' \
+                                                                f'ngen{max_ngen}_{nchannels}chan.pkl'
+    if not cp_filename.parent.is_dir():
+        os.makedirs(cp_filename.parent)
+    if cp_filename.is_file():
+        print(f"Continuing from checkpoint: {cp_filename}")
+        continue_cp = True
+    else:
+        print(f"Saving checkpoint in: {cp_filename}")
+        continue_cp = False
+    t_start = time.time()
+    final_pop, halloffame, log, hist = opt.run(max_ngen=max_ngen, cp_filename=cp_filename, continue_cp=continue_cp)
+    t_stop = time.time()
+    print('Optimization time', t_stop - t_start)
+
+    output = {'final_pop': final_pop, 'halloffame': halloffame, 'log': log, 'hist': hist}
+    return output
 
 
 def create():
