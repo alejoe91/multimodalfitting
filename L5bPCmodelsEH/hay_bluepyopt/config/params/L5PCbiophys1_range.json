@@ -1,0 +1,68 @@
+{
+    "mechanisms": {
+        "all":
+            {"mech":["pas"]},
+        "somatic":
+            {"mech":["Ca_LVAst", "Ca_HVA", "SKv3_1","SK_E2",
+                "K_Tst", "K_Pst", "Nap_Et2", "NaTa_t", "CaDynamics_E2", "Ih" ]},
+        "apical":
+            {"mech":["Ih", "SK_E2", "Ca_LVAst", "Ca_HVA", "SKv3_1", "NaTa_t", "Im", "CaDynamics_E2"]},
+        "basal":
+            {"mech":["Ih"]}
+    },
+    "distributions": {
+        "exp":
+            {"fun": "(-0.8696 + 2.087*math.exp(({distance})*0.0031))*{value}"}
+    },
+    "parameters": {
+        "global":   [
+            {"name":"v_init",   "val":-80},
+            {"name":"celsius",  "val":34}
+        ],
+        "all": [
+            {"name":"cm",                     "val":1},
+            {"name":"Ra",                     "val":100},
+	        {"name":"e_pas",                  "val":-90} 
+        ],
+        "somatic": [
+            {"name":"ena",                    "val":50},
+            {"name":"ek",                     "val":-85},
+            {"name":"gIhbar_Ih",              "val":0.0002},
+            {"name":"g_pas",                  "val":[0.00002, 0.00005]},
+            {"name":"decay_CaDynamics_E2",    "val":[20, 1000]},
+            {"name":"gamma_CaDynamics_E2",    "val":[0.0005, 0.05]},
+            {"name":"gCa_LVAstbar_Ca_LVAst",  "val":[0, 0.01]},
+            {"name":"gCa_HVAbar_Ca_HVA",      "val":[0, 0.1]},
+            {"name":"gSKv3_1bar_SKv3_1",      "val":[0, 2]},
+            {"name":"gSK_E2bar_SK_E2",        "val":[0, 0.1]},
+            {"name":"gK_Tstbar_K_Tst",        "val":[0, 0.1]},
+            {"name":"gK_Pstbar_K_Pst",        "val":[0, 1]},
+            {"name":"gNap_Et2bar_Nap_Et2",    "val":[0, 0.01]},
+            {"name":"gNaTa_tbar_NaTa_t",      "val":[0, 4]}
+        ],
+        "apical": [
+            {"name":"ena",                    "val":50},
+            {"name":"ek",                     "val":-85},
+            {"name":"g_pas",                  "val":[0.000015, 0.00005]},
+            {"name":"decay_CaDynamics_E2",    "val":[20, 200]},
+            {"name":"gamma_CaDynamics_E2",    "val":[0.0005, 0.05]},
+            {"name":"gSK_E2bar_SK_E2",        "val":[0, 0.05]},
+            {"name":"gSKv3_1bar_SKv3_1",      "val":[0, 0.02]},
+            {"name":"gNaTa_tbar_NaTa_t",      "val":[0, 0.02]},
+            {"name":"gImbar_Im",              "val":[0, 0.005]},
+            {"name":"gIhbar_Ih",              "val":0.0002, "dist":"exp",
+                "__comment": "distribution starts in soma (uniform) and spreads exponentially to dendrites"},
+            {"name":"gCa_LVAstbar_Ca_LVAst",  "val":0.00343,"dist":"exp",
+                "__comment": "distribution starts in soma (uniform) and spreads exponentially to dendrites"},
+            {"name":"gCa_HVAbar_Ca_HVA",      "val":0.000992,"dist":"exp",
+                "__comment": "distribution starts in soma (uniform) and spreads exponentially to dendrites"}
+        ],
+        "basal": [
+            {"name":"gIhbar_Ih",              "val":0.0002},
+            {"name":"g_pas",                  "val":[0.000015, 0.00005]}
+        ],
+        "axonal": [
+            {"name":"g_pas",                  "val":[0.00002, 0.00005]}
+        ]
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "L5PCbiophys1": {
+        "morph_path": "morphologies/",  			 
+        "morphology": "cell1.asc",
+        "params": "config/params/L5PCbiophys1_range.json",
+        "protocol": "config/protocols/prot_L5PC1.json",
+        "features": "config/features/feat_L5PC1.json"
+    }
+}
