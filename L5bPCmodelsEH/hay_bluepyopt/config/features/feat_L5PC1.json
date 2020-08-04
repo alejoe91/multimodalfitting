@@ -1,0 +1,170 @@
+{
+    "Step1": {
+        "soma.v": [
+            {"feature": "mean_frequency", "val": [
+                9,
+                0.88
+            ]},
+            {"feature": "adaptation_index2", "val": [
+                0.0036,
+                0.0091
+            ]},
+            {"feature": "ISI_CV", "val": [
+                0.1204,
+                0.0321
+            ]},
+            {"feature": "doublet_ISI", "val": [
+                57.75,
+                33.48
+            ]},
+            {"feature": "time_to_first_spike", "val": [
+                43.25,
+                7.32
+            ]},
+            {"feature": "AP_height", "val": [
+                26.23,
+                4.97
+            ]},
+            {"feature": "AHP_depth_abs", "val": [
+                -51.95,
+                5.82
+            ]},
+            {"feature": "AHP_depth_abs_slow", "val": [
+                -58.04,
+                4.58
+            ]},
+            {"feature": "AHP_slow_time", "val": [
+                0.238,
+                0.030
+            ]},
+            {"feature": "AP_width", "val": [
+                1.31,
+                0.17
+            ]}
+        ]
+    },
+    "Step2": {
+        "soma.v": [
+            {"feature": "mean_frequency", "val": [
+                14.5,
+                0.56
+            ]},
+            {"feature": "adaptation_index2", "val": [
+                0.0023,
+                0.0056
+            ]},
+            {"feature": "ISI_CV", "val": [
+                0.1083,
+                0.0368
+            ]},
+            {"feature": "doublet_ISI", "val": [
+                6.625,
+                8.65
+            ]},
+            {"feature": "time_to_first_spike", "val": [
+                19.13,
+                7.31
+            ]},
+            {"feature": "AP_height", "val": [
+                16.52,
+                6.11
+            ]},
+            {"feature": "AHP_depth_abs", "val": [
+                -54.19,
+                5.57
+            ]},
+            {"feature": "AHP_depth_abs_slow", "val": [
+                -60.51,
+                4.67
+            ]},
+            {"feature": "AHP_slow_time", "val": [
+                0.279,
+                0.027
+            ]},
+            {"feature": "AP_width", "val": [
+                1.38,
+                0.28
+            ]}
+        ]
+    },
+    "Step3": {
+        "soma.v": [
+            {"feature": "mean_frequency", "val": [
+                22.5,
+                2.22
+            ]},
+            {"feature": "adaptation_index2", "val": [
+                0.0046,
+                0.0026
+            ]},
+            {"feature": "ISI_CV", "val": [
+                0.0954,
+                0.0140
+            ]},
+            {"feature": "doublet_ISI", "val": [
+                5.38,
+                0.83
+            ]},
+            {"feature": "time_to_first_spike", "val": [
+                7.25,
+                1
+            ]},
+            {"feature": "AP_height", "val": [
+                16.44,
+                6.93
+            ]},
+            {"feature": "AHP_depth_abs", "val": [
+                -56.56,
+                3.58
+            ]},
+            {"feature": "AHP_depth_abs_slow", "val": [
+                -59.99,
+                3.92
+            ]},
+            {"feature": "AHP_slow_time", "val": [
+                0.213,
+                0.037
+            ]},
+            {"feature": "AP_width", "val": [
+                1.86,
+                0.41
+            ]}
+        ]
+    },
+    "bAP": {
+        "soma.v": [
+            {"feature": "doublet_ISI", "val": [
+                9.9,
+                0.85
+            ]},
+            {"feature": "AHP_depth_abs", "val": [
+                -65,
+                4
+            ]},
+            {"feature": "AP_height", "val": [
+                25.0,
+                5.0
+            ]},
+            {"feature": "AP_width", "val": [
+                2.0,
+                0.5
+            ]},
+            {"feature": "Spikecount", "val": [
+                1.0,
+                0
+            ]}
+        ],
+        "dend1.v": [
+            {"feature": "AP_amplitude_from_voltagebase", "val": [
+                45,
+                10
+            ]}
+        ],
+        "dend2.v": [
+            {"feature": "AP_amplitude_from_voltagebase", "val": [
+                36,
+                9.33
+            ]}
+        ]
+    }
+}
