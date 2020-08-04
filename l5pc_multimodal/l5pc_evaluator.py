@@ -33,6 +33,8 @@ import bluepyopt.ephys as ephys
 import LFPy
 import time
 
+from utils import _filter_response, _interpolate_response, _upsample_wf, _get_peak_times, _get_waveforms
+
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, 'config')
 
@@ -112,15 +114,15 @@ def define_protocols(electrode=None):
 
 
 def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap', std=0.2,
-                           feature_folder='config/features', probe=None, channels=None):
+                           feature_folder='config/features', probe=None, channels=None, save_to_file=True):
     """Compute feature values based on params"""
 
-    assert feature_set in ['bap', 'soma', 'extra']
+    assert feature_set in ['bap', 'soma', 'extra', 'all']
 
     feature_list = json.load(
         open(os.path.join(config_dir, 'features_list.json')))[feature_set]
 
-    if feature_set == 'extra':
+    if feature_set in ['extra', 'all']:
         assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
         if channels is None:
             channels = np.arange(probe.number_electrodes)
@@ -194,7 +196,6 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
         responses.update(protocol.run(cell_model=cell_model, param_values=params, sim=sim))
 
     feature_meanstd = {}
-    std = 0.2
     for protocol_name, featlist in features.items():
         print(protocol_name, 'Num features:', len(featlist))
 
@@ -214,15 +215,81 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
         feature_meanstd[protocol_name] = mean_std
 
         feature_folder = Path(feature_folder)
-    if not feature_folder.is_dir():
-        os.makedirs(feature_folder)
 
-    feature_file = feature_folder / f'{feature_set}.json'
+    if save_to_file:
+        if not feature_folder.is_dir():
+            os.makedirs(feature_folder)
 
-    with feature_file.open('w') as f:
-        json.dump(feature_meanstd, f, indent=4)
+        feature_file = feature_folder / f'{feature_set}.json'
 
-    return str(feature_file), responses
+        with feature_file.open('w') as f:
+            json.dump(feature_meanstd, f, indent=4)
+    else:
+        feature_file = None
+
+    return str(feature_file), responses, feature_meanstd
+
+
+def calculate_eap(responses, protocol_name, protocols, fs=20, fcut=1,
+                  ms_cut=[2, 10], upsample=10, skip_first_spike=True, skip_last_spike=True,
+                  raise_warnings=False, verbose=False, **efel_kwargs):
+    assert "Step" in protocol_name
+    stimulus = protocols[protocol_name].stimuli[0]
+    stim_start = stimulus.step_delay
+    stim_end = stimulus.step_delay + stimulus.step_duration
+    efel_kwargs['threshold'] = -20
+
+    somatic_recording_name = f'{protocol_name}.soma.v'
+    extra_recording_name = f'{protocol_name}.MEA.LFP'
+
+    assert somatic_recording_name in responses.keys(), f"{somatic_recording_name} not found in responses"
+    assert extra_recording_name in responses.keys(), f"{extra_recording_name} not found in responses"
+
+    peak_times = _get_peak_times(responses, somatic_recording_name, stim_start, stim_end,
+                                 raise_warnings=raise_warnings, **efel_kwargs)
+
+    if len(peak_times) > 1 and skip_first_spike:
+        peak_times = peak_times[1:]
+
+    if len(peak_times) > 1 and skip_last_spike:
+        peak_times = peak_times[:-1]
+
+    if responses[extra_recording_name] is not None:
+        response = responses[extra_recording_name]
+    else:
+        return None
+
+    if np.std(np.diff(response['time'])) > 0.001 * np.mean(np.diff(response['time'])):
+        assert fs is not None
+        if verbose:
+            print('interpolate')
+        response_interp = _interpolate_response(response, fs=fs)
+    else:
+        response_interp = response
+
+    if fcut is not None:
+        if verbose:
+            print('filter enabled')
+        response_filter = _filter_response(response_interp, fcut=fcut)
+    else:
+        if verbose:
+            print('filter disabled')
+        response_filter = response_interp
+
+    ewf = _get_waveforms(response_filter, peak_times, ms_cut)
+    mean_wf = np.mean(ewf, axis=0)
+    if upsample is not None:
+        if verbose:
+            print('upsample')
+        assert upsample > 0
+        upsample = int(upsample)
+        mean_wf_up = _upsample_wf(mean_wf, upsample)
+        fs_up = upsample * fs
+    else:
+        mean_wf_up = mean_wf
+        fs_up = fs
+
+    return mean_wf_up
 
 
 def define_fitness_calculator(protocols, feature_file=None, feature_set=None, channels=None,

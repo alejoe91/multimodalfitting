@@ -17,16 +17,22 @@ def plot_responses(responses, return_fig=False):
         return fig
 
 
-def plot_multiple_responses(responses_list, cmap=None, return_fig=False):
+def plot_multiple_responses(responses_list, cmap=None, colors=None, return_fig=False):
     responses = responses_list[0]
     resp_no_mea = []
+
+    if colors is not None:
+        assert len(colors) ==  len(responses)
+
     for (resp_name, response) in sorted(responses.items()):
         if 'MEA' not in resp_name:
             resp_no_mea.append(resp_name)
     fig, axes = plt.subplots(len(resp_no_mea), figsize=(10, 10))
     for i, responses in enumerate(responses_list):
-        if cmap is None:
+        if cmap is None and colors is None:
             color = f'C{i}'
+        elif colors is not None:
+            color = colors[i]
         else:
             cm = plt.get_cmap(cmap)
             color = cm(i / len(responses_list))
