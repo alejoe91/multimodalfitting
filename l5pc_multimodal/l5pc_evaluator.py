@@ -23,6 +23,7 @@ Copyright (c) 2016, EPFL/Blue Brain Project
 import os
 import json
 import numpy as np
+import pickle
 from pathlib import Path
 
 import l5pc_model  # NOQA
@@ -114,9 +115,28 @@ def define_protocols(electrode=None):
 
 
 def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap', std=0.2,
-                           feature_folder='config/features', probe=None, channels=None, save_to_file=True):
-    """Compute feature values based on params"""
+                           feature_folder='config/features', probe=None, channels=None,
+                           detect_threshold=0, save_to_file=True):
+    """
+    Calculate features for cell model and protocols.
 
+    Parameters
+    ----------
+    params
+    cell_model
+    protocols
+    sim
+    feature_set
+    std
+    feature_folder
+    probe
+    channels: list or None
+    save_to_file
+
+    Returns
+    -------
+
+    """
     assert feature_set in ['bap', 'soma', 'extra', 'all']
 
     feature_list = json.load(
@@ -124,8 +144,9 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
 
     if feature_set in ['extra', 'all']:
         assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
-        if channels is None:
-            channels = np.arange(probe.number_electrodes)
+
+    if channels is None:
+        channels = np.arange(probe.number_electrodes)
 
     features = {}
 
@@ -162,7 +183,7 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
                     kwargs['somatic_recording_name'] = f'{protocol_name}.soma.v'
                     kwargs['channel_locations'] = probe.positions
                     kwargs['extrafel_feature_name'] = efel_feature_name
-                    if efel_feature_name != 'velocity':
+                    if channels is not 'map':
                         for ch in channels:
                             kwargs['channel_id'] = int(ch)
                             feature = feature_class(
@@ -172,10 +193,11 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
                                 **kwargs)
                             features[protocol_name].append(feature)
                     else:
+                        kwargs['channel_id'] = None
                         feature = feature_class(
                             feature_name,
-                            exp_mean=0,
-                            exp_std=0,
+                            exp_mean=None,
+                            exp_std=None,
                             **kwargs)
                         features[protocol_name].append(feature)
                 else:
@@ -202,16 +224,29 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
         mean_std = {}
         for feat in featlist:
             prot, location, name = feat.name.split('.')
-            val = feat.calculate_feature(responses)
-            # remove features with mean = 0
-            if val is not None and val != 0:
-                if isinstance(feat, ephys.efeatures.eFELFeature):
-                    feat_name = name
-                else:
-                    feat_name = f'{name}_{str(feat.channel_id)}'
+
+            if location != 'MEA':
+                val = feat.calculate_feature(responses)
                 if location not in mean_std.keys():
                     mean_std[location] = {}
-                mean_std[location][feat_name] = [val, np.abs(std * val)]
+                mean_std[location][name] = [val, np.abs(std * val)]
+            else:
+                if channels is not 'map':
+                    val = feat.calculate_feature(responses)
+                    if val is not None and val != 0:
+                        if isinstance(feat, ephys.efeatures.eFELFeature):
+                            feat_name = name
+                        else:
+                            feat_name = f'{name}_{str(feat.channel_id)}'
+                        if location not in mean_std.keys():
+                            mean_std[location] = {}
+                        mean_std[location][feat_name] = [val, np.abs(std * val)]
+                else:
+                    val = feat.calculate_feature(responses, detect_threshold=detect_threshold)
+                    if location not in mean_std.keys():
+                        mean_std[location] = {}
+                    mean_std[location][name] = [val, None]
+
         feature_meanstd[protocol_name] = mean_std
 
         feature_folder = Path(feature_folder)
@@ -220,10 +255,16 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
         if not feature_folder.is_dir():
             os.makedirs(feature_folder)
 
-        feature_file = feature_folder / f'{feature_set}.json'
+        if channels is 'map':
+            feature_file = feature_folder / f'{feature_set}.pkl'
 
-        with feature_file.open('w') as f:
-            json.dump(feature_meanstd, f, indent=4)
+            with feature_file.open('wb') as f:
+                pickle.dump(feature_meanstd, f)
+        else:
+            feature_file = feature_folder / f'{feature_set}.json'
+
+            with feature_file.open('w') as f:
+                json.dump(feature_meanstd, f, indent=4)
     else:
         feature_file = None
 
@@ -233,6 +274,28 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
 def calculate_eap(responses, protocol_name, protocols, fs=20, fcut=1,
                   ms_cut=[2, 10], upsample=10, skip_first_spike=True, skip_last_spike=True,
                   raise_warnings=False, verbose=False, **efel_kwargs):
+    """
+    Calculate extracellular action potential (EAP)
+
+    Parameters
+    ----------
+    responses
+    protocol_name
+    protocols
+    fs
+    fcut
+    ms_cut
+    upsample
+    skip_first_spike
+    skip_last_spike
+    raise_warnings
+    verbose
+    efel_kwargs
+
+    Returns
+    -------
+
+    """
     assert "Step" in protocol_name
     stimulus = protocols[protocol_name].stimuli[0]
     stim_start = stimulus.step_delay
@@ -302,13 +365,14 @@ def define_fitness_calculator(protocols, feature_file=None, feature_set=None, ch
         if feature_set == 'extra':
             assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
         feature_definitions = json.load(
-            open(os.path.join(config_dir,'features.json')))[feature_set]
+            open(os.path.join(config_dir, 'features.json')))[feature_set]
     else:
         if 'extra' in str(feature_file):
             assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
-        feature_definitions = json.load(open(feature_file))
-
-
+        if feature_file.suffix == '.json':
+            feature_definitions = json.load(open(feature_file))
+        else:
+            feature_definitions = pickle.load(open(feature_file, 'rb'))
 
     objectives = []
 
@@ -343,13 +407,18 @@ def define_fitness_calculator(protocols, feature_file=None, feature_set=None, ch
                     kwargs['upsample'] = 10
                     kwargs['somatic_recording_name'] = f'{protocol_name}.soma.v'
                     kwargs['channel_locations'] = probe.positions
-                    kwargs['extrafel_feature_name'] = '_'.join(efel_feature_name.split('_')[:-1])
-                    channel_id = int(efel_feature_name.split('_')[-1])
 
-                    if channels is not None and channel_id not in channels:
-                        continue
+                    if channels is not 'map':
+                        channel_id = int(efel_feature_name.split('_')[-1])
+                        kwargs['extrafel_feature_name'] = '_'.join(efel_feature_name.split('_')[:-1])
+                        if channels is not None and channel_id not in channels:
+                            continue
+                        else:
+                            kwargs['channel_id'] = channel_id
                     else:
-                        kwargs['channel_id'] = channel_id
+                        kwargs['channel_id'] = None
+                        kwargs['extrafel_feature_name'] = efel_feature_name
+
                 else:
                     feature_class = ephys.efeatures.eFELFeature
                     kwargs['efel_feature_name'] = efel_feature_name
@@ -388,7 +457,7 @@ def define_electrode(probe_json=None):
 
 
 def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path='config',
-                         channels=None, map_function=None):
+                         channels=None, map_function=None, probe_type='linear'):
     config_path = Path(config_path)
     morphology = ephys.morphologies.NrnFileMorphology('morphology/C060114A7.asc', do_replace_axon=True)
     parameters = l5pc_model.define_parameters()
@@ -401,11 +470,6 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
     if feature_set == "extra":
         probe_file = config_path / 'features' / f'random_{sample_id}' / 'probe.json'
         probe, electrode = define_electrode(probe_file)
-        if channels is None:
-            print(f"MEA z positions:\n{probe.positions[:, 1]}")
-
-        else:
-            print(f"MEA z positions:\n{probe.positions[channels, 1]}")
     else:
         probe = None
         electrode = None
@@ -413,13 +477,14 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
     fitness_protocols = define_protocols(electrode=electrode)
     sim = ephys.simulators.LFPySimulator(LFPyCellModel=cell, cvode_active=True, electrode=electrode)
 
-    feature_file = config_path / 'features' / f'random_{sample_id}' / f'{feature_set}.json'
+    if channels == 'map':
+        assert probe_type in ['linear', 'planar']
+        feature_file = config_path / 'features' / f'random_{sample_id}_{probe_type}_map' / f'{feature_set}.pkl'
+    else:
+        feature_file = config_path / 'features' / f'random_{sample_id}' / f'{feature_set}.json'
     fitness_calculator = define_fitness_calculator(protocols=fitness_protocols,
                                                    feature_file=feature_file,
                                                    probe=probe, channels=channels)
-
-    print(f'Number of features: {len(fitness_calculator.objectives)}')
-
     evaluator = ephys.evaluators.CellEvaluator(cell_model=cell,
                                                param_names=param_names,
                                                fitness_protocols=fitness_protocols,
@@ -436,9 +501,11 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
     return output
 
 
-def run_optimization(feature_set, sample_id, channels, opt, max_ngen):
+def run_optimization(feature_set, sample_id, opt, channels, max_ngen):
     if channels is None:
         nchannels = 'all'
+    elif channels is 'map':
+        nchannels = 'map-'
     else:
         nchannels = len(channels)
     cp_filename = Path('checkpoints') / f'random_{sample_id}' / f'{feature_set}_off{opt.offspring_size}_' \
