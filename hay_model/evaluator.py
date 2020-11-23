@@ -16,6 +16,8 @@ import logging
 import LFPy
 import model
 
+from utils import _filter_response, _interpolate_response, _upsample_wf, _get_peak_times, _get_waveforms
+
 logger = logging.getLogger("__main__")
 
 script_dir = os.path.dirname(__file__)
@@ -41,7 +43,6 @@ def define_protocols(electrode=None):
         )
 
         recordings = [somav_recording]
-
 
         if "extra_recordings" in protocol_definition:
             for recording_definition in protocol_definition["extra_recordings"]:
@@ -75,16 +76,13 @@ def define_protocols(electrode=None):
         for stimulus_definition in protocol_definition["stimuli"]:
 
             if protocol_name in ['BAC', 'Step1', 'bAP']:
-                
-                stimuli.append(
-                    ephys.stimuli.NrnSquarePulse(
-                        step_amplitude=stimulus_definition["amp"],
-                        step_delay=stimulus_definition["delay"],
-                        step_duration=stimulus_definition["duration"],
-                        location=soma_loc,
-                        total_duration=stimulus_definition["totduration"],
-                    )
-                )
+
+                stimuli.append(ephys.stimuli.LFPySquarePulse(
+                    step_amplitude=stimulus_definition['amp'],
+                    step_delay=stimulus_definition['delay'],
+                    step_duration=stimulus_definition['duration'],
+                    location=soma_loc,
+                    total_duration=stimulus_definition['totduration']))
             
             if protocol_name in ['EPSP', 'BAC']:
 
@@ -94,15 +92,12 @@ def define_protocols(electrode=None):
                             seclist_name="apical",
                         )
 
-                stimuli.append(
-                    ephys.stimuli.NrnSquarePulse(
-                        step_amplitude=stimulus_definition["amp"],
-                        step_delay=stimulus_definition["delay"],
-                        step_duration=stimulus_definition["duration"],
-                        location=loc_api,
-                        total_duration=stimulus_definition["totduration"],
-                    )
-                )
+                stimuli.append(ephys.stimuli.LFPySquarePulse(
+                    step_amplitude=stimulus_definition['amp'],
+                    step_delay=stimulus_definition['delay'],
+                    step_duration=stimulus_definition['duration'],
+                    location=loc_api,
+                    total_duration=stimulus_definition['totduration']))
 
             if protocol_name in ['CaBurst']:
 
@@ -112,15 +107,12 @@ def define_protocols(electrode=None):
                             seclist_name="apical",
                         )
 
-                stimuli.append(
-                    ephys.stimuli.NrnSquarePulse(
-                        step_amplitude=3*stimulus_definition["amp"],
-                        step_delay=stimulus_definition["delay"],
-                        step_duration=stimulus_definition["duration"],
-                        location=loc_api,
-                        total_duration=stimulus_definition["totduration"],
-                    )
-                )
+                stimuli.append(ephys.stimuli.LFPySquarePulse(
+                    step_amplitude=stimulus_definition['amp'],
+                    step_delay=stimulus_definition['delay'],
+                    step_duration=stimulus_definition['duration'],
+                    location=loc_api,
+                    total_duration=stimulus_definition['totduration']))
             
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
@@ -378,11 +370,13 @@ def define_fitness_calculator(protocols, feature_file=None, feature_set=None, ch
 
     assert feature_file is not None or feature_set is not None
     if feature_set is not None:
-        assert feature_set in ['bap', 'soma', 'extra']
+        assert feature_set in ['multiple', 'soma', 'extra']
         if feature_set == 'extra':
             assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
         feature_definitions = json.load(
-            open(os.path.join(config_dir, 'features.json')))[feature_set]
+            # open(os.path.join(config_dir, 'features.json')))[feature_set]
+            open(os.path.join(config_dir, 'features_list.json')))[feature_set]
+
     else:
         if 'extra' in str(feature_file):
             assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
@@ -464,15 +458,13 @@ def define_electrode(probe_json=None):
         probe = mu.return_mea('SqMEA-10-15')
         probe.rotate([0, 1, 0], 90)
         probe.move([0, 0, -50])
-        electrode = LFPy.RecExtElectrode(probe=sq_mea)
+        electrode = LFPy.RecExtElectrode(probe=probe)
     else:
         with probe_json.open('r') as f:
             info = json.load(f)
         probe = mu.return_mea(info=info)
         electrode = LFPy.RecExtElectrode(probe=probe)
     return probe, electrode
-
-
 
 
 def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path='config',
@@ -525,8 +517,6 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
               'protocols': fitness_protocols}
 
     return output
-
-
 
 
 def run_optimization(feature_set, sample_id, opt, channels, max_ngen, seed=1, prob_type=None):

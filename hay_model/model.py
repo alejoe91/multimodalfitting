@@ -18,6 +18,7 @@ def define_mechanisms():
             sectionlist, seclist_name=sectionlist
         )
         for channel in channels:
+            print(channel, sectionlist, seclist_loc)
             mechanisms.append(
                 ephys.mechanisms.NrnMODMechanism(
                     name="%s.%s" % (channel, sectionlist),
@@ -130,5 +131,11 @@ def create():
         morph=define_morphology(),
         mechs=define_mechanisms(),
         params=define_parameters())
+    # cell = ephys.models.CellModel(
+    #     'hay',
+    #     v_init=-65.,
+    #     morph=define_morphology(),
+    #     mechs=define_mechanisms(),
+    #     params=define_parameters())
 
     return cell
