@@ -2,6 +2,8 @@ import os
 import json
 
 import bluepyopt.ephys as ephys
+import LFPy
+import numpy as np
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -18,7 +20,6 @@ def define_mechanisms():
             sectionlist, seclist_name=sectionlist
         )
         for channel in channels:
-            print(channel, sectionlist, seclist_loc)
             mechanisms.append(
                 ephys.mechanisms.NrnMODMechanism(
                     name="%s.%s" % (channel, sectionlist),
@@ -30,6 +31,50 @@ def define_mechanisms():
             )
 
     return mechanisms
+
+
+def define_probe(probe_type="linear", num_linear=20, linear_span=[-500, 1000], z_shift=20, probe_center=[0, 300, 20],
+                 mea_dim=[20, 4], mea_pitch=[50, 50]):
+    """
+
+    Parameters
+    ----------
+    probe_type
+    num_linear
+    linear_span
+    z_shift
+    probe_center
+    mea_dim
+    mea_pitch
+
+    Returns
+    -------
+
+    """
+    import MEAutility as mu
+
+    if probe_type == 'linear':
+        mea_positions = np.zeros((num_linear, 3))
+        mea_positions[:, 2] = z_shift
+        mea_positions[:, 1] = np.linspace(linear_span[0], linear_span[1], num_linear)
+        probe = mu.return_mea(info={'pos': list([list(p) for p in mea_positions]), 'center': False, 'plane': 'xy'})
+
+    elif probe_type == 'planar':
+        mea_info = {'dim': mea_dim,
+                    'electrode_name': 'hd-mea',
+                    'pitch': mea_pitch,
+                    'shape': 'square',
+                    'size': 5,
+                    'type': 'mea',
+                    'plane': 'xy'}
+        probe = mu.return_mea(info=mea_info)
+        # Move the MEA out of the neuron plane (yz)
+        probe.move(probe_center)
+
+    # Instantiate LFPy electrode object
+    electrode = LFPy.RecExtElectrode(probe=probe)
+
+    return electrode
 
 
 def define_parameters():

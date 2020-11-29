@@ -24,7 +24,7 @@ script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
 
 
-def define_protocols(electrode=None):
+def define_protocols(electrode=None, protocols_with_lfp=None):
     """Define protocols"""
 
     protocol_definitions = json.load(open(os.path.join(config_dir, "protocols.json")))
@@ -68,14 +68,21 @@ def define_protocols(electrode=None):
 
         # Add LFP recording
         if electrode is not None:
-            recordings.append(
-                ephys.recordings.LFPRecording("%s.MEA.LFP" % protocol_name)
-            )
+            if protocols_with_lfp is None:
+                recordings.append(
+                    ephys.recordings.LFPRecording("%s.MEA.LFP" % protocol_name)
+                )
+            else:
+                assert isinstance(protocols_with_lfp, list)
+                if protocol_name in protocols_with_lfp:
+                    recordings.append(
+                        ephys.recordings.LFPRecording("%s.MEA.LFP" % protocol_name)
+                    )
 
         stimuli = []
         for stimulus_definition in protocol_definition["stimuli"]:
 
-            if protocol_name in ['BAC', 'Step1', 'bAP']:
+            if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP']:
 
                 stimuli.append(ephys.stimuli.LFPySquarePulse(
                     step_amplitude=stimulus_definition['amp'],
@@ -121,9 +128,53 @@ def define_protocols(electrode=None):
     return protocols
 
 
+def get_release_params():
+    # load release params
+    release_params_file = os.path.join(config_dir, "parameters_release.json")
+    # load unfrozen params
+    params_file = os.path.join(config_dir, "parameters.json")
+
+    all_release_params = {}
+    with open(release_params_file, 'r') as f:
+        data = json.load(f)
+
+        for prm in data:
+            all_release_params[f"{prm['param_name']}.{prm['sectionlist']}"] = prm["value"]
+
+    params_bounds = {}
+    with open(params_file, 'r') as f:
+        data = json.load(f)
+
+        for prm in data:
+            if "bounds" in prm:
+                params_bounds[f"{prm['param_name']}.{prm['sectionlist']}"] = prm["bounds"]
+
+    release_params = {}
+    for k, v in all_release_params.items():
+        if k in params_bounds.keys():
+            release_params[k] = v
+
+    return release_params
+
+
+def get_unfrozen_params_bounds():
+    # load unfrozen params
+    params_file = os.path.join(config_dir, "parameters.json")
+
+    params_bounds = {}
+    with open(params_file, 'r') as f:
+        data = json.load(f)
+
+        for prm in data:
+            if "bounds" in prm:
+                params_bounds[f"{prm['param_name']}.{prm['sectionlist']}"] = prm["bounds"]
+
+    return params_bounds
+
+
 def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap', std=0.2,
                            feature_folder='config/features', probe=None, channels=None,
-                           detect_threshold=0, save_to_file=True):
+                           detect_threshold=0, save_to_file=True, verbose=False):
     """
     Calculate features for cell model and protocols.
 
@@ -221,14 +272,17 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
     responses = {}
 
     for protocol_name, protocol in protocols.items():
-        print('Running', protocol_name)
+        if verbose:
+            print('Running', protocol_name)
         t1 = time.time()
         responses.update(protocol.run(cell_model=cell_model, param_values=params, sim=sim))
-        print(time.time()-t1)
+        if verbose:
+            print(time.time()-t1)
         
     feature_meanstd = {}
     for protocol_name, featlist in features.items():
-        print(protocol_name, 'Num features:', len(featlist))
+        if verbose:
+            print(protocol_name, 'Num features:', len(featlist))
 
         mean_std = {}
         for feat in featlist:
@@ -236,9 +290,13 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
 
             if location != 'MEA':
                 val = feat.calculate_feature(responses)
-                if location not in mean_std.keys():
-                    mean_std[location] = {}
-                mean_std[location][name] = [val, np.abs(std * val)]
+                if val is not None:
+                    if location not in mean_std.keys():
+                        mean_std[location] = {}
+                    mean_std[location][name] = [val, np.abs(std * val)]
+                else:
+                    if verbose:
+                        print(f"Feature {name} at {location} is None")
             else:
                 if channels is not 'map':
                     val = feat.calculate_feature(responses)
@@ -375,7 +433,7 @@ def define_fitness_calculator(protocols, feature_file=None, feature_set=None, ch
             assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
         feature_definitions = json.load(
             # open(os.path.join(config_dir, 'features.json')))[feature_set]
-            open(os.path.join(config_dir, 'features_list.json')))[feature_set]
+            open(os.path.join(config_dir, 'features.json')))[feature_set]
 
     else:
         if 'extra' in str(feature_file):
