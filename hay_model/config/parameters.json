@@ -197,7 +197,7 @@
         "mech_param": "gamma",
         "type": "range",
         "sectionlist": "apical",
-        "bounds": [0.005, 0.05]
+        "bounds": [0.0005, 0.05]
     },
     {
         "param_name": "gSK_E2bar_SK_E2",
@@ -240,7 +240,7 @@
         "type": "section",
         "dist_type": "uniform",
         "sectionlist": "apical",
-        "bounds": [1.5e-5, 5e-5]
+        "bounds": [1.5e-5, 6e-5]
     },
     {
         "param_name": "gCa_LVAstbar_Ca_LVAst",
