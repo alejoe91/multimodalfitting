@@ -535,7 +535,7 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
     if feature_set == "extra":
         if channels == 'map':
             assert probe_type in ['linear', 'planar']
-            probe_file = config_path / 'features' / f'random_{sample_id}_{probe_type}_map' / 'probe.json'
+            probe_file = config_path / 'features' / f'random_{sample_id}' / 'probe.json'
         else:
             probe_file = config_path / 'features' / f'random_{sample_id}' / 'probe.json'
         probe, electrode = define_electrode(probe_file)
@@ -548,9 +548,10 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
 
     if channels == 'map':
         assert probe_type in ['linear', 'planar']
-        feature_file = config_path / 'features' / f'random_{sample_id}_{probe_type}_map' / f'{feature_set}.pkl'
+        feature_file = config_path / 'features' / f'random_{sample_id}' / f'{feature_set}.pkl'
     else:
         feature_file = config_path / 'features' / f'random_{sample_id}' / f'{feature_set}.json'
+
     fitness_calculator = define_fitness_calculator(protocols=fitness_protocols,
                                                    feature_file=feature_file,
                                                    probe=probe, channels=channels)
@@ -560,7 +561,7 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
                                                fitness_protocols=fitness_protocols,
                                                fitness_calculator=fitness_calculator,
                                                sim=sim,
-                                               timeout=300)
+                                               timeout=900)
 
     opt = bpopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
             evaluator=evaluator,

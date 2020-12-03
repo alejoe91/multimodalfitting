@@ -7,7 +7,7 @@ from datetime import datetime
 
 import pandas as pd
 
-import l5pc_evaluator
+import evaluator
 
 logger = logging.getLogger()
 
@@ -70,16 +70,17 @@ logging.basicConfig(
     stream=sys.stdout,
 )
 
-map_function = get_mapper(args)
+#map_function = get_mapper(args)
+map_function = None
 
 channels = "map"
-prob_type = "linear"
+prob_type = "planar"
 
 random_params_file = "config/params/smart_random.csv"
 random_params = pd.read_csv(random_params_file, index_col="index")
 params = random_params.iloc[0].to_dict()
 
-prep = l5pc_evaluator.prepare_optimization(
+prep = evaluator.prepare_optimization(
     feature_set=args.feature_set,
     sample_id=args.sample_id,
     offspring_size=args.offspring_size,
@@ -90,11 +91,11 @@ prep = l5pc_evaluator.prepare_optimization(
 )
 
 opt = prep["optimisation"]
-evaluator = prep["evaluator"]
+eva = prep["evaluator"]
 fitness_calculator = prep["objectives_calculator"]
 fitness_protocols = prep["protocols"]
 
-out = l5pc_evaluator.run_optimization(
+out = evaluator.run_optimization(
     feature_set=args.feature_set,
     sample_id=args.sample_id,
     opt=opt,

@@ -1,4 +1,6 @@
 x86_64/
+hay_model/config/params/
+hay_model/config/features/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
