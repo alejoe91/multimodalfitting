@@ -93,7 +93,7 @@ def define_stimuli(protocol_name, protocol_definition):
         if protocol_name in ['EPSP', 'BAC']:
 
             loc_api = ephys.locations.NrnSomaDistanceCompLocation(
-                        name=recording_definition["name"],
+                        name=stimulus_definition["name"],
                         soma_distance=620,
                         seclist_name="apical",
                     )
@@ -108,7 +108,7 @@ def define_stimuli(protocol_name, protocol_definition):
         if protocol_name in ['CaBurst']:
 
             loc_api = ephys.locations.NrnSomaDistanceCompLocation(
-                        name=recording_definition["name"],
+                        name=stimulus_definition["name"],
                         soma_distance=620,
                         seclist_name="apical",
                     )

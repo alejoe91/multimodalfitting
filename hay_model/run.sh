@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export FEATURE_SET='extra' # multiple, soma, extra
+export FEATURE_SET='multiple' # multiple, soma, extra
 
 for seed in {1..5}; do
     export OPT_SEED=${seed}
