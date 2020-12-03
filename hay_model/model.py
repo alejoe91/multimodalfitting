@@ -5,6 +5,8 @@ import bluepyopt.ephys as ephys
 import LFPy
 import numpy as np
 
+from morphology_modifiers import replace_axon_with_taper, replace_axon_with_hillock
+
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
 
@@ -33,54 +35,70 @@ def define_mechanisms():
     return mechanisms
 
 
-def define_probe(probe_type="linear", num_linear=20, linear_span=[-500, 1000], z_shift=20, probe_center=[0, 300, 20],
-                 mea_dim=[20, 4], mea_pitch=[50, 50]):
-    """
-
-    Parameters
-    ----------
-    probe_type
-    num_linear
-    linear_span
-    z_shift
-    probe_center
-    mea_dim
-    mea_pitch
-
-    Returns
-    -------
-
-    """
+def define_electrode(
+    probe_type="linear", 
+    num_linear=20, 
+    linear_span=[-500, 1000], 
+    z_shift=20, 
+    probe_center=[0, 300, 20],
+    mea_dim=[20, 4], 
+    mea_pitch=[50, 50],
+    probe_file=None
+):
+    """Define electrode"""
     import MEAutility as mu
+    
+    if probe_file is None:
+        
+        assert probe_type in ['linear', 'planar']
+        
+        if probe_type == 'linear':
+            
+            mea_positions = np.zeros((num_linear, 3))
+            mea_positions[:, 2] = z_shift
+            mea_positions[:, 1] = np.linspace(linear_span[0], linear_span[1], num_linear)
+            
+            mea_info = {
+                'pos': list([list(p) for p in mea_positions]), 
+                'center': False, 
+                'plane': 'xy'
+            }
+            probe = mu.return_mea(info=mea_info)
 
-    if probe_type == 'linear':
-        mea_positions = np.zeros((num_linear, 3))
-        mea_positions[:, 2] = z_shift
-        mea_positions[:, 1] = np.linspace(linear_span[0], linear_span[1], num_linear)
-        probe = mu.return_mea(info={'pos': list([list(p) for p in mea_positions]), 'center': False, 'plane': 'xy'})
+        elif probe_type == 'planar':
+            
+            mea_info = {
+                'dim': mea_dim,
+                'electrode_name': 'hd-mea',
+                'pitch': mea_pitch,
+                'shape': 'square',
+                'size': 5,
+                'type': 'mea',
+                'plane': 'xy'
+            }
+            probe = mu.return_mea(info=mea_info)
 
-    elif probe_type == 'planar':
-        mea_info = {'dim': mea_dim,
-                    'electrode_name': 'hd-mea',
-                    'pitch': mea_pitch,
-                    'shape': 'square',
-                    'size': 5,
-                    'type': 'mea',
-                    'plane': 'xy'}
-        probe = mu.return_mea(info=mea_info)
-        # Move the MEA out of the neuron plane (yz)
-        probe.move(probe_center)
+            # Move the MEA out of the neuron plane (yz)
+            probe.move(probe_center)
 
-    # Instantiate LFPy electrode object
-    electrode = LFPy.RecExtElectrode(probe=probe)
+    else:
+        
+        with probe_file.open('r') as f:
+            info = json.load(f)
+ 
+        probe = mu.return_mea(info=info)
 
-    return electrode
+    return probe, LFPy.RecExtElectrode(probe=probe)
 
 
-def define_parameters():
+def define_parameters(release=False):
     """Define parameters"""
-
-    param_configs = json.load(open(os.path.join(config_dir, "parameters.json")))
+    
+    if release:
+        param_configs = json.load(open(os.path.join(config_dir, "parameters_release.json")))
+    else:
+        param_configs = json.load(open(os.path.join(config_dir, "parameters.json")))
+        
     parameters = []
 
     for param_config in param_configs:
@@ -160,27 +178,46 @@ def define_parameters():
     return parameters
 
 
-def define_morphology():
+def define_morphology(morph_modifiers):
     """Define morphology"""
 
     return ephys.morphologies.NrnFileMorphology(
-        os.path.join("morphology/cell1.asc"), do_replace_axon=True
+        os.path.join("morphology/cell1.asc"),
+        morph_modifiers = morph_modifiers,
     )
 
 
-def create():
+def create(morph_modifier="", release=False):
     """Create cell model"""
+    
+    if morph_modifier == 'hillock':
+        morph_modifiers = [replace_axon_with_hillock]
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axonal',
+                         'myelinated', 'axon_initial_segment', 'hillockal']
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'myelin', 
+                          'ais', 'hillock']
+        
+    elif  morph_modifier == 'tapper':
+        morph_modifiers = [replace_axon_with_taper]
+        seclist_names = None
+        secarray_names = None
+        
+    elif morph_modifier == "":
+        morph_modifiers = []
+        seclist_names = None
+        secarray_names = None
+        
+    else:
+        raise Exception("Unknown morph_modifier")
+        
     cell = ephys.models.LFPyCellModel(
         'hay',
         v_init=-65.,
-        morph=define_morphology(),
+        morph=define_morphology(morph_modifiers),
         mechs=define_mechanisms(),
-        params=define_parameters())
-    # cell = ephys.models.CellModel(
-    #     'hay',
-    #     v_init=-65.,
-    #     morph=define_morphology(),
-    #     mechs=define_mechanisms(),
-    #     params=define_parameters())
+        params=define_parameters(release),
+        seclist_names=seclist_names,
+        secarray_names=secarray_names
+    )
 
     return cell
