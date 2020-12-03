@@ -124,11 +124,11 @@ def define_stimuli(protocol_name, protocol_definition):
 
 
 def define_protocols(feature_set=None, feature_file=None, electrode=None):
-    
+
     protocol_definitions = get_protocol_definitions()
     feature_definitions = get_feature_definitions(feature_set, feature_file)
     protocols = {}
-    
+
     for protocol_name in feature_definitions:
 
         recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], electrode)
@@ -137,7 +137,10 @@ def define_protocols(feature_set=None, feature_file=None, electrode=None):
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
         )
-
+        
+        print(ephys.protocols.SweepProtocol(
+            protocol_name, stimuli, recordings, cvode_active=True
+        ))
     return protocols
 
 
@@ -495,7 +498,9 @@ def define_fitness_calculator(protocols, feature_file, feature_set, channels=Non
                         feature
                     )
                 )
-
+                
+                print(feature, objectives[-1])
+                
     return ephys.objectivescalculators.ObjectivesCalculator(objectives), efeatures
 
 
@@ -517,7 +522,7 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
 
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 
-    fitness_protocols = define_protocols(feature_set, feature_file, electrode=None)
+    fitness_protocols = define_protocols(feature_set, feature_file, electrode=electrode)
     
     sim = ephys.simulators.LFPySimulator(LFPyCellModel=cell, cvode_active=True, electrode=electrode)
 
@@ -528,7 +533,7 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
         probe=probe, 
         channels=channels
     )
-    
+
     evaluator = ephys.evaluators.CellEvaluator(cell_model=cell,
                                                param_names=param_names,
                                                fitness_protocols=fitness_protocols,
@@ -570,7 +575,9 @@ def run_optimization(feature_set, sample_id, opt, channels, max_ngen, seed=1, pr
     else:
         logger.info(f"Saving checkpoint in: {cp_filename}")
         continue_cp = False
-
+    
+    exit()
+    
     final_pop, halloffame, log, hist = opt.run(max_ngen=max_ngen, cp_filename=cp_filename, continue_cp=continue_cp)
-
+    
     return {'final_pop': final_pop, 'halloffame': halloffame, 'log': log, 'hist': hist}
