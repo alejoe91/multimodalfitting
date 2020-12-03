@@ -138,9 +138,6 @@ def define_protocols(feature_set=None, feature_file=None, electrode=None):
             protocol_name, stimuli, recordings, cvode_active=True
         )
         
-        print(ephys.protocols.SweepProtocol(
-            protocol_name, stimuli, recordings, cvode_active=True
-        ))
     return protocols
 
 
@@ -498,9 +495,7 @@ def define_fitness_calculator(protocols, feature_file, feature_set, channels=Non
                         feature
                     )
                 )
-                
-                print(feature, objectives[-1])
-                
+
     return ephys.objectivescalculators.ObjectivesCalculator(objectives), efeatures
 
 
@@ -575,8 +570,6 @@ def run_optimization(feature_set, sample_id, opt, channels, max_ngen, seed=1, pr
     else:
         logger.info(f"Saving checkpoint in: {cp_filename}")
         continue_cp = False
-    
-    exit()
     
     final_pop, halloffame, log, hist = opt.run(max_ngen=max_ngen, cp_filename=cp_filename, continue_cp=continue_cp)
     
