@@ -178,12 +178,13 @@ def define_parameters(release=False):
     return parameters
 
 
-def define_morphology(morph_modifiers):
+def define_morphology(morph_modifiers, do_replace_axon):
     """Define morphology"""
 
     return ephys.morphologies.NrnFileMorphology(
         os.path.join("morphology/cell1.asc"),
         morph_modifiers = morph_modifiers,
+        do_replace_axon=do_replace_axon
     )
 
 
@@ -196,16 +197,19 @@ def create(morph_modifier="", release=False):
                          'myelinated', 'axon_initial_segment', 'hillockal']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'myelin', 
                           'ais', 'hillock']
+        do_replace_axon = False
         
     elif  morph_modifier == 'tapper':
         morph_modifiers = [replace_axon_with_taper]
         seclist_names = None
         secarray_names = None
+        do_replace_axon = False
         
     elif morph_modifier == "":
-        morph_modifiers = []
+        morph_modifiers = None
         seclist_names = None
         secarray_names = None
+        do_replace_axon = True
         
     else:
         raise Exception("Unknown morph_modifier")
@@ -213,7 +217,7 @@ def create(morph_modifier="", release=False):
     cell = ephys.models.LFPyCellModel(
         'hay',
         v_init=-65.,
-        morph=define_morphology(morph_modifiers),
+        morph=define_morphology(morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(),
         params=define_parameters(release),
         seclist_names=seclist_names,

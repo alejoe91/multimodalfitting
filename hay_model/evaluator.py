@@ -500,7 +500,7 @@ def define_fitness_calculator(protocols, feature_file, feature_set, channels=Non
 
 
 def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path='config',
-                         channels=None, map_function=None, probe_type='linear', seed=1):
+                         channels=None, map_function=None, probe_type='linear', seed=1, morph_modifier=""):
     
     config_path = Path(config_path)
     feature_file = config_path / 'features' / f'random_{sample_id}' / f'{feature_set}.pkl'
@@ -513,7 +513,7 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
         probe_file = config_path / 'features' / f'random_{sample_id}' / 'probe.json'
         probe, electrode = model.define_electrode(probe_file=probe_file)
 
-    cell = model.create()
+    cell = model.create(morph_modifier, release=False)
 
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 

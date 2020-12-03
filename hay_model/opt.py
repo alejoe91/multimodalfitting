@@ -64,6 +64,7 @@ logging.basicConfig(
 
 map_function = get_mapper(args)
 
+morph_modifier = ""  # "", "hillock", "tapper"
 channels = "map"
 prob_type = "planar"
 
@@ -79,6 +80,7 @@ prep = evaluator.prepare_optimization(
     probe_type=prob_type,
     map_function=map_function,
     seed=args.seed,
+    morph_modifier=morph_modifier
 )
 
 opt = prep["optimisation"]
