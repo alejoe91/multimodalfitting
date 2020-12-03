@@ -29,14 +29,6 @@ def get_parser():
     parser.add_argument("--feature_set", type=str, default="extra")
     parser.add_argument("--sample_id", type=int, required=True)
     parser.add_argument(
-        "-v",
-        "--verbose",
-        action="count",
-        dest="verbose",
-        default=0,
-        help="-v for INFO, -vv for DEBUG",
-    )
-    parser.add_argument(
         "--ipyparallel", action="store_true", default=False, help="Use ipyparallel"
     )
     return parser
@@ -66,13 +58,13 @@ def get_mapper(args):
 args = get_parser().parse_args()
 
 logging.basicConfig(
-    level=(logging.WARNING, logging.INFO, logging.DEBUG)[args.verbose],
+    level=logging.INFO,
     stream=sys.stdout,
 )
 
-#map_function = get_mapper(args)
-map_function = None
+map_function = get_mapper(args)
 
+morph_modifier = ""  # "", "hillock", "tapper"
 channels = "map"
 prob_type = "planar"
 
@@ -88,6 +80,7 @@ prep = evaluator.prepare_optimization(
     probe_type=prob_type,
     map_function=map_function,
     seed=args.seed,
+    morph_modifier=morph_modifier
 )
 
 opt = prep["optimisation"]

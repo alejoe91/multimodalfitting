@@ -1,6 +1,9 @@
 x86_64/
 hay_model/config/params/
 hay_model/config/features/
+.ipython/
+hay_model/checkpoints/
+hay_model/logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
