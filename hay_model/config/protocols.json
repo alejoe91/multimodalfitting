@@ -118,37 +118,5 @@
                 "totduration": 3000
             }
         ]
-    },
-    "Step2": {
-        "stimuli": [
-            {
-                "delay": 700,
-                "amp": 0.993,
-                "duration": 2000,
-                "totduration": 3000
-            },
-            {
-                "delay": 0,
-                "amp": 0.0,
-                "duration": 3000,
-                "totduration": 3000
-            }
-        ]
-    },
-    "Step3": {
-        "stimuli": [
-            {
-                "delay": 700,
-                "amp": 1.586,
-                "duration": 2000,
-                "totduration": 3000
-            },
-            {
-                "delay": 0,
-                "amp": 0.0,
-                "duration": 3000,
-                "totduration": 3000
-            }
-        ]
     }
 }
