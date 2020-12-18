@@ -4,10 +4,12 @@ import os
 import sys
 import textwrap
 from datetime import datetime
-
 import pandas as pd
+from pathlib import Path
 
 import evaluator
+
+from configs import config_dir
 
 logger = logging.getLogger()
 
@@ -66,9 +68,11 @@ map_function = get_mapper(args)
 
 morph_modifier = ""  # "", "hillock", "tapper"
 channels = "map"
-prob_type = "planar"
+probe_type = "planar"
+optimizer = "CMA"
+max_ngen = 20000
 
-random_params_file = "config/params/smart_random.csv"
+random_params_file = Path(config_dir) / 'params' / 'smart_random.csv'
 random_params = pd.read_csv(random_params_file, index_col="index")
 params = random_params.iloc[0].to_dict()
 
@@ -77,9 +81,10 @@ prep = evaluator.prepare_optimization(
     sample_id=args.sample_id,
     offspring_size=args.offspring_size,
     channels=channels,
-    probe_type=prob_type,
+    probe_type=probe_type,
     map_function=map_function,
     seed=args.seed,
+    optimizer=optimizer,
     morph_modifier=morph_modifier
 )
 
@@ -92,8 +97,6 @@ out = evaluator.run_optimization(
     feature_set=args.feature_set,
     sample_id=args.sample_id,
     opt=opt,
-    max_ngen=20000,
+    max_ngen=max_ngen,
     channels=channels,
-    seed=args.seed,
-    prob_type=prob_type,
 )

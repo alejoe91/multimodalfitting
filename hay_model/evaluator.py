@@ -2,26 +2,18 @@
 
 import os
 import json
-import numpy as np
 import pickle
 from pathlib import Path
-import itertools
-import model
 
 import bluepyopt as bpopt
 import bluepyopt.ephys as ephys
 
-import time
 import logging
-import LFPy
 import model
 
-from utils import _filter_response, _interpolate_response, _upsample_wf, _get_peak_times, _get_waveforms
+from configs import config_dir
 
 logger = logging.getLogger("__main__")
-
-script_dir = os.path.dirname(__file__)
-config_dir = os.path.join(script_dir, "config")
 
 soma_loc = ephys.locations.NrnSeclistCompLocation(
     name="soma", seclist_name="somatic", sec_index=0, comp_x=0.5
@@ -29,46 +21,86 @@ soma_loc = ephys.locations.NrnSeclistCompLocation(
 
 
 def get_protocol_definitions():
+    """
+    Returns protocol definitions
+
+    Returns
+    -------
+    protocols_dict: dict
+        Dictionary with protocol definitions
+    """
     return json.load(open(os.path.join(config_dir, "protocols.json")))
 
 
 def get_feature_definitions(feature_set=None, feature_file=None):
+    """
+    Returns features definitions
 
+    Parameters
+    ----------
+    feature_set: str
+        "soma", "multiple", "extra", or "all"
+    feature_file: str
+        Path to json file specifying list of features for each fetaure set
+
+    Returns
+    -------
+    fetaures_dict: dict
+        Dictionary with features definitions
+    """
     if feature_file is not None:
         assert feature_set is not None
         return pickle.load(open(feature_file, 'rb'))
     else:
-        return json.load(open(os.path.join(config_dir, 'features.json')))['multiple']
+        if feature_set is not None:
+            return json.load(open(os.path.join(config_dir, 'features_list.json')))[feature_set]
+        else:
+            return json.load(open(os.path.join(config_dir, 'features_list.json')))["multiple"]
 
 
 def define_recordings(protocol_name, protocol_definition, electrode=None):
-    
+    """
+    Defines recordings for the specified protocol
+
+    Parameters
+    ----------
+    protocol_name: str
+        The protocol name
+    protocol_definition: dict
+        Dictionary with protocol definitions (used to access "extra_recordings")
+    electrode: LFPy.RecExtElectrode
+        If given, the MEA recording is added
+
+    Returns
+    -------
+    recording: list
+        List of defined recordings for the specified protocol_name
+    """
     recordings = [
         ephys.recordings.CompRecording(
             name="%s.soma.v" % protocol_name, location=soma_loc, variable="v"
         )
     ]
-    
+
     if "extra_recordings" in protocol_definition:
 
-            for recording_definition in protocol_definition["extra_recordings"]:
-                
-                if recording_definition["type"] == "somadistance":
-                    
-                    location = ephys.locations.NrnSomaDistanceCompLocation(
-                        name=recording_definition["name"],
-                        soma_distance=recording_definition["somadistance"],
-                        seclist_name=recording_definition["seclist_name"],
+        for recording_definition in protocol_definition["extra_recordings"]:
+
+            if recording_definition["type"] == "somadistance":
+                location = ephys.locations.NrnSomaDistanceCompLocation(
+                    name=recording_definition["name"],
+                    soma_distance=recording_definition["somadistance"],
+                    seclist_name=recording_definition["seclist_name"],
+                )
+
+                var = recording_definition["var"]
+                recordings.append(
+                    ephys.recordings.CompRecording(
+                        name="%s.%s.%s" % (protocol_name, location.name, var),
+                        location=location,
+                        variable=recording_definition["var"],
                     )
-                    
-                    var = recording_definition["var"]
-                    recordings.append(
-                            ephys.recordings.CompRecording(
-                            name="%s.%s.%s" % (protocol_name, location.name, var),
-                            location=location,
-                            variable=recording_definition["var"],
-                        )
-                    )
+                )
 
     if electrode is not None:
         recordings.append(ephys.recordings.LFPRecording("%s.MEA.LFP" % protocol_name))
@@ -77,12 +109,26 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
 
 
 def define_stimuli(protocol_name, protocol_definition):
+    """
+    Defines stimuli associated with a specified protocol
 
+    Parameters
+    ----------
+    protocol_name: str
+        The protocol name
+    protocol_definition: dict
+        Dictionary with protocol definitions (used to access "extra_recordings")
+
+    Returns
+    -------
+    stimuli: list
+        List of defined stimuli for the specified protocol_name
+
+    """
     stimuli = []
     for stimulus_definition in protocol_definition["stimuli"]:
 
         if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP']:
-
             stimuli.append(ephys.stimuli.LFPySquarePulse(
                 step_amplitude=stimulus_definition['amp'],
                 step_delay=stimulus_definition['delay'],
@@ -91,12 +137,11 @@ def define_stimuli(protocol_name, protocol_definition):
                 total_duration=stimulus_definition['totduration']))
 
         if protocol_name in ['EPSP', 'BAC']:
-
             loc_api = ephys.locations.NrnSomaDistanceCompLocation(
-                        name=protocol_name,
-                        soma_distance=620,
-                        seclist_name="apical",
-                    )
+                name=protocol_name,
+                soma_distance=620,
+                seclist_name="apical",
+            )
 
             stimuli.append(ephys.stimuli.LFPySquarePulse(
                 step_amplitude=stimulus_definition['amp'],
@@ -106,12 +151,11 @@ def define_stimuli(protocol_name, protocol_definition):
                 total_duration=stimulus_definition['totduration']))
 
         if protocol_name in ['CaBurst']:
-
             loc_api = ephys.locations.NrnSomaDistanceCompLocation(
-                        name=protocol_name,
-                        soma_distance=620,
-                        seclist_name="apical",
-                    )
+                name=protocol_name,
+                soma_distance=620,
+                seclist_name="apical",
+            )
 
             stimuli.append(ephys.stimuli.LFPySquarePulse(
                 step_amplitude=stimulus_definition['amp'],
@@ -119,29 +163,61 @@ def define_stimuli(protocol_name, protocol_definition):
                 step_duration=stimulus_definition['duration'],
                 location=loc_api,
                 total_duration=stimulus_definition['totduration']))
-    
+
     return stimuli
 
 
-def define_protocols(feature_set=None, feature_file=None, electrode=None):
+def define_protocols(feature_set=None, feature_file=None, electrode=None,
+                     protocols_with_lfp=None):
+    """
+    Defines protocols for a specified feature_Set (or file)
 
+    Parameters
+    ----------
+    feature_set: str
+        "soma", "multiple", "extra", or "all"
+    feature_file: str
+        Path to a feature pkl file to load protocols from
+    electrode: LFPy.RecExtElectrode
+        If given, the MEA recording is added
+    protocols_with_lfp: list or None
+        List of protocols for which LFP should be computed. If None, LFP are added to all protocols
+
+    Returns
+    -------
+    protocols: dict
+        Dictionary with defined protocols
+    """
     protocol_definitions = get_protocol_definitions()
     feature_definitions = get_feature_definitions(feature_set, feature_file)
     protocols = {}
 
     for protocol_name in feature_definitions:
-
-        recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], electrode)
+        if protocols_with_lfp is not None:
+            if protocol_name in protocols_with_lfp:
+                recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], electrode)
+            else:
+                recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], None)
+        else:
+            recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], electrode)
         stimuli = define_stimuli(protocol_name, protocol_definitions[protocol_name])
 
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
         )
-        
+
     return protocols
 
 
 def get_release_params():
+    """
+    Returns release params for the hay model
+
+    Returns
+    -------
+    release_params: dict
+        Dictionary with parameters and their release values
+    """
     # load release params
     release_params_file = os.path.join(config_dir, "parameters_release.json")
     # load unfrozen params
@@ -171,6 +247,14 @@ def get_release_params():
 
 
 def get_unfrozen_params_bounds():
+    """
+    Returns unfrozen params bounds model
+
+    Returns
+    -------
+    params_bounds: dict
+        Dictionary with parameters and their bounds
+    """
     # load unfrozen params
     params_file = os.path.join(config_dir, "parameters.json")
 
@@ -185,258 +269,47 @@ def get_unfrozen_params_bounds():
     return params_bounds
 
 
-def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap', std=0.2, 
-                           probe=None, channels=None, detect_threshold=0, verbose=False):
+def define_fitness_calculator(protocols, feature_file, feature_set, channels="map", probe=None):
     """
-    Calculate features for cell model and protocols.
-    Parameters
-    ----------
-    params
-    cell_model
-    protocols
-    sim
-    feature_set
-    std
-    feature_folder
-    probe
-    channels: list or None
-    save_to_file
-    Returns
-    -------
-    """
-    assert feature_set in ['bap', 'soma', 'extra', 'all']
-
-    feature_list = json.load(
-        open(os.path.join(config_dir, 'features_list.json')))[feature_set]
-
-    if feature_set in ['extra', 'all']:
-        assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
-
-    if channels is None:
-        channels = np.arange(probe.number_electrodes)
-
-    features = {}
-
-    for protocol_name, locations in feature_list.items():
-        features[protocol_name] = []
-        for location, feats in locations.items():
-            for efel_feature_name in feats:
-                
-                if protocol_name in protocols:
-                    
-                    feature_name = '%s.%s.%s' % (
-                        protocol_name, location, efel_feature_name)
-                    kwargs = {}
-
-                    stimulus = protocols[protocol_name].stimuli[0]
-                    kwargs['stim_start'] = stimulus.step_delay
-
-                    if location == 'soma':
-                        kwargs['threshold'] = -20
-                    elif 'dend' in location:
-                        kwargs['threshold'] = -55
-                    else:
-                        kwargs['threshold'] = -20
-
-                    if protocol_name == 'bAP':
-                        kwargs['stim_end'] = stimulus.total_duration
-                    else:
-                        kwargs['stim_end'] = stimulus.step_delay + stimulus.step_duration
-
-                    if location == 'MEA':
-                        feature_class = ephys.efeatures.extraFELFeature
-                        kwargs['recording_names'] = {'': '%s.%s.LFP' % (protocol_name, location)}
-                        kwargs['fs'] = 20
-                        kwargs['fcut'] = 1
-                        kwargs['ms_cut'] = [3, 10]
-                        kwargs['upsample'] = 10
-                        kwargs['somatic_recording_name'] = f'{protocol_name}.soma.v'
-                        kwargs['channel_locations'] = probe.positions
-                        kwargs['extrafel_feature_name'] = efel_feature_name
-                        if channels is not 'map':
-                            for ch in channels:
-                                kwargs['channel_id'] = int(ch)
-                                feature = feature_class(
-                                    feature_name,
-                                    exp_mean=0,
-                                    exp_std=0,
-                                    **kwargs)
-                                features[protocol_name].append(feature)
-                        else:
-                            kwargs['channel_id'] = None
-                            feature = feature_class(
-                                feature_name,
-                                exp_mean=None,
-                                exp_std=None,
-                                **kwargs)
-                            features[protocol_name].append(feature)
-                    else:
-                        feature_class = ephys.efeatures.eFELFeature
-                        kwargs['efel_feature_name'] = efel_feature_name
-                        kwargs['recording_names'] = {'': '%s.%s.v' % (protocol_name, location)}
-
-                        feature = feature_class(
-                            feature_name,
-                            exp_mean=0,
-                            exp_std=0,
-                            **kwargs)
-                        features[protocol_name].append(feature)
-                        
-    responses = {}
-
-    for protocol_name, protocol in protocols.items():
-        if verbose:
-            print('Running', protocol_name)
-        t1 = time.time()
-        responses.update(protocol.run(cell_model=cell_model, param_values=params, sim=sim))
-        if verbose:
-            print(time.time()-t1)
-        
-    feature_meanstd = {}
-    for protocol_name, featlist in features.items():
-        if verbose:
-            print(protocol_name, 'Num features:', len(featlist))
-
-        mean_std = {}
-        for feat in featlist:
-            prot, location, name = feat.name.split('.')
-
-            if location != 'MEA':
-                val = feat.calculate_feature(responses)
-                if val is not None:
-                    if location not in mean_std.keys():
-                        mean_std[location] = {}
-                    mean_std[location][name] = [val, np.abs(std * val)]
-                else:
-                    if verbose:
-                        print(f"Feature {name} at {location} is None")
-            else:
-                if channels is not 'map':
-                    val = feat.calculate_feature(responses)
-                    if val is not None and val != 0:
-                        if isinstance(feat, ephys.efeatures.eFELFeature):
-                            feat_name = name
-                        else:
-                            feat_name = f'{name}_{str(feat.channel_id)}'
-                        if location not in mean_std.keys():
-                            mean_std[location] = {}
-                        mean_std[location][feat_name] = [val, np.abs(std * val)]
-                else:
-                    val = feat.calculate_feature(responses, detect_threshold=detect_threshold)
-                    if location not in mean_std.keys():
-                        mean_std[location] = {}
-                    mean_std[location][name] = [val, None]
-
-        feature_meanstd[protocol_name] = mean_std
-
-    return responses, feature_meanstd
-
-
-def calculate_eap(responses, protocol_name, protocols, fs=20, fcut=1,
-                  ms_cut=[2, 10], upsample=10, skip_first_spike=True, skip_last_spike=True,
-                  raise_warnings=False, verbose=False, **efel_kwargs):
-    """
-    Calculate extracellular action potential (EAP)
+    Defines objective calculator
 
     Parameters
     ----------
-    responses
-    protocol_name
-    protocols
-    fs
-    fcut
-    ms_cut
-    upsample
-    skip_first_spike
-    skip_last_spike
-    raise_warnings
-    verbose
-    efel_kwargs
+    protocols: dict
+        Dictionary with defined protocols
+    feature_file: str
+        Path to json file specifying list of features for each fetaure set
+    feature_set: str
+        "soma", "multiple", "extra", or "all"
+    channels: list, "map", or None
+        If None, features are computed separately for each channel
+        If list, features are computed separately for the provided channels
+        If 'map' (default), each feature is an array with the features computed on all channels
+    probe: MEAutility.MEA
+        The probe to use for extracellular features
 
     Returns
     -------
 
     """
-    assert "Step" in protocol_name
-    stimulus = protocols[protocol_name].stimuli[0]
-    stim_start = stimulus.step_delay
-    stim_end = stimulus.step_delay + stimulus.step_duration
-    efel_kwargs['threshold'] = -20
-
-    somatic_recording_name = f'{protocol_name}.soma.v'
-    extra_recording_name = f'{protocol_name}.MEA.LFP'
-
-    assert somatic_recording_name in responses.keys(), f"{somatic_recording_name} not found in responses"
-    assert extra_recording_name in responses.keys(), f"{extra_recording_name} not found in responses"
-
-    peak_times = _get_peak_times(responses, somatic_recording_name, stim_start, stim_end,
-                                 raise_warnings=raise_warnings, **efel_kwargs)
-
-    if len(peak_times) > 1 and skip_first_spike:
-        peak_times = peak_times[1:]
-
-    if len(peak_times) > 1 and skip_last_spike:
-        peak_times = peak_times[:-1]
-
-    if responses[extra_recording_name] is not None:
-        response = responses[extra_recording_name]
-    else:
-        return None
-
-    if np.std(np.diff(response['time'])) > 0.001 * np.mean(np.diff(response['time'])):
-        assert fs is not None
-        if verbose:
-            print('interpolate')
-        response_interp = _interpolate_response(response, fs=fs)
-    else:
-        response_interp = response
-
-    if fcut is not None:
-        if verbose:
-            print('filter enabled')
-        response_filter = _filter_response(response_interp, fcut=fcut)
-    else:
-        if verbose:
-            print('filter disabled')
-        response_filter = response_interp
-
-    ewf = _get_waveforms(response_filter, peak_times, ms_cut)
-    mean_wf = np.mean(ewf, axis=0)
-    if upsample is not None:
-        if verbose:
-            print('upsample')
-        assert upsample > 0
-        upsample = int(upsample)
-        mean_wf_up = _upsample_wf(mean_wf, upsample)
-        fs_up = upsample * fs
-    else:
-        mean_wf_up = mean_wf
-        fs_up = fs
-
-    return mean_wf_up
-
-
-def define_fitness_calculator(protocols, feature_file, feature_set, channels=None, probe=None):
-    """Define fitness calculator"""
-    
     assert feature_set in ['multiple', 'soma', 'extra']
     if feature_set == 'extra':
         assert probe is not None, "Provide a MEAutility probe to use the 'extra' set"
 
     feature_definitions = get_feature_definitions(feature_set, feature_file)
-    
+
     objectives = []
     efeatures = {}
     for protocol_name, locations in feature_definitions.items():
-        
+
         efeatures[protocol_name] = []
-        
+
         for location, features in locations.items():
-            
+
             for efel_feature_name, meanstd in features.items():
-                
+
                 feature_name = '%s.%s.%s' % (protocol_name, location, efel_feature_name)
-                
+
                 stimulus = protocols[protocol_name].stimuli[0]
 
                 kwargs = {'stim_start': stimulus.step_delay}
@@ -462,11 +335,11 @@ def define_fitness_calculator(protocols, feature_file, feature_set, channels=Non
                     kwargs['upsample'] = 10
                     kwargs['somatic_recording_name'] = f'{protocol_name}.soma.v'
                     kwargs['channel_locations'] = probe.positions
-                    
+
                     if channels == 'map':
                         kwargs['channel_id'] = None
                         kwargs['extrafel_feature_name'] = efel_feature_name
-                        
+
                     else:
                         channel_id = int(efel_feature_name.split('_')[-1])
                         kwargs['extrafel_feature_name'] = '_'.join(efel_feature_name.split('_')[:-1])
@@ -486,9 +359,9 @@ def define_fitness_calculator(protocols, feature_file, feature_set, channels=Non
                     exp_std=meanstd[1],
                     **kwargs
                 )
-                
+
                 efeatures[protocol_name].append(feature)
-                
+
                 objectives.append(
                     ephys.objectives.SingletonObjective(
                         feature_name,
@@ -499,17 +372,52 @@ def define_fitness_calculator(protocols, feature_file, feature_set, channels=Non
     return ephys.objectivescalculators.ObjectivesCalculator(objectives), efeatures
 
 
-def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path='config',
-                         channels=None, map_function=None, probe_type='linear', seed=1, morph_modifier=""):
-    
-    config_path = Path(config_path)
+def prepare_optimization(feature_set, sample_id, offspring_size=10, channels='map', map_function=None,
+                         optimizer="CMA", seed=1, morph_modifier=""):
+    """
+    Prepares objects for optimization of test models with CMA or IBEA.
+    Features are assumed to be pkl files in 'config_dir'/random_'sample_id'/'feature_set'.pkl
+
+    Parameters
+    ----------
+    feature_set: str
+        "soma", "multiple", "extra", or "all"
+    sample_id: int
+        The test sample ID
+    offspring_size: int
+        Offspring size
+    channels: list, "map", or None
+        If None, features are computed separately for each channel
+        If list, features are computed separately for the provided channels
+        If 'map' (default), each feature is an array with the features computed on all channels
+    map_function: mapper
+        Map function to be used by the optimizer
+    seed: int
+        The random seed
+    morph_modifier: str
+        The modifier to apply to the axon:
+            - "hillock": the axon is replaced with an axon hillock, an AIS, and a myelinated linear axon.
+               The hillock morphology uses the original axon reconstruction. The 'axon',
+              'ais', 'hillock', and 'myelin' sections are added.
+            - "taper": the axon is replaced with a tapered hillock
+            - "": the axon is replaced by a 2-segment axon stub
+
+    Returns
+    -------
+    opt_dict: dict
+        A dictionary with the optimization objects
+            - 'optimisation': opt
+            - 'evaluator': evaluator
+            - 'objectives_calculator': fitness_calculator
+            - 'protocols': fitness_protocols
+    """
+    config_path = Path(config_dir)
     feature_file = config_path / 'features' / f'random_{sample_id}' / f'{feature_set}.pkl'
-    
+
     probe = None
     electrode = None
-    
+
     if feature_set == "extra" and channels == 'map':
-        assert probe_type in ['linear', 'planar']
         probe_file = config_path / 'features' / f'random_{sample_id}' / 'probe.json'
         probe, electrode = model.define_electrode(probe_file=probe_file)
 
@@ -518,14 +426,14 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 
     fitness_protocols = define_protocols(feature_set, feature_file, electrode=electrode)
-    
+
     sim = ephys.simulators.LFPySimulator(LFPyCellModel=cell, cvode_active=True, electrode=electrode)
 
     fitness_calculator, _ = define_fitness_calculator(
         protocols=fitness_protocols,
         feature_file=feature_file,
         feature_set=feature_set,
-        probe=probe, 
+        probe=probe,
         channels=channels
     )
 
@@ -536,31 +444,65 @@ def prepare_optimization(feature_set, sample_id, offspring_size=10, config_path=
                                                sim=sim,
                                                timeout=900)
 
-    opt = bpopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
+    if optimizer == "CMA":
+        opt = bpopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
             evaluator=evaluator,
-            offspring_size=20,
+            offspring_size=offspring_size,
             seed=seed,
             map_function=map_function,
             weight_hv=0.4,
             selector_name="multi_objective"
-    )
+        )
+    elif optimizer == "IBEA":
+        opt = bpopt.optimisations.DEAPOptimisation(evaluator=evaluator,
+                                                   offspring_size=offspring_size,
+                                                   seed=seed,
+                                                   map_function=map_function)
 
     return {'optimisation': opt, 'evaluator': evaluator, 'objectives_calculator': fitness_calculator,
             'protocols': fitness_protocols}
 
 
-def run_optimization(feature_set, sample_id, opt, channels, max_ngen, seed=1, prob_type=None):
-    
+def run_optimization(feature_set, sample_id, opt, channels, max_ngen):
+    """
+    Runs the optimization after preparing optimization objects.
+    Checkpoints are saved in optimizaiton_results/checkpoints/random_'sample_id'/
+                             'feature_set'_off'offspring_size'_ngen'max_ngen'_'nchannels'chan.pkl'
+
+    Parameters
+    ----------
+    feature_set: str
+        "soma", "multiple", "extra", or "all"
+    sample_id: int
+        The test sample ID
+    opt: BPO optimizer
+        The optimizer to be used
+    channels: list, "map", or None
+        If None, features are computed separately for each channel
+        If list, features are computed separately for the provided channels
+        If 'map' (default), each feature is an array with the features computed on all channels
+    max_ngen: int
+        Maximum number of generations
+
+    Returns
+    -------
+    opt_results: dict
+        Dictionary with optimization results:
+            - 'final_pop': final_pop
+            - 'halloffame': halloffame
+            - 'log': log
+            - 'hist': hist
+    """
     if channels is None:
         nchannels = 'all'
     elif channels is 'map':
-        nchannels = f'map-{prob_type}'
+        nchannels = f'map'
     else:
         nchannels = len(channels)
-    
-    cp_filename = Path('checkpoints') / f'random_{sample_id}' / f'{feature_set}_off{opt.offspring_size}_' \
-                                                                f'ngen{max_ngen}_{nchannels}chan_{seed}seed.pkl'
-    
+
+    cp_filename = Path('optimization_results') / 'checkpoints' / f'random_{sample_id}' / \
+                  f'{feature_set}_off{opt.offspring_size}_ngen{max_ngen}_{nchannels}chan.pkl'
+
     if not cp_filename.parent.is_dir():
         os.makedirs(cp_filename.parent)
 
@@ -570,7 +512,7 @@ def run_optimization(feature_set, sample_id, opt, channels, max_ngen, seed=1, pr
     else:
         logger.info(f"Saving checkpoint in: {cp_filename}")
         continue_cp = False
-    
+
     final_pop, halloffame, log, hist = opt.run(max_ngen=max_ngen, cp_filename=cp_filename, continue_cp=continue_cp)
-    
+
     return {'final_pop': final_pop, 'halloffame': halloffame, 'log': log, 'hist': hist}
