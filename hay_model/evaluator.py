@@ -48,6 +48,7 @@ def get_feature_definitions(feature_set=None, feature_file=None):
     fetaures_dict: dict
         Dictionary with features definitions
     """
+
     if feature_file is not None:
         assert feature_set is not None
         return pickle.load(open(feature_file, 'rb'))
@@ -190,9 +191,11 @@ def define_protocols(feature_set=None, feature_file=None, electrode=None,
     """
     protocol_definitions = get_protocol_definitions()
     feature_definitions = get_feature_definitions(feature_set, feature_file)
+
     protocols = {}
 
     for protocol_name in feature_definitions:
+
         if protocols_with_lfp is not None:
             if protocol_name in protocols_with_lfp:
                 recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], electrode)
@@ -278,7 +281,7 @@ def define_fitness_calculator(protocols, feature_file, feature_set, channels="ma
     protocols: dict
         Dictionary with defined protocols
     feature_file: str
-        Path to json file specifying list of features for each fetaure set
+        Path to json file specifying list of features for each feature set
     feature_set: str
         "soma", "multiple", "extra", or "all"
     channels: list, "map", or None
@@ -300,6 +303,7 @@ def define_fitness_calculator(protocols, feature_file, feature_set, channels="ma
 
     objectives = []
     efeatures = {}
+
     for protocol_name, locations in feature_definitions.items():
 
         efeatures[protocol_name] = []
