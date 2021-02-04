@@ -2,6 +2,7 @@
 :Reference : :		Avery and Johnston 1996, tau from Randall 1997
 :Comment: shifted by -10 mv to correct for junction potential
 :Comment: corrected rates using q10 = 2.3, target temperature 34, orginal 21
+: LJP: OK
 
 NEURON	{
 	SUFFIX Ca_LVAst

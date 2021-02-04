@@ -2,6 +2,7 @@
 :Reference : :		Voltage-gated K+ channels in layer 5 neocortical pyramidal neurones from young rats:subtypes and gradients,Korngreen and Sakmann, J. Physiology, 2000
 :Comment : shifted -10 mv to correct for junction potential
 :Comment: corrected rates using q10 = 2.3, target temperature 34, orginal 21
+: LJP: OK
 
 NEURON	{
 	SUFFIX K_Tst

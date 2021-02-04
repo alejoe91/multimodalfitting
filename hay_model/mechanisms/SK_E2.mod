@@ -1,11 +1,12 @@
 : SK-type calcium-activated potassium current
 : Reference : Kohler et al. 1996
+: LJP: OK, correction not necessary, no voltage values
 
 NEURON {
        SUFFIX SK_E2
        USEION k READ ek WRITE ik
        USEION ca READ cai
-       RANGE gSK_E2bar, gSK_E2, ik
+       RANGE gSK_E2bar, gSK_E2, ik, zTau
 }
 
 UNITS {

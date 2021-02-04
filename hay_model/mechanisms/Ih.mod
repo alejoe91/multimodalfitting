@@ -1,10 +1,11 @@
 :Comment :
 :Reference : :		Kole,Hallermann,and Stuart, J. Neurosci. 2006
+: LJP: OK, "Somatic whole- cell voltage was corrected for the  14 mV difference" 
 
 NEURON	{
 	SUFFIX Ih
 	NONSPECIFIC_CURRENT ihcn
-	RANGE gIhbar, gIh, ihcn 
+	RANGE gIhbar, gIh, ihcn
 }
 
 UNITS	{
@@ -14,7 +15,7 @@ UNITS	{
 }
 
 PARAMETER	{
-	gIhbar = 0.00001 (S/cm2) 
+	gIhbar = 0.00001 (S/cm2)
 	ehcn =  -45.0 (mV)
 }
 
@@ -28,7 +29,7 @@ ASSIGNED	{
 	mBeta
 }
 
-STATE	{ 
+STATE	{
 	m
 }
 
