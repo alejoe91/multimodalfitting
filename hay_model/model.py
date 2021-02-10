@@ -5,7 +5,7 @@ import bluepyopt.ephys as ephys
 import LFPy
 import numpy as np
 
-from morphology_modifiers import replace_axon_with_taper, replace_axon_with_hillock
+from morphology_modifiers import replace_axon_with_hillock
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -18,16 +18,25 @@ def define_mechanisms():
 
     mechanisms = []
     for sectionlist, channels in mech_definitions.items():
-        seclist_loc = ephys.locations.NrnSeclistLocation(
+        
+        seclist_loc = [ephys.locations.NrnSeclistLocation(
             sectionlist, seclist_name=sectionlist
-        )
+        )]
+        
+        if sectionlist == "somatic":
+            seclist_loc.append(ephys.locations.NrnSeclistLocation(
+                "hillockal", seclist_name="hillockal"
+            ))
+            
         for channel in channels:
+            
+            
             mechanisms.append(
                 ephys.mechanisms.NrnMODMechanism(
                     name="%s.%s" % (channel, sectionlist),
                     mod_path=None,
                     suffix=channel,
-                    locations=[seclist_loc],
+                    locations=seclist_loc,
                     preloaded=True,
                 )
             )
@@ -141,6 +150,7 @@ def define_parameters(release=False):
     parameters = []
 
     for param_config in param_configs:
+        
         if "value" in param_config:
             frozen = True
             value = param_config["value"]
@@ -169,19 +179,27 @@ def define_parameters(release=False):
 
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
-            elif param_config["dist_type"] == "exp":
+            elif param_config["dist_type"] in ["exp", "step_funct"]:
+                
+                if "soma_ref_point" in param_config:
+                    ref_point = param_config["soma_ref_point"]
+                else:
+                    ref_point =  0.5
+                    
                 scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
-                    distribution=param_config["dist"]
-                )
-            elif param_config["dist_type"] == "step_funct":
-                scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
-                    distribution=param_config["dist"]
+                    distribution=param_config["dist"],
+                    soma_ref_location=ref_point
                 )
 
-            seclist_loc = ephys.locations.NrnSeclistLocation(
+            seclist_loc = [ephys.locations.NrnSeclistLocation(
                 param_config["sectionlist"], seclist_name=param_config["sectionlist"]
-            )
-
+            )]
+            
+            if param_config["sectionlist"] == 'somatic':
+                seclist_loc.append(ephys.locations.NrnSeclistLocation(
+                    "hillockal", seclist_name="hillockal"
+                ))
+                
             name = "%s.%s" % (param_config["param_name"], param_config["sectionlist"])
 
             if param_config["type"] == "section":
@@ -193,7 +211,7 @@ def define_parameters(release=False):
                         value=value,
                         frozen=frozen,
                         bounds=bounds,
-                        locations=[seclist_loc],
+                        locations=seclist_loc,
                     )
                 )
             elif param_config["type"] == "range":
@@ -205,7 +223,7 @@ def define_parameters(release=False):
                         value=value,
                         frozen=frozen,
                         bounds=bounds,
-                        locations=[seclist_loc],
+                        locations=seclist_loc,
                     )
                 )
         else:
@@ -269,12 +287,6 @@ def create(morph_modifier="", release=False):
                          'myelinated', 'axon_initial_segment', 'hillockal']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'myelin',
                           'ais', 'hillock']
-        do_replace_axon = False
-
-    elif morph_modifier == 'taper':
-        morph_modifiers = [replace_axon_with_taper]
-        seclist_names = None
-        secarray_names = None
         do_replace_axon = False
 
     elif morph_modifier == "":

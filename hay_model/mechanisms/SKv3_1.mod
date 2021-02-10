@@ -1,10 +1,12 @@
 :Comment :
-:Reference : :		Characterization of a Shaw-related potassium channel family in rat brain, The EMBO Journal, vol.11, no.7,2473-2486 (1992)
+:Reference : :	Rettig et.al (1992) EMBO J 11, no. 7: 2473-86.
+:								Methods: Grupe et al. (1990) EMBO J 9, 1749-1756.
+: LJP: OK, no LJP, "Patch pipetes were filed with the normal bathing solution in al experiments.""
 
 NEURON	{
 	SUFFIX SKv3_1
 	USEION k READ ek WRITE ik
-	RANGE gSKv3_1bar, gSKv3_1, ik 
+	RANGE gSKv3_1bar, gSKv3_1, ik
 }
 
 UNITS	{
@@ -14,7 +16,7 @@ UNITS	{
 }
 
 PARAMETER	{
-	gSKv3_1bar = 0.00001 (S/cm2) 
+	gSKv3_1bar = 0.00001 (S/cm2)
 }
 
 ASSIGNED	{
@@ -26,7 +28,7 @@ ASSIGNED	{
 	mTau
 }
 
-STATE	{ 
+STATE	{
 	m
 }
 

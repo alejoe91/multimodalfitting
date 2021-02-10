@@ -102,6 +102,35 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
                         variable=recording_definition["var"],
                     )
                 )
+    
+    ############## HACK ##############
+    #for d in [15]:
+    #    location = ephys.locations.NrnSomaDistanceCompLocation(
+    #        name=f"hillock_{d}",
+    #        soma_distance=d,
+    #        seclist_name="hillockal",
+    #    )
+    #    recordings.append(
+    #        ephys.recordings.CompRecording(
+    #            name="%s.%s.%s" % (protocol_name, location.name, "v"),
+    #            location=location,
+    #            variable="v",
+    #        )
+    #    )
+    #
+    #for d in [35, 45, 55]:
+    #    location = ephys.locations.NrnSomaDistanceCompLocation(
+    #        name=f"ais_{d}",
+    #        soma_distance=d,
+    #        seclist_name="axon_initial_segment",
+    #    )
+    #    recordings.append(
+    #        ephys.recordings.CompRecording(
+    #            name="%s.%s.%s" % (protocol_name, location.name, "v"),
+    #            location=location,
+    #            variable="v",
+    #        )
+    #    )
 
     if electrode is not None:
         recordings.append(ephys.recordings.LFPRecording("%s.MEA.LFP" % protocol_name))
@@ -499,7 +528,7 @@ def run_optimization(feature_set, sample_id, opt, channels, max_ngen):
     """
     if channels is None:
         nchannels = 'all'
-    elif channels is 'map':
+    elif channels == 'map':
         nchannels = f'map'
     else:
         nchannels = len(channels)
