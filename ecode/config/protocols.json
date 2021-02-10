@@ -1,0 +1,157 @@
+{
+    "bAP": {
+        "stimuli": [
+            {
+                "delay": 95,
+                "amp": 1.9,
+                "duration": 5,
+                "totduration": 400
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 400,
+                "type": "somadistance",
+                "name": "dend1",
+                "seclist_name": "apical"
+            },
+            {
+                "var": "v",
+                "somadistance": 620,
+                "type": "somadistance",
+                "name": "dend2",
+                "seclist_name": "apical"
+            }
+        ]
+    },
+    "BAC": {
+        "stimuli": [
+            {
+                "delay": 95,
+                "amp": 1.9,
+                "duration": 5,
+                "totduration": 400
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 400,
+                "type": "somadistance",
+                "name": "dend1",
+                "seclist_name": "apical"
+            },
+            {
+                "var": "v",
+                "somadistance": 620,
+                "type": "somadistance",
+                "name": "dend2",
+                "seclist_name": "apical"
+            }
+        ]
+    },
+    "EPSP": {
+        "stimuli": [
+            {
+                "delay": 95,
+                "amp": 1.9,
+                "duration": 5,
+                "totduration": 400
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 400,
+                "type": "somadistance",
+                "name": "dend1",
+                "seclist_name": "apical"
+            },
+            {
+                "var": "v",
+                "somadistance": 620,
+                "type": "somadistance",
+                "name": "dend2",
+                "seclist_name": "apical"
+            }
+        ]
+    },
+    "CaBurst": {
+        "stimuli": [
+            {
+                "delay": 95,
+                "amp": 1.9,
+                "duration": 5,
+                "totduration": 400
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 400,
+                "type": "somadistance",
+                "name": "dend1",
+                "seclist_name": "apical"
+            },
+            {
+                "var": "v",
+                "somadistance": 620,
+                "type": "somadistance",
+                "name": "dend2",
+                "seclist_name": "apical"
+            }
+        ]
+    },
+    "Step1": {
+        "stimuli": [
+            {
+                "delay": 700,
+                "amp": 0.793,
+                "duration": 2000,
+                "totduration": 3000
+            },
+            {
+                "delay": 0,
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
+            }
+        ]
+    },
+    "sAHP": {
+        "stimuli": [
+            {
+                "long_amplitude": 0.2,
+                "amplitude": 0.793,
+                "holding_amplitude": 0.0
+            }
+        ]
+    },
+    "HyperDepol": {
+        "stimuli": [
+            {
+                "hyperpol_amplitude": -0.2,
+                "depol_amplitude": 0.793,
+                "holding_amplitude": 0.0
+            }
+        ]
+    },
+    "PosCheops": {
+        "stimuli": [
+            {
+                "ramp1_amp": 1,
+                "ramp2_amp": 1,
+                "ramp3_amp": 1,
+                "holding_amplitude": 0.0
+            }
+        ]
+    },
+    "NoiseOU3": {
+        "stimuli": [
+            {
+                "filename": "NoiseOU3txt.txt"
+            }
+        ]
+    }
+}
