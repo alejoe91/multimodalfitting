@@ -15,7 +15,7 @@ def replace_axon_with_hillock(sim=None, icell=None):
 
     seg_length_to_get_diameters = 1  # the length of the segments to get the diameters
     final_seg_length = 5  # the final length of the segments during the simulation
-
+    print('yooooo')
     diams = []
     lens = []
     seg_distance = []
