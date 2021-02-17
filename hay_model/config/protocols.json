@@ -117,6 +117,24 @@
                 "duration": 3000,
                 "totduration": 3000
             }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "comp_x": 0,
+                "type": "nrnseclistcomp",
+                "name": "ais0",
+                "seclist_name": "axon_initial_segment",
+                "sec_index": 0
+            },
+            {
+                "var": "v",
+                "comp_x": 1,
+                "type": "nrnseclistcomp",
+                "name": "ais1",
+                "seclist_name": "axon_initial_segment",
+                "sec_index": 0
+            }
         ]
     }
 }

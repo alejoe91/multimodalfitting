@@ -84,7 +84,6 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
     ]
 
     if "extra_recordings" in protocol_definition:
-
         for recording_definition in protocol_definition["extra_recordings"]:
 
             if recording_definition["type"] == "somadistance":
@@ -102,6 +101,23 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
                         variable=recording_definition["var"],
                     )
                 )
+            elif recording_definition['type'] == 'nrnseclistcomp':
+                location = ephys.locations.NrnSeclistCompLocation(
+                    name=recording_definition['name'],
+                    comp_x=recording_definition['comp_x'],
+                    sec_index=recording_definition['sec_index'],
+                    seclist_name=recording_definition['seclist_name'])
+
+                var = recording_definition["var"]
+                recordings.append(
+                    ephys.recordings.CompRecording(
+                        name="%s.%s.%s" % (protocol_name, location.name, var),
+                        location=location,
+                        variable=recording_definition["var"],
+                    )
+                )
+            else:
+                raise Exception("Type not supported")
     
     ############## HACK ##############
     #for d in [15]:

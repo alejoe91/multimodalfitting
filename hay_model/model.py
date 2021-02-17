@@ -235,7 +235,7 @@ def define_parameters(release=False):
     return parameters
 
 
-def define_morphology(morph_modifiers, do_replace_axon):
+def define_morphology(morph_modifiers, do_replace_axon, **morph_modifiers_kwargs):
     """
     Defines neuron morphology for the Hay model
 
@@ -244,6 +244,8 @@ def define_morphology(morph_modifiers, do_replace_axon):
     morph_modifiers: list of python functions
         The modifier functions to apply to the axon
     do_replace_axon: bool
+        If True axon is replaced with a stub
+    morph_modifiers_kwargs: keyword args for morph modifier
 
     Returns
     -------
@@ -254,11 +256,12 @@ def define_morphology(morph_modifiers, do_replace_axon):
     return ephys.morphologies.NrnFileMorphology(
         os.path.join("morphology/cell1.asc"),
         morph_modifiers=morph_modifiers,
-        do_replace_axon=do_replace_axon
+        do_replace_axon=do_replace_axon,
+        **morph_modifiers_kwargs
     )
 
 
-def create(morph_modifier="", release=False):
+def create(morph_modifier="", release=False, **morph_modifier_kwargs):
     """
     Create Hay cell model
 
@@ -301,7 +304,7 @@ def create(morph_modifier="", release=False):
     cell = ephys.models.LFPyCellModel(
         'hay',
         v_init=-65.,
-        morph=define_morphology(morph_modifiers, do_replace_axon),
+        morph=define_morphology(morph_modifiers, do_replace_axon, **morph_modifier_kwargs),
         mechs=define_mechanisms(),
         params=define_parameters(release),
         seclist_names=seclist_names,

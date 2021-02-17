@@ -276,6 +276,13 @@
         "value": 0.0000325
     },
     {
+        "param_name": "g_pas",
+        "sectionlist": "axon_initial_segment",
+        "type": "section",
+        "dist_type": "uniform",
+        "value": 0.0000325
+    },
+    {
         "param_name": "gNa12bar_Na12Hu2009",
         "mech": "Na12Hu2009",
         "dist": "(1/(1+math.exp(({distance}-25)/3)))*{value}",

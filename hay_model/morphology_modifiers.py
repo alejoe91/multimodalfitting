@@ -3,15 +3,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def replace_axon_with_hillock(sim=None, icell=None):
+def replace_axon_with_hillock(sim=None, icell=None, l_hillock=10, l_AIS=35, l_myelin=1000):
     """Replace axon"""
 
     """
     Replace axon by an hillock, an AIS and a long myelinated axon.
     """
-    L_hillock = 10
-    L_AIS = 35  # define the desired length of AIS
-    L_total = L_hillock + L_AIS
+    l_total = l_hillock + l_AIS
 
     seg_length_to_get_diameters = 1  # the length of the segments to get the diameters
     final_seg_length = 5  # the final length of the segments during the simulation
@@ -19,6 +17,8 @@ def replace_axon_with_hillock(sim=None, icell=None):
     diams = []
     lens = []
     seg_distance = []
+    pos3d = []
+    diams3d = []
 
     dist_seg_from_soma = 0
     for section in icell.axonal:
@@ -32,9 +32,9 @@ def replace_axon_with_hillock(sim=None, icell=None):
             lens.append(L / nseg)
             seg_distance.append(dist_seg_from_soma)
             dist_seg_from_soma = dist_seg_from_soma + real_seg_length
-            if dist_seg_from_soma >= L_total:
+            if dist_seg_from_soma >= l_total:
                 break
-        if dist_seg_from_soma >= L_total:
+        if dist_seg_from_soma >= l_total:
             break
 
     for section in icell.axonal:
@@ -53,27 +53,27 @@ def replace_axon_with_hillock(sim=None, icell=None):
     n_seg_hillock = 0
     n_seg_AIS = 0
     for dist_segment in seg_distance:
-        if dist_segment <= L_hillock:
+        if dist_segment <= l_hillock:
             n_seg_hillock = n_seg_hillock + 1
         else:
             n_seg_AIS = n_seg_AIS + 1
 
     count = 0
 
-    icell.hillock.L = L_hillock
+    icell.hillock.L = l_hillock
     icell.hillock.nseg = n_seg_hillock
     for seg in icell.hillock:
         seg.diam = diams[count]
         count = count + 1
 
-    icell.ais.L = L_AIS
+    icell.ais.L = l_AIS
     icell.ais.nseg = n_seg_AIS
     for seg in icell.ais:
         seg.diam = diams[count]
         count = count + 1
 
-    icell.hillock.nseg = 1 + int(L_hillock / final_seg_length)
-    icell.ais.nseg = 1 + int(L_AIS / final_seg_length)
+    icell.hillock.nseg = 1 + int(l_hillock / final_seg_length)
+    icell.ais.nseg = 1 + int(l_AIS / final_seg_length)
 
     # childsec.connect(parentsec, parentx, childx)
     icell.hillock.connect(icell.soma[0], 1.0, 0.0)
@@ -83,7 +83,7 @@ def replace_axon_with_hillock(sim=None, icell=None):
     icell.myelinated.append(sec=icell.myelin[0])
     icell.all.append(sec=icell.myelin[0])
     icell.myelin[0].nseg = 5
-    icell.myelin[0].L = 1000
+    icell.myelin[0].L = l_myelin
     icell.myelin[0].diam = diams[count - 1]
     icell.myelin[0].connect(icell.ais, 1.0, 0.0)
 
@@ -96,5 +96,5 @@ def replace_axon_with_hillock(sim=None, icell=None):
 
     logger.debug(
         "Replace axon with hillock of length %f and AIS of length %f, diameters are %s for the hillock and %s for the AIS"
-        % (L_hillock, L_AIS, diams_hillock, diams_AIS)
+        % (l_hillock, l_AIS, diams_hillock, diams_AIS)
     )

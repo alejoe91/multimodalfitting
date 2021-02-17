@@ -2,6 +2,7 @@ from bluepyopt.ephys.stimuli import Stimulus
 import LFPy
 import numpy as np
 
+
 class sAHP(Stimulus):
 
     """sAHP current clamp injection"""

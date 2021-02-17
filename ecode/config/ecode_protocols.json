@@ -1,0 +1,117 @@
+{
+    "8_IDthres": {
+        "stimuli": [
+            {
+                "delay": 700,
+                "amp": 0.793,
+                "duration": 2000,
+                "totduration": 3000
+            },
+            {
+                "delay": 0,
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
+            }
+        ]
+    },
+    "9_firingpattern": {
+        "stimuli": [
+            {
+                "delay": 700,
+                "amp": 0.793,
+                "duration": 2000,
+                "totduration": 3000
+            },
+            {
+                "delay": 0,
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
+            }
+        ]
+    },
+    "10_IV": {
+        "stimuli": [
+            {
+                "delay": 700,
+                "amp": 0.793,
+                "duration": 2000,
+                "totduration": 3000
+            },
+            {
+                "delay": 0,
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
+            }
+        ]
+    },
+    "11_IDRest": {
+        "stimuli": [
+            {
+                "delay": 700,
+                "amp": 0.793,
+                "duration": 2000,
+                "totduration": 3000
+            },
+            {
+                "delay": 0,
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
+            }
+        ]
+    },
+    "12_APWaveform": {
+        "stimuli": [
+            {
+                "delay": 700,
+                "amp": 0.793,
+                "duration": 2000,
+                "totduration": 3000
+            },
+            {
+                "delay": 0,
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
+            }
+        ]
+    },
+    "13_sAHP": {
+        "stimuli": [
+            {
+                "long_amplitude": 0.2,
+                "amplitude": 0.793,
+                "holding_amplitude": 0.0
+            }
+        ]
+    },
+    "14_HyperDepol": {
+        "stimuli": [
+            {
+                "hyperpol_amplitude": -0.2,
+                "depol_amplitude": 0.793,
+                "holding_amplitude": 0.0
+            }
+        ]
+    },
+    "15_PosCheops": {
+        "stimuli": [
+            {
+                "ramp1_amp": 1,
+                "ramp2_amp": 1,
+                "ramp3_amp": 1,
+                "holding_amplitude": 0.0
+            }
+        ]
+    },
+   "16_NoiseOU3": {
+        "stimuli": [
+            {
+                "filename": "NoiseOU3txt.txt"
+            }
+        ]
+    }
+}
