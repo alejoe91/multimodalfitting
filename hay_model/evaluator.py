@@ -59,7 +59,7 @@ def get_feature_definitions(feature_set=None, feature_file=None):
             return json.load(open(os.path.join(config_dir, 'features_list.json')))["multiple"]
 
 
-def define_recordings(protocol_name, protocol_definition, electrode=None):
+def define_recordings(protocol_name, protocol_definition, cell, electrode=None):
     """
     Defines recordings for the specified protocol
 
@@ -85,39 +85,41 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
 
     if "extra_recordings" in protocol_definition:
         for recording_definition in protocol_definition["extra_recordings"]:
-
-            if recording_definition["type"] == "somadistance":
-                location = ephys.locations.NrnSomaDistanceCompLocation(
-                    name=recording_definition["name"],
-                    soma_distance=recording_definition["somadistance"],
-                    seclist_name=recording_definition["seclist_name"],
-                )
-
-                var = recording_definition["var"]
-                recordings.append(
-                    ephys.recordings.CompRecording(
-                        name="%s.%s.%s" % (protocol_name, location.name, var),
-                        location=location,
-                        variable=recording_definition["var"],
+            print(recording_definition["seclist_name"], cell.seclist_names)
+            if recording_definition["seclist_name"] in cell.seclist_names:
+                print("IN")
+                if recording_definition["type"] == "somadistance":
+                    location = ephys.locations.NrnSomaDistanceCompLocation(
+                        name=recording_definition["name"],
+                        soma_distance=recording_definition["somadistance"],
+                        seclist_name=recording_definition["seclist_name"],
                     )
-                )
-            elif recording_definition['type'] == 'nrnseclistcomp':
-                location = ephys.locations.NrnSeclistCompLocation(
-                    name=recording_definition['name'],
-                    comp_x=recording_definition['comp_x'],
-                    sec_index=recording_definition['sec_index'],
-                    seclist_name=recording_definition['seclist_name'])
 
-                var = recording_definition["var"]
-                recordings.append(
-                    ephys.recordings.CompRecording(
-                        name="%s.%s.%s" % (protocol_name, location.name, var),
-                        location=location,
-                        variable=recording_definition["var"],
+                    var = recording_definition["var"]
+                    recordings.append(
+                        ephys.recordings.CompRecording(
+                            name="%s.%s.%s" % (protocol_name, location.name, var),
+                            location=location,
+                            variable=recording_definition["var"],
+                        )
                     )
-                )
-            else:
-                raise Exception("Type not supported")
+                elif recording_definition['type'] == 'nrnseclistcomp':
+                    location = ephys.locations.NrnSeclistCompLocation(
+                        name=recording_definition['name'],
+                        comp_x=recording_definition['comp_x'],
+                        sec_index=recording_definition['sec_index'],
+                        seclist_name=recording_definition['seclist_name'])
+
+                    var = recording_definition["var"]
+                    recordings.append(
+                        ephys.recordings.CompRecording(
+                            name="%s.%s.%s" % (protocol_name, location.name, var),
+                            location=location,
+                            variable=recording_definition["var"],
+                        )
+                    )
+                else:
+                    raise Exception("Type not supported")
     
     ############## HACK ##############
     #for d in [15]:
@@ -213,7 +215,7 @@ def define_stimuli(protocol_name, protocol_definition):
     return stimuli
 
 
-def define_protocols(feature_set=None, feature_file=None, electrode=None,
+def define_protocols(cell, feature_set=None, feature_file=None, electrode=None,
                      protocols_with_lfp=None):
     """
     Defines protocols for a specified feature_Set (or file)
@@ -243,11 +245,11 @@ def define_protocols(feature_set=None, feature_file=None, electrode=None,
 
         if protocols_with_lfp is not None:
             if protocol_name in protocols_with_lfp:
-                recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], electrode)
+                recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], cell, electrode)
             else:
-                recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], None)
+                recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], cell, None)
         else:
-            recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], electrode)
+            recordings = define_recordings(protocol_name, protocol_definitions[protocol_name], cell, electrode)
         stimuli = define_stimuli(protocol_name, protocol_definitions[protocol_name])
 
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
