@@ -27,11 +27,6 @@ def define_mechanisms(model):
             sectionlist, seclist_name=sectionlist
         )]
 
-        if sectionlist == "somatic":
-            seclist_loc.append(ephys.locations.NrnSeclistLocation(
-                "hillockal", seclist_name="hillockal"
-            ))
-
         for channel in channels:
             mechanisms.append(
                 ephys.mechanisms.NrnMODMechanism(
@@ -203,11 +198,6 @@ def define_parameters(model, release=False):
                 seclist_name=param_config["sectionlist"]
             )]
 
-            if param_config["sectionlist"] == 'somatic':
-                seclist_loc.append(ephys.locations.NrnSeclistLocation(
-                    "hillockal", seclist_name="hillockal"
-                ))
-
             name = f"{param_config['param_name']}.{param_config['sectionlist']}"
 
             if param_config["type"] == "section":
@@ -264,7 +254,7 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     path_morpho = pathlib.Path(f"{model}_model") / "morphology.asc"
 
     return ephys.morphologies.NrnFileMorphology(
-        path_morpho,
+        str(path_morpho),
         morph_modifiers=morph_modifiers,
         do_replace_axon=do_replace_axon
     )

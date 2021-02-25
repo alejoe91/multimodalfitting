@@ -96,19 +96,19 @@ def replace_axon_with_hillock(sim=None, icell=None):
             if i==0:
                 dist_from_soma=dist_from_soma
             else:
-                dist_from_soma = dist_from_soma + sim.neuron.h.arc3d(i, sec=section) - sim.neuron.h.arc3d(i-1, sec=section)# this line increase the distance from the soma at each new 3d info point 
+                dist_from_soma = dist_from_soma + sim.neuron.h.arc3d(i, sec=section) - sim.neuron.h.arc3d(i-1, sec=section) # this line increase the distance from the soma at each new 3d info point 
             
             if dist_from_soma<=L_hillock:
-                x3d_hillock.append(sim.neuron.h.x3d(i, sec=section)
-                y3d_hillock.append(sim.neuron.h.y3d(i, sec=section)
-                z3d_hillock.append(sim.neuron.h.z3d(i, sec=section)
-                diam3d_hillock.append(sim.neuron.h.diam3d(i, sec=section)  
-                                      
+                x3d_hillock.append(sim.neuron.h.x3d(i, sec=section))
+                y3d_hillock.append(sim.neuron.h.y3d(i, sec=section))
+                z3d_hillock.append(sim.neuron.h.z3d(i, sec=section))
+                diam3d_hillock.append(sim.neuron.h.diam3d(i, sec=section))
+                                     
             elif dist_from_soma>L_hillock and dist_from_soma<=L_total:
-                x3d_ais.append(sim.neuron.h.x3d(i, sec=section)
-                y3d_ais.append(sim.neuron.h.y3d(i, sec=section)
-                z3d_ais.append(sim.neuron.h.z3d(i, sec=section)
-                diam3d_ais.append(sim.neuron.h.diam3d(i, sec=section)
+                x3d_ais.append(sim.neuron.h.x3d(i, sec=section))
+                y3d_ais.append(sim.neuron.h.y3d(i, sec=section))
+                z3d_ais.append(sim.neuron.h.z3d(i, sec=section))
+                diam3d_ais.append(sim.neuron.h.diam3d(i, sec=section))
                                   
             else:
                 break

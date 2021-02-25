@@ -25,12 +25,6 @@ sleep 20
 srun --output="${LOGS}/engine.out" /gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/ipengine --profile=${IPYTHON_PROFILE} &
 sleep 20
 
-touch ${LOGS}/params.dat
-echo ${OPT_MODEL} >> ${LOGS}/params.dat
-echo ${OPT_FEATURE_SET} >> ${LOGS}/params.dat
-echo ${OPT_SEED} >> ${LOGS}/params.dat
-echo ${OPT_SAMPLE_ID} >> ${LOGS}/params.dat
-
 /gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/python3 2-run-optimizations.py --ipyparallel                    \
                                                                            --seed=${OPT_SEED}               \
                                                                            --feature_set=${OPT_FEATURE_SET} \

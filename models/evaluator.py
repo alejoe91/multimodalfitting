@@ -52,7 +52,7 @@ def get_feature_definitions(feature_file, feature_set=None):
     fetaures_dict: dict
         Dictionary with features definitions
     """
-
+    
     if ".pkl" in feature_file:
         feature_definitions = pickle.load(open(feature_file, 'rb'))
     elif ".json" in feature_file:
@@ -119,7 +119,7 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
     return recordings
 
 
-def define_stimuli(protocol_name, protocol_definition):
+def define_stimuli_hay(protocol_name, protocol_definition):
     """
     Defines stimuli associated with a specified protocol
 
@@ -178,6 +178,10 @@ def define_stimuli(protocol_name, protocol_definition):
     return stimuli
 
 
+def define_stimuli_hallerman(protocol_name, protocol_definition):
+    return []
+    
+    
 def define_protocols(
     model,
     feature_set=None,
@@ -209,7 +213,7 @@ def define_protocols(
     """
 
     protocol_definitions = get_protocol_definitions(model)
-    feature_definitions = get_feature_definitions(feature_set, feature_file)
+    feature_definitions = get_feature_definitions(feature_file, feature_set)
 
     protocols = {}
 
@@ -226,10 +230,16 @@ def define_protocols(
             recordings = define_recordings(
                 protocol_name, protocol_definitions[protocol_name], None
             )
-
-        stimuli = define_stimuli(protocol_name,
-                                 protocol_definitions[protocol_name])
-
+        
+        if model == 'hay':
+            stimuli = define_stimuli_hay(
+                protocol_name, protocol_definitions[protocol_name]
+            )
+        else:
+            stimuli = define_stimuli_hallerman(
+                protocol_name, protocol_definitions[protocol_name]
+            )
+            
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
         )

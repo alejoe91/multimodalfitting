@@ -49,11 +49,10 @@ def get_mapper(args):
         return None
 
 
-def get_cp_filename(sample_id, feature_set, opt):
-    cp_filename = pathlib.Path('optimization_results') / \
-                  'checkpoints' / \
-                  f'random_{sample_id}' / \
-                  f'{feature_set}_off{opt.offspring_size}.pkl'
+def get_cp_filename(model, sample_id, feature_set, seed):
+
+    cp_filename = pathlib.Path('optimization_results') / 'checkpoints' / \
+        f'model={model}_sampleid={sample_id}_featureset={feature_set}_seed={seed}'
 
     if not cp_filename.parent.is_dir():
         os.makedirs(cp_filename.parent)
@@ -87,7 +86,7 @@ def main():
         selector_name="multi_objective"
     )
 
-    cp_filename = get_cp_filename(args.sample_id, args.feature_set, opt)
+    cp_filename = get_cp_filename(args.model,, args.sample_id, args.feature_set, args.seed)
 
     if cp_filename.is_file():
         logger.info(f"Continuing from checkpoint: {cp_filename}")
