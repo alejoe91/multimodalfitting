@@ -1,9 +1,11 @@
 x86_64/
-hay_model/config/params/
-hay_model/config/features/
+models/config/params/
+models/config/features/
 .ipython/
-hay_model/checkpoints/
-hay_model/logs/
+models/checkpoints/
+models/logs/
+.ideas/
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
