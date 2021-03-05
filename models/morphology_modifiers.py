@@ -10382,18 +10382,52 @@ shape3d_47()
 shape3d_48()
 shape3d_49()
 
-soma[0] all.append()
-for i=0, 8 axon[i] all.append()
-for i=0, 36 dend[i] all.append()
-for i=0, 68 apic[i] all.append()
-for i=0, 9 node[i] all.append()
-for i=0, 9 my[i] all.append()
+objref all, axonal, somatic, collaterals, basal, nodal, myelinated, apical
 
-soma[0] somatic.append()
-axon[0] axonal.append()
-for i=0, 36 dend[i] basal.append()
-for i=0, 68 apic[i] apical.append()
-for i=1, 8 axon[i] collaterals.append()
-for i=0, 9 node[i] nodal.append()
-for i=0, 9 my[i] myelinated_new.append()
+all = new SectionList()
+axonal = new SectionList()
+somatic = new SectionList()
+collaterals = new SectionList()
+basal = new SectionList()
+apical = new SectionList()
+nodal = new SectionList()
+myelinated = new SectionList()
+
+access soma[0]
+all.append()
+somatic.append()
+
+access axon[0]
+all.append()
+axonal.append()
+
+for i=1,8{
+access axon[i]
+all.append()
+collaterals.append()
+}
+
+for i=0,36{
+access dend[i]
+all.append()
+basal.append()
+}
+
+for i=0,68{
+access apic[i]
+all.append()
+apical.append()
+}
+
+for i=0,9{
+access node[i]
+all.append()
+nodal.append()
+}
+
+for i=0,9{
+access my[i]
+all.append()
+myelinated.append()
+}
 """

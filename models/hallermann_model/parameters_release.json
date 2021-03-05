@@ -29,7 +29,7 @@
         "type": "section",
         "dist_type": "uniform",
         "value": 55
-    },    
+    },  
     {
         "param_name": "ek",
         "sectionlist": "all",
@@ -78,38 +78,38 @@
         "sectionlist": "basal"
     },
     {
-        "param_name": "gbar_Kca_Kca",
-        "mech": "Kca",
+        "param_name": "gbar_kca_kca",
+        "mech": "kca",
         "value": 0.15,
         "dist_type": "uniform",
-        "mech_param": "gbar_Kca",
+        "mech_param": "gbar_kca",
         "type": "range",
         "sectionlist": "basal"
     },
     {
-        "param_name": "taur_Cad_Cad",
-        "mech": "Cad",
+        "param_name": "taur_cad_cad",
+        "mech": "cad",
         "value": 80,
         "dist_type": "uniform",
-        "mech_param": "taur_Cad",
+        "mech_param": "taur_cad",
         "type": "range",
         "sectionlist": "basal"
     },
     {
-        "param_name": "gbar_CaH_CaH",
-        "mech": "CaH",
+        "param_name": "gbar_ca_ca",
+        "mech": "ca",
         "value": 0.3,
         "dist_type": "uniform",
-        "mech_param": "gbar_CaH",
+        "mech_param": "gbar_ca",
         "type": "range",
         "sectionlist": "basal"
     },
     {
-        "param_name": "gcabar_CaT_CaT",
-        "mech": "CaT",
+        "param_name": "gcabar_it2_it2",
+        "mech": "it2",
         "value": 0.3,
         "dist_type": "uniform",
-        "mech_param": "gcabar_CaT",
+        "mech_param": "gcabar_it2",
         "type": "range",
         "sectionlist": "basal"
     },
@@ -155,38 +155,38 @@
         "sectionlist": "apical"
     },
     {
-        "param_name": "gbar_Kca_Kca",
-        "mech": "Kca",
+        "param_name": "gbar_kca_kca",
+        "mech": "kca",
         "value": 0.15,
         "dist_type": "uniform",
-        "mech_param": "gbar_Kca",
+        "mech_param": "gbar_kca",
         "type": "range",
         "sectionlist": "apical"
     },
     {
-        "param_name": "taur_Cad_Cad",
-        "mech": "Cad",
+        "param_name": "taur_cad_cad",
+        "mech": "cad",
         "value": 80,
         "dist_type": "uniform",
-        "mech_param": "taur_Cad",
+        "mech_param": "taur_cad",
         "type": "range",
         "sectionlist": "apical"
     },
     {
-        "param_name": "gbar_CaH_CaH",
-        "mech": "CaH",
+        "param_name": "gbar_ca_ca",
+        "mech": "ca",
         "value": 0.3,
         "dist_type": "uniform",
-        "mech_param": "gbar_CaH",
+        "mech_param": "gbar_ca",
         "type": "range",
         "sectionlist": "apical"
     },
     {
-        "param_name": "gcabar_CaT_CaT",
-        "mech": "CaT",
+        "param_name": "gcabar_it2_it2",
+        "mech": "it2",
         "value": 0.9,
         "dist_type": "uniform",
-        "mech_param": "gcabar_CaT",
+        "mech_param": "gcabar_it2",
         "type": "range",
         "sectionlist": "apical"
     },
@@ -209,38 +209,38 @@
         "sectionlist": "somatic"
     },
     {
-        "param_name": "gbar_CaH_CaH",
-        "mech": "CaH",
+        "param_name": "gbar_ca_ca",
+        "mech": "ca",
         "value": 0.2,
         "dist_type": "uniform",
-        "mech_param": "gbar_CaH",
+        "mech_param": "gbar_ca",
         "type": "range",
         "sectionlist": "somatic"
     },
     {
-        "param_name": "gbar_Kca_Kca",
-        "mech": "Kca",
+        "param_name": "gbar_kca_kca",
+        "mech": "kca",
         "value": 0.1,
         "dist_type": "uniform",
-        "mech_param": "gbar_Kca",
+        "mech_param": "gbar_kca",
         "type": "range",
         "sectionlist": "somatic"
     },
     {
-        "param_name": "taur_Cad_Cad",
-        "mech": "Cad",
+        "param_name": "taur_cad_cad",
+        "mech": "cad",
         "value": 80,
         "dist_type": "uniform",
-        "mech_param": "taur_Cad",
+        "mech_param": "taur_cad",
         "type": "range",
         "sectionlist": "somatic"
     },
     {
-        "param_name": "gcabar_CaT_CaT",
-        "mech": "CaT",
+        "param_name": "gcabar_it2_it2",
+        "mech": "it2",
         "value": 0.2,
         "dist_type": "uniform",
-        "mech_param": "gcabar_CaT",
+        "mech_param": "gcabar_it2",
         "type": "range",
         "sectionlist": "somatic"
     },
@@ -368,38 +368,38 @@
         "comp_x": [1, 7]
     },
     {
-        "param_name": "taur_Cad_Cad",
-        "mech": "Cad",
+        "param_name": "taur_cad_cad",
+        "mech": "cad",
         "value": 80,
         "dist_type": "uniform",
-        "mech_param": "taur_Cad",
+        "mech_param": "taur_cad",
         "type": "range",
         "sectionlist": "axonal"
     },
     {
-        "param_name": "gbar_CaH_CaH",
-        "mech": "CaH",
+        "param_name": "gbar_ca_ca",
+        "mech": "ca",
         "value": 0,
         "dist_type": "uniform",
-        "mech_param": "gbar_CaH",
+        "mech_param": "gbar_ca",
         "type": "range",
         "sectionlist": "axonal"
     },
     {
-        "param_name": "gcabar_CaT_CaT",
-        "mech": "CaT",
+        "param_name": "gcabar_it2_it2",
+        "mech": "it2",
         "value": 0,
         "dist_type": "uniform",
-        "mech_param": "gcabar_CaT",
+        "mech_param": "gcabar_it2",
         "type": "range",
         "sectionlist": "axonal"
     },
     {
-        "param_name": "gbar_Kca_Kca",
-        "mech": "Kca",
+        "param_name": "gbar_kca_kca",
+        "mech": "kca",
         "value": 0.1,
         "dist_type": "uniform",
-        "mech_param": "gbar_Kca",
+        "mech_param": "gbar_kca",
         "type": "range",
         "sectionlist": "axonal"
     },
@@ -479,46 +479,46 @@
         "sectionlist": "nodal"
     },
     {
-        "param_name": "gbar_h",
-        "mech": "h",
+        "param_name": "gihbar_ih",
+        "mech": "ih",
         "value": 0.0002,
         "dist_type": "uniform",
-        "mech_param": "gbar_h",
+        "mech_param": "gihbar",
         "type": "range",
         "sectionlist": "somatic"
     },
     {
-        "param_name": "gbar_h",
-        "mech": "h",
+        "param_name": "gihbar_ih",
+        "mech": "ih",
         "value": 0.0005,
         "dist_type": "uniform",
-        "mech_param": "gbar_h",
+        "mech_param": "gihbar",
         "type": "range",
         "sectionlist": "collaterals"
     },
     {
-        "param_name": "gbar_CaH_CaH",
-        "mech": "CaH",
+        "param_name": "gbar_ca_ca",
+        "mech": "ca",
         "value": 0.3,
         "dist": "( (1. * (685 <= {distance} <= 885) ) + (0.01 * ({distance} < 685 or {distance} > 885)) ) * {value}",
         "dist_type": "step_funct",
-        "mech_param": "gbar_CaH",
+        "mech_param": "gbar_ca",
         "type": "range",
         "sectionlist": "apical"
     },
     {
-        "param_name": "gcabar_CaT_CaT",
-        "mech": "CaT",
+        "param_name": "gcabar_it2_it2",
+        "mech": "it2",
         "value": 0.9,
         "dist": "( (1. * (685 <= {distance} <= 885) ) + (0.01 * ({distance} < 685 or {distance} > 885)) ) * {value}",
         "dist_type": "step_funct",
-        "mech_param": "gcabar_CaT",
+        "mech_param": "gcabar_it2",
         "type": "range",
         "sectionlist": "apical"
     },
     {
-        "param_name": "gIhbar_h",
-        "mech": "h",
+        "param_name": "gIhbar_ih",
+        "mech": "ih",
         "dist": "(-0.8696 + 2.087*math.exp({distance} * 0.0031))*{value}",
         "dist_type": "exp",
         "mech_param": "gIhbar",
@@ -527,8 +527,8 @@
         "sectionlist": "basal"
     },
     {
-        "param_name": "gIhbar_h",
-        "mech": "h",
+        "param_name": "gIhbar_ih",
+        "mech": "ih",
         "dist": "(-0.8696 + 2.087*math.exp({distance} * 0.0031))*{value}",
         "dist_type": "exp",
         "mech_param": "gIhbar",
