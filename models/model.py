@@ -7,7 +7,7 @@ import LFPy
 
 import numpy as np
 
-from morphology_modifiers import replace_axon_with_hillock
+from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -131,7 +131,7 @@ def define_parameters(model, release=False):
     Parameters
     ----------
     model: str
-            "hay" or "hallerman"
+            "hay" or "hallermann"
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the unfrozen parameters with bounds are
         returned (use False - default - for optimizations)
@@ -233,14 +233,14 @@ def define_parameters(model, release=False):
     return parameters
 
 
-def define_morphology(model, morph_modifiers, do_replace_axon):
+def define_morphology(model, morph_modifiers, morph_modifiers_hoc, do_replace_axon):
     """
     Defines neuron morphology for the Hay model
 
     Parameters
     ----------
     model: str
-            "hay" or "hallerman"
+            "hay" or "hallermann"
     morph_modifiers: list of python functions
         The modifier functions to apply to the axon
     do_replace_axon: bool
@@ -250,12 +250,16 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     morphology: bluepyopt.ephys.morphologies.NrnFileMorphology
         The morphology object
     """
-
-    path_morpho = pathlib.Path(f"{model}_model") / "morphology.asc"
+    
+    if model == "hay":
+        path_morpho = pathlib.Path(f"{model}_model") / "morphology.asc"
+    elif model == "hallermann":
+        path_morpho = pathlib.Path(f"{model}_model") / "morphology.swc"
 
     return ephys.morphologies.NrnFileMorphology(
         str(path_morpho),
         morph_modifiers=morph_modifiers,
+        morph_modifiers_hoc=morph_modifiers_hoc,
         do_replace_axon=do_replace_axon
     )
 
@@ -267,7 +271,7 @@ def create(model, morph_modifier="", release=False):
     Parameters
     ----------
     model: str
-            "hay" or "hallerman"
+            "hay" or "hallermann"
     morph_modifier: str
         The modifier to apply to the axon:
             - "hillock": the axon is replaced with an axon hillock, an AIS, and
@@ -289,6 +293,7 @@ def create(model, morph_modifier="", release=False):
 
     if morph_modifier == 'hillock':
         morph_modifiers = [replace_axon_with_hillock]
+        morph_modifiers_hoc = None
         seclist_names = ['all', 'somatic', 'basal', 'apical', 'axonal',
                          'myelinated', 'axon_initial_segment', 'hillockal']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'myelin',
@@ -297,17 +302,24 @@ def create(model, morph_modifier="", release=False):
 
     elif morph_modifier == "":
         morph_modifiers = None
+        morph_modifiers_hoc = None
         seclist_names = None
         secarray_names = None
         do_replace_axon = True
 
+    elif morph_modifier == "hallermann":
+        morph_modifiers = None
+        morph_modifiers_hoc = [fix_hallerman_morpho]
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'collaterals', 'nodal', 'myelinated', 'axonal']
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'my', 'node']
+        do_replace_axon = False
     else:
         raise Exception("Unknown morph_modifier")
 
     cell = ephys.models.LFPyCellModel(
         model,
         v_init=-65.,
-        morph=define_morphology(model, morph_modifiers, do_replace_axon),
+        morph=define_morphology(model, morph_modifiers, morph_modifiers_hoc, do_replace_axon),
         mechs=define_mechanisms(model),
         params=define_parameters(model, release),
         seclist_names=seclist_names,

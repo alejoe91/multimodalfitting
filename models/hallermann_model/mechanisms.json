@@ -1,0 +1,66 @@
+{
+    "somatic": [
+        "pas",
+        "Kv",
+        "CaH",
+        "Kca",
+        "Cad",
+        "CaT",
+        "Kv1",
+        "Kv7",
+        "h"
+    ],
+    "apical": [
+        "pas",
+        "Kv",
+        "Kv1",
+        "Kv7",
+        "Kca",
+        "Cad",
+        "CaH",
+        "CaT",
+        "h",
+        "na8st"
+    ],
+    "basal": [
+        "pas",
+        "Kv",
+        "Kv1",
+        "Kv7",
+        "Kca",
+        "Cad",
+        "CaH",
+        "CaT",
+        "h",
+        "na8st"
+    ],
+    "collaterals":[
+        "pas",
+        "nax8st",
+        "Kv1",
+        "h"
+    ],
+    "axonal":[
+        "pas",
+        "nax8st",
+        "na8st",
+        "Kv1",
+        "Kv7",
+        "Cad",
+        "CaH",
+        "CaT",
+        "Kca"
+    ],
+    "myelinated":[
+        "pas",
+        "nax8st",
+        "Kv1",
+        "Kv7"
+    ],
+    "nodal":[
+        "pas",
+        "nax8st",
+        "Kv1",
+        "Kv7"
+    ]
+}
