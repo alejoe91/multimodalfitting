@@ -1,33 +1,5 @@
 {
     "multiple": {
-        "bAP": {
-            "soma": {
-                "AP_width": [
-                    2.0,
-                    0.5
-                ],
-                "AP_height": [
-                    25.0,
-                    5.0
-                ],
-                "Spikecount": [
-                    1.0,
-                    0.01
-                ]
-            },
-            "dend1": {
-                "AP_amplitude_from_voltagebase": [
-                    45,
-                    10
-                ]
-            },
-            "dend2": {
-                "AP_amplitude_from_voltagebase": [
-                    36,
-                    9.33
-                ]
-            }
-        },
         "Step1": {
             "soma": {
                 "AP_height": [

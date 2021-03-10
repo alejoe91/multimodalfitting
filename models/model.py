@@ -181,6 +181,7 @@ def define_parameters(model, release=False):
 
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
+                
             elif param_config["dist_type"] in ["exp", "step_funct"]:
 
                 if "soma_ref_point" in param_config:
@@ -192,13 +193,19 @@ def define_parameters(model, release=False):
                     distribution=param_config["dist"],
                     soma_ref_location=ref_point
                 )
-
-            seclist_loc = [ephys.locations.NrnSeclistLocation(
-                param_config["sectionlist"],
-                seclist_name=param_config["sectionlist"]
-            )]
-
-            name = f"{param_config['param_name']}.{param_config['sectionlist']}"
+            
+            if not isinstance(param_config["sectionlist"], list):
+                param_config["sectionlist"] = [param_config["sectionlist"]]
+            
+            seclist_loc = []
+            for loc in param_config["sectionlist"]:
+                seclist_loc.append(ephys.locations.NrnSeclistLocation(
+                    loc,
+                    seclist_name=loc
+                ))
+            
+            str_loc = "_".join(e for e in param_config['sectionlist'])
+            name = f"{param_config['param_name']}.{str_loc}"
 
             if param_config["type"] == "section":
                 parameters.append(
@@ -233,7 +240,7 @@ def define_parameters(model, release=False):
     return parameters
 
 
-def define_morphology(model, morph_modifiers, morph_modifiers_hoc, do_replace_axon):
+def define_morphology(model, morph_modifiers, do_replace_axon):
     """
     Defines neuron morphology for the Hay model
 
@@ -259,7 +266,6 @@ def define_morphology(model, morph_modifiers, morph_modifiers_hoc, do_replace_ax
     return ephys.morphologies.NrnFileMorphology(
         str(path_morpho),
         morph_modifiers=morph_modifiers,
-        morph_modifiers_hoc=morph_modifiers_hoc,
         do_replace_axon=do_replace_axon
     )
 
@@ -293,7 +299,6 @@ def create(model, morph_modifier="", release=False):
 
     if morph_modifier == 'hillock':
         morph_modifiers = [replace_axon_with_hillock]
-        morph_modifiers_hoc = None
         seclist_names = ['all', 'somatic', 'basal', 'apical', 'axonal',
                          'myelinated', 'axon_initial_segment', 'hillockal']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'myelin',
@@ -302,15 +307,13 @@ def create(model, morph_modifier="", release=False):
 
     elif morph_modifier == "":
         morph_modifiers = None
-        morph_modifiers_hoc = None
         seclist_names = None
         secarray_names = None
         do_replace_axon = True
 
     elif morph_modifier == "hallermann":
-        morph_modifiers = None
-        morph_modifiers_hoc = [fix_hallerman_morpho]
-        seclist_names = ['all', 'somatic', 'basal', 'apical', 'collaterals', 'nodal', 'myelinated', 'axonal']
+        morph_modifiers = [fix_hallerman_morpho]
+        seclist_names = ['all', 'somatic', 'axon_initial_segment', 'collaterals', 'basal', 'apical', 'nodal', 'myelinated']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'my', 'node']
         do_replace_axon = False
     else:
@@ -319,7 +322,7 @@ def create(model, morph_modifier="", release=False):
     cell = ephys.models.LFPyCellModel(
         model,
         v_init=-65.,
-        morph=define_morphology(model, morph_modifiers, morph_modifiers_hoc, do_replace_axon),
+        morph=define_morphology(model, morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(model),
         params=define_parameters(model, release),
         seclist_names=seclist_names,

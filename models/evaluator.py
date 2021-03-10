@@ -178,7 +178,19 @@ def define_stimuli_hay(protocol_name, protocol_definition):
 
 
 def define_stimuli_hallermann(protocol_name, protocol_definition):
-    return []
+    
+    stimuli = []
+    
+    for stimulus_definition in protocol_definition["stimuli"]:
+
+        stimuli.append(ephys.stimuli.LFPySquarePulse(
+            step_amplitude=stimulus_definition['amp'],
+            step_delay=stimulus_definition['delay'],
+            step_duration=stimulus_definition['duration'],
+            location=soma_loc,
+            total_duration=stimulus_definition['totduration']))
+
+    return stimuli
 
 
 def define_protocols(
@@ -230,14 +242,14 @@ def define_protocols(
                 protocol_name, protocol_definitions[protocol_name], None
             )
 
-        #if model == 'hay':
-        stimuli = define_stimuli_hay(
-            protocol_name, protocol_definitions[protocol_name]
-        )
-        #else:
-        #    stimuli = define_stimuli_hallermann(
-        #        protocol_name, protocol_definitions[protocol_name]
-        #    )
+        if model == 'hay':
+            stimuli = define_stimuli_hay(
+                protocol_name, protocol_definitions[protocol_name]
+            )
+        else:
+            stimuli = define_stimuli_hallermann(
+               protocol_name, protocol_definitions[protocol_name]
+            )
 
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
@@ -431,8 +443,9 @@ def define_fitness_calculator(
 def create_evaluator(
         model,
         feature_set,
-        sample_id,
-        morph_modifier=""
+        sample_id=None,
+        morph_modifier="",
+        feature_file=None,
 ):
     """
         Prepares objects for optimization of test models.
@@ -460,6 +473,9 @@ def create_evaluator(
         -------
         CellEvaluator
         """
+    
+    if sample_id and feature_file:
+        raise Exception('Either feature_file or sample_id should be None')
 
     sample_dir = pathlib.Path(
         f"{model}_model") / 'features' / f'random_{sample_id}'
@@ -469,16 +485,24 @@ def create_evaluator(
     if feature_set == "extra":
         probe_file = sample_dir / 'probe.json'
         probe, electrode = model.define_electrode(probe_file=probe_file)
-
-    feature_file = sample_dir / f'{feature_set}.pkl'
-    fitness_protocols = define_protocols(feature_set, feature_file,
-                                         electrode=electrode)
+    
+    if sample_id:
+        feature_file = sample_dir / f'{feature_set}.pkl'
+    
+    fitness_protocols = define_protocols(
+        feature_set, feature_file, electrode=electrode
+    )
 
     cell = model.create(model, morph_modifier, release=False)
 
-    sim = ephys.simulators.LFPySimulator(
-        LFPyCellModel=cell, cvode_active=True, electrode=electrode
-    )
+    if model == "hallermann":
+        sim = ephys.simulators.LFPySimulator(
+            LFPyCellModel=cell, cvode_active=False, electrode=electrode
+        )
+    else:
+        sim = ephys.simulators.LFPySimulator(
+            LFPyCellModel=cell, cvode_active=True, electrode=electrode
+        )
 
     fitness_calculator, _ = define_fitness_calculator(
         protocols=fitness_protocols,
