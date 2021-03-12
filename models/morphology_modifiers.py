@@ -179,6 +179,11 @@ def fix_hallerman_morpho(sim=None, icell=None):
     sim.neuron.h.execute("create apic[69]", icell)
     sim.neuron.h.execute("create my[10]", icell)
     sim.neuron.h.execute("create node[10]", icell)
+    
+    for i in range(0, 10):
+        icell.node[i].nseg = 1
+        icell.node[i].L = 1
+        icell.node[i].diam = 1.3
 
     icell.axon[0].connect(icell.soma[0], 0.5, 0.0)
     icell.my[0].connect(icell.axon[0], 1.0, 0.0)
@@ -10242,22 +10247,34 @@ def fix_hallerman_morpho(sim=None, icell=None):
     for i in range(0, 10):
         icell.all.append(sec=icell.my[i])
         icell.myelinated.append(sec=icell.my[i])
-    
-    freq = 10000.
-    d_lambda = 0.1
-    axial_res = 100.
-    membrane_capa = 1.
-    n_myelin_wraps = 5.
-    membrane_capa_myelinated = membrane_capa / (2 * n_myelin_wraps + 1.)
 
-    def compute_nseg(section, capa):
-        mean_diam = sum(seg.diam for seg in section) / section.nseg
-        lambda_100 = 1e5 * math.sqrt(mean_diam / (4 * math.pi * freq * axial_res * capa))
-        # print(section, int((section.L / (d_lambda * lambda_100) + 0.9) / 2) * 2 + 1)
-        section.nseg = int((section.L / (d_lambda * lambda_100) + 0.9) / 2) * 2 + 1
+    freq = 1000
+    d_lambda = 0.1
+    axial_res = 100.0
+    membrane_capa = 1.0
+    n_myelin_wraps = 5.0
+    membrane_capa_myelinated = 1 / 11
+
+    def compute_nseg(section, membrane_capa):
+        if section.n3d() < 2:
+            lambda_f = 1e5 * math.sqrt(section.diam/(4*math.pi*freq*axial_res*membrane_capa))
+        else:
+            x1 = section.arc3d(0)
+            d1 = section.diam3d(0)
+            lam = 0
+            for i in range(1, section.n3d()):
+                x2 = section.arc3d(i)
+                d2 = section.diam3d(i)
+                lam = lam + (x2 - x1) / math.sqrt(d1 + d2)
+                x1, d1 = x2, d2
+            lam = lam * math.sqrt(2) * 1e-5 * math.sqrt(4*math.pi*freq*axial_res*membrane_capa)
+            lambda_f = section.L/lam
+        section.nseg = int((section.L/(d_lambda*lambda_f)+0.9)/2)*2 + 1
+        # print(section,": nseg:",section.nseg)
         
     for index, section in enumerate(icell.axon_initial_segment):
-        compute_nseg(section, membrane_capa)
+        section.nseg = 21
+        # compute_nseg(section, membrane_capa)
     for index, section in enumerate(icell.nodal):
         compute_nseg(section, membrane_capa)
     for index, section in enumerate(icell.myelinated):
@@ -10267,8 +10284,15 @@ def fix_hallerman_morpho(sim=None, icell=None):
     for index, section in enumerate(icell.apical):
         compute_nseg(section, membrane_capa)
     for index, section in enumerate(icell.basal):
-        compute_nseg(section, membrane_capa)   
-
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.2)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.4)))
+        compute_nseg(section, membrane_capa)  
+    
+    
+    
+    #for index, section in enumerate(icell.basal):
+    #    access section
+    #    ion_style("ca_ion",0,1,0,0,0)
+    
+    #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.0)))
+    #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](1.0)))
+    #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.4)))
     # print(sim.neuron.h.topology())

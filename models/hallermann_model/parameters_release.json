@@ -14,7 +14,7 @@
         "sectionlist": "all",
         "type": "section",
         "dist_type": "uniform",
-        "value": 1
+        "value": 1.0
     },
     {
         "param_name": "Ra",
@@ -22,7 +22,14 @@
         "type": "section",
         "dist_type": "uniform",
         "value": 80
-    }, 
+    },
+    {
+        "param_name": "g_pas",
+        "sectionlist": "all",
+        "type": "section",
+        "dist_type": "uniform",
+        "value": 0.000066667
+    },
     {
         "param_name": "ek",
         "sectionlist": "all",
@@ -44,6 +51,15 @@
         "type": "section",
         "dist_type": "uniform",
         "value": 55
+    },
+    {
+        "param_name": "taur_cad",
+        "mech": "cad",
+        "value": 80,
+        "dist_type": "uniform",
+        "mech_param": "taur_cad",
+        "type": "range",
+        "sectionlist": "all"
     },
     {
         "param_name": "g_pas",
@@ -225,40 +241,27 @@
         "sectionlist": "collaterals"
     },
     {
-        "param_name": "gbar_na",
-        "mech": "na",
-        "value": 2500,
-        "dist_type": "uniform",
-        "mech_param": "gbar_na",
-        "type": "range",
-        "sectionlist": "axon_initial_segment"
-    },
-    {
         "param_name": "gbar_Kv1",
         "mech": "Kv1",
         "value": 1000,
-        "dist_type": "uniform",
+        "dist": "{gbar_Kv1_somatic} + ({value}-{gbar_Kv1_somatic}) * (({distance} - 63.1639) / 63.1639)",
+        "dist_type": "exp",
         "mech_param": "gbar_Kv1",
         "type": "range",
-        "sectionlist": "axon_initial_segment"
+        "sectionlist": "axon_initial_segment",
+        "dependencies": ["gbar_Kv1_somatic"]
     },
     {
         "param_name": "gbar_Kv7",
         "mech": "Kv7",
-        "value": 1,
+        "value": 7,
+        "dist": "(31.58195 > {distance}) * {gbar_Kv7_somatic} + (31.58195 <= {distance}) * ({gbar_Kv7_somatic} + (({value}-{gbar_Kv7_somatic}) * (({distance} - 31.581949) / 37.898)))",
+        "dist_type": "exp",
         "dist_type": "uniform",
         "mech_param": "gbar_Kv7",
         "type": "range",
-        "sectionlist": "axon_initial_segment"
-    },
-    {
-        "param_name": "gbar_Kv7",
-        "mech": "Kv7",
-        "value": 1,
-        "dist_type": "uniform",
-        "mech_param": "gbar_Kv7",
-        "type": "range",
-        "sectionlist": "axon_initial_segment"
+        "sectionlist": "axon_initial_segment",
+        "dependencies": ["gbar_Kv7_apical_somatic_myelinated"]
     },
     {
         "param_name": "gbar_ca",
@@ -394,7 +397,7 @@
     {
         "param_name": "gbar_ih",
         "mech": "ih",
-        "dist": "(-0.8696 + 2.087*math.exp({distance} * 0.0031))*{value}",
+        "dist": "(-0.0002 + ({value}*(math.exp(0.003087*{distance})))) * 1.5",
         "dist_type": "exp",
         "mech_param": "gbar_ih",
         "value": 0.0002,
@@ -404,7 +407,7 @@
     {
         "param_name": "gbar_ih",
         "mech": "ih",
-        "dist": "(-0.8696 + 2.087*math.exp({distance} * 0.0031))*{value}",
+        "dist": "(-0.0002 + ({value}*(math.exp(0.003087*{distance})))) * 1.5",
         "dist_type": "exp",
         "mech_param": "gbar_ih",
         "value": 0.0002,
@@ -464,11 +467,12 @@
     {
         "param_name": "gbar_na",
         "mech": "na",
-        "value": 4500,
-        "dist": "500 + {value} * ( ({distance} - 14.74) / 14.74 * ({distance} < 14.74) + (14.74<= {distance} <= 27.37) )",
+        "value": 5000,
+        "dist": "{gbar_na_somatic} + ({value}-{gbar_na_somatic}) * ( ({distance} - 14.74) / 14.74 * ({distance} < 14.74) + (14.74 <= {distance} <= 27.37) )",
         "dist_type": "exp",
         "mech_param": "gbar_na",
         "type": "range",
-        "sectionlist": "axon_initial_segment"
+        "sectionlist": "axon_initial_segment",
+        "dependencies": ["gbar_na_somatic"]
     }
 ]

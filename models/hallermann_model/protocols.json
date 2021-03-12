@@ -2,16 +2,16 @@
     "Step1": {
         "stimuli": [
             {
-                "delay": 515,
+                "delay": 500,
                 "amp": 2.5,
-                "duration": 3,
-                "totduration": 1000
+                "duration": 100,
+                "totduration": 900
             },
             {
                 "delay": 0,
                 "amp": 0,
-                "duration": 1000,
-                "totduration": 1000
+                "duration": 900,
+                "totduration": 900
             }
         ]
     }

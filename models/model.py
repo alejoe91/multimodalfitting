@@ -205,8 +205,8 @@ def define_parameters(model, release=False):
                 ))
             
             str_loc = "_".join(e for e in param_config['sectionlist'])
-            name = f"{param_config['param_name']}.{str_loc}"
-
+            name = f"{param_config['param_name']}_{str_loc}"
+            
             if param_config["type"] == "section":
                 parameters.append(
                     ephys.parameters.NrnSectionParameter(
@@ -217,6 +217,7 @@ def define_parameters(model, release=False):
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
+                        param_dependancies=param_config.get("dependencies", None)
                     )
                 )
             elif param_config["type"] == "range":
@@ -229,14 +230,17 @@ def define_parameters(model, release=False):
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
+                        param_dependancies=param_config.get("dependencies", None)
                     )
                 )
+            
         else:
             raise Exception(
                 "Param config type has to be global, section or range: %s"
                 % param_config
             )
-
+        
+        
     return parameters
 
 
@@ -318,10 +322,15 @@ def create(model, morph_modifier="", release=False):
         do_replace_axon = False
     else:
         raise Exception("Unknown morph_modifier")
-
+    
+    if model =="hallermann":
+        v_init = -85.
+    else:
+        v_init = -65.
+        
     cell = ephys.models.LFPyCellModel(
         model,
-        v_init=-65.,
+        v_init=v_init,
         morph=define_morphology(model, morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(model),
         params=define_parameters(model, release),
