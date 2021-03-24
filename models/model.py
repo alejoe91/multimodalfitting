@@ -42,6 +42,7 @@ def define_mechanisms(model):
 
 
 def define_electrode(
+        cell,
         probe_type="linear",
         num_linear=20,
         linear_span=[-500, 1000],
@@ -56,6 +57,8 @@ def define_electrode(
 
     Parameters
     ----------
+    cell: LFPy.Cell
+        The LFP Cell associated to the electrode
     probe_type: str
         'linear' or  'planar'
     num_linear: int
@@ -75,8 +78,8 @@ def define_electrode(
 
     Returns
     -------
-    electrode: LFPy.RecExtElectrode
-        The LFPy electrode object
+    electrode: MEAutility.MEA object
+        The MEAutility electrode object
     """
     import MEAutility as mu
 
@@ -121,7 +124,7 @@ def define_electrode(
 
         probe = mu.return_mea(info=info)
 
-    return LFPy.RecExtElectrode(probe=probe)
+    return probe
 
 
 def define_parameters(model, release=False):
