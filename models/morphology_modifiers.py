@@ -10248,7 +10248,7 @@ def fix_hallerman_morpho(sim=None, icell=None):
         icell.all.append(sec=icell.my[i])
         icell.myelinated.append(sec=icell.my[i])
 
-    freq = 1000
+    freq = 10000
     d_lambda = 0.1
     axial_res = 100.0
     membrane_capa = 1.0
@@ -10271,12 +10271,13 @@ def fix_hallerman_morpho(sim=None, icell=None):
             lambda_f = section.L/lam
         section.nseg = int((section.L/(d_lambda*lambda_f)+0.9)/2)*2 + 1
         # print(section,": nseg:",section.nseg)
-        
+    
+    for index, section in enumerate(icell.somatic):
+        section.nseg = 9
     for index, section in enumerate(icell.axon_initial_segment):
         section.nseg = 21
-        # compute_nseg(section, membrane_capa)
     for index, section in enumerate(icell.nodal):
-        compute_nseg(section, membrane_capa)
+        section.nseg = 1
     for index, section in enumerate(icell.myelinated):
         compute_nseg(section, membrane_capa_myelinated)
     for index, section in enumerate(icell.collaterals):
@@ -10286,12 +10287,21 @@ def fix_hallerman_morpho(sim=None, icell=None):
     for index, section in enumerate(icell.basal):
         compute_nseg(section, membrane_capa)  
     
-    
-    
+    # Check the surface area
+    #total_area = 0
+    #for index, section in enumerate(icell.all):
+    #    area_sum = 0
+    #    for seg in section:
+    #        area_sum += sim.neuron.h.area(seg.x, sec=section)
+    #        total_area +=  sim.neuron.h.area(seg.x, sec=section)
+    #    print(section,  index, area_sum)
+    #print(total_area)
+
     #for index, section in enumerate(icell.basal):
     #    access section
     #    ion_style("ca_ion",0,1,0,0,0)
     
+    # Distance from soma based on the comp_x
     #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.0)))
     #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](1.0)))
     #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.4)))
