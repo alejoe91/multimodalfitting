@@ -3,7 +3,22 @@ import numpy as np
 import utils
 import MEAutility as mu
 
-def plot_responses(responses, max_rows=6, figsize=(10, 10), color="C0", return_fig=False):
+import re
+
+def atoi(text):
+    return int(text) if text.isdigit() else text
+
+def natural_keys(text):
+    '''
+    alist.sort(key=natural_keys) sorts in human order
+    http://nedbatchelder.com/blog/200712/human_sorting.html
+    (See Toothy's implementation in the comments)
+    '''
+    return [ atoi(c) for c in re.split(r'(\d+)', text) ]
+
+
+def plot_responses(responses, protocol_names=None,
+                   max_rows=6, figsize=(10, 10), color="C0", return_fig=False):
     """
     Plots one response to multiple protocols
 
@@ -11,6 +26,8 @@ def plot_responses(responses, max_rows=6, figsize=(10, 10), color="C0", return_f
     ----------
     responses: dict
         Output of run_protocols function
+    protocol_names: list or None
+        List of protocol names (or substrings of protocol names) to plot
     max_rows: int
         Max number of rows (default 6)
     figsize: tuple
@@ -30,33 +47,65 @@ def plot_responses(responses, max_rows=6, figsize=(10, 10), color="C0", return_f
     for (resp_name, response) in sorted(responses.items()):
         if 'MEA' not in resp_name:
             resp_no_mea[resp_name] = response
-    if len(resp_no_mea) <= max_rows:
-        nrows = len(resp_no_mea)
+
+    if protocol_names is not None:
+        resp_to_plot = {}
+        for resp_name, response in resp_no_mea.items():
+            if np.any([pn in resp_name for pn in protocol_names]):
+                resp_to_plot[resp_name] = response
+    else:
+        resp_to_plot = resp_no_mea
+
+    # sort responses if multiple runs of the same protocol
+    protocol_keys = list(resp_to_plot.keys())
+    protocol_keys.sort(key=natural_keys)
+
+    if len(resp_to_plot) <= max_rows:
+        nrows = len(resp_to_plot)
         ncols = 1
     else:
         nrows = max_rows
-        ncols = int(np.ceil(len(resp_no_mea) / max_rows))
+        ncols = int(np.ceil(len(resp_to_plot) / max_rows))
+
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
 
     max_v = -200
     min_v = 200
 
-    for index, (resp_name, response) in enumerate(sorted(resp_no_mea.items())):
+    for index, (resp_name) in enumerate(protocol_keys):
+        resoinse = resp_to_plot[resp_name]
         c = index // nrows
         r = np.mod(index, nrows)
         response = responses[resp_name]
-        axes[r, c].plot(response['time'], response['voltage'], label=resp_name, color=color)
-        axes[r, c].set_title(resp_name)
+        if ncols > 1:
+            axes[r, c].plot(response['time'], response['voltage'], label=resp_name, color=color)
+            axes[r, c].set_title(resp_name)
+        elif ncols == 1 and nrows == 1:
+            axes.plot(response['time'], response['voltage'], label=resp_name, color=color)
+            axes.set_title(resp_name)
+        else:
+            axes[r].plot(response['time'], response['voltage'], label=resp_name, color=color)
+            axes[r].set_title(resp_name)
         if np.max(response['voltage']) > max_v:
             max_v = np.max(response['voltage'])
         if np.min(response['voltage']) < min_v:
             min_v = np.min(response['voltage'])
-    for ax in axes[r + 1:, c]:
-        ax.axis("off")
 
-    for axr in axes:
-        for ax in axr:
+    if ncols > 1:
+        for ax in axes[r + 1:, c]:
+            ax.axis("off")
+        for axr in axes:
+            for ax in axr:
+                ax.set_ylim(min_v - 10, max_v + 10)
+    elif ncols == 1 and nrows == 1:
+        axes.axis("off")
+        axes.set_ylim(min_v - 10, max_v + 10)
+    else:
+        for ax in axes[r + 1:]:
+            ax.axis("off")
+        for ax in axes:
             ax.set_ylim(min_v - 10, max_v + 10)
+
     fig.tight_layout()
     fig.show()
 

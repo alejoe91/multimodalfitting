@@ -56,6 +56,8 @@ def define_electrode(
 
     Parameters
     ----------
+    cell: LFPy.Cell
+        The LFP Cell associated to the electrode
     probe_type: str
         'linear' or  'planar'
     num_linear: int
@@ -75,8 +77,8 @@ def define_electrode(
 
     Returns
     -------
-    electrode: LFPy.RecExtElectrode
-        The LFPy electrode object
+    electrode: MEAutility.MEA object
+        The MEAutility electrode object
     """
     import MEAutility as mu
 
@@ -121,7 +123,7 @@ def define_electrode(
 
         probe = mu.return_mea(info=info)
 
-    return LFPy.RecExtElectrode(probe=probe)
+    return probe
 
 
 def define_parameters(model, release=False):
@@ -260,7 +262,7 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     )
 
 
-def create(model, morph_modifier="", release=False):
+def create(model, morph_modifier="", v_init=-65., release=False):
     """
     Create Hay cell model
 
@@ -306,7 +308,7 @@ def create(model, morph_modifier="", release=False):
 
     cell = ephys.models.LFPyCellModel(
         model,
-        v_init=-65.,
+        v_init=v_init,
         morph=define_morphology(model, morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(model),
         params=define_parameters(model, release),
