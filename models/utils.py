@@ -5,7 +5,6 @@ import os
 import bluepyopt.ephys as ephys
 import time
 
-from configs import config_dir
 
 # Helper function to turn feature dicitonary into a list
 def vectorize_features(feature_list):
@@ -75,6 +74,7 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
 
     """
     assert feature_set in ['multiple', 'soma', 'extra', 'all']
+    from configs import config_dir
 
     feature_list = json.load(
         open(os.path.join(config_dir, 'features_list.json')))[feature_set]

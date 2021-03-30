@@ -42,7 +42,6 @@ def define_mechanisms(model):
 
 
 def define_electrode(
-        cell,
         probe_type="linear",
         num_linear=20,
         linear_span=[-500, 1000],
@@ -263,7 +262,7 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     )
 
 
-def create(model, morph_modifier="", release=False):
+def create(model, morph_modifier="", v_init=-65., release=False):
     """
     Create Hay cell model
 
@@ -309,7 +308,7 @@ def create(model, morph_modifier="", release=False):
 
     cell = ephys.models.LFPyCellModel(
         model,
-        v_init=-65.,
+        v_init=v_init,
         morph=define_morphology(model, morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(model),
         params=define_parameters(model, release),

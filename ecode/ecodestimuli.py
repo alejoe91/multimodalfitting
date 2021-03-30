@@ -7,7 +7,7 @@ class sAHP(Stimulus):
     """sAHP current clamp injection"""
 
     def __init__(self,
-                 holding_amplitude=None,
+                 holding_amplitude=0.0,
                  delay=250.0,
                  sahp_tmid=500.0,
                  sahp_tmid2=725.0,
@@ -106,7 +106,7 @@ class sAHP(Stimulus):
                                             # delay=self.step_delay,
                                             dur=self.total_duration)
 
-        stim = LFPyCell.stimlist[0]
+        stim = LFPyCell._hoc_stimlist[0]
 
         # play the above current amplitudes into the current clamp
         amps.play(stim._ref_amp, times, 1)  # pylint: disable=W0212
@@ -141,7 +141,7 @@ class HyperDepol(Stimulus):
     """HyperDepol Protocol"""
 
     def __init__(self,
-                 holding_amplitude=None,
+                 holding_amplitude=0.0,
                  hyperpol_amplitude=None,
                  depol_amplitude=None,
                  delay=250.0,
@@ -158,6 +158,7 @@ class HyperDepol(Stimulus):
         super().__init__()
         self.hyperpol_amplitude = hyperpol_amplitude
         self.depol_amplitude = depol_amplitude
+        self.holding_amplitude = holding_amplitude
         self.delay = delay
         self.tmid = tmid
         self.toff = toff
@@ -186,34 +187,34 @@ class HyperDepol(Stimulus):
         times = sim.neuron.h.Vector()
 
         times.append(0.0)
-        amps.append(0.0)
+        amps.append(self.holding_amplitude)
 
         times.append(self.delay)
-        amps.append(0.0)
+        amps.append(self.holding_amplitude)
 
         times.append(self.delay)
-        amps.append(0.0 + self.hyperpol_amplitude)
+        amps.append(self.holding_amplitude + self.hyperpol_amplitude)
 
         times.append(self.tmid)
-        amps.append(0.0 + self.hyperpol_amplitude)
+        amps.append(self.holding_amplitude + self.hyperpol_amplitude)
 
         times.append(self.tmid)
-        amps.append(0.0 + self.depol_amplitude)
+        amps.append(self.holding_amplitude + self.depol_amplitude)
 
         times.append(self.toff)
-        amps.append(0.0 + self.depol_amplitude)
+        amps.append(self.holding_amplitude + self.depol_amplitude)
 
         times.append(self.toff)
-        amps.append(0.0)
+        amps.append(self.holding_amplitude)
 
         times.append(self.total_duration)
-        amps.append(0.0)
+        amps.append(self.holding_amplitude)
 
         self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
                                             idx=sec_index,
                                             pptype='IClamp',
                                             dur=self.total_duration)
-        stim = LFPyCell.stimlist[0]
+        stim = LFPyCell._hoc_stimlist[0]
 
         amps.play(
             stim._ref_amp,  # pylint:disable=W0212
@@ -244,7 +245,7 @@ class PosCheops(Stimulus):
 
     def __init__(self,
                  delay=250.0,
-                 holding_amplitude=None,
+                 holding_amplitude=0,
                  ramp1_dur=4000.0,
                  ramp2_dur=2000.0,
                  ramp3_dur=1330.0,
@@ -337,7 +338,7 @@ class PosCheops(Stimulus):
                                             idx=sec_index,
                                             pptype='IClamp',
                                             dur=self.total_duration)
-        stim = LFPyCell.stimlist[0]
+        stim = LFPyCell._hoc_stimlist[0]
 
         current_vec.play(
             stim._ref_amp,  # pylint:disable=W0212
@@ -420,7 +421,7 @@ class NoiseOU3(Stimulus):
                                             pptype='IClamp',
                                             dur=self.total_duration)
 
-        stim = LFPyCell.stimlist[0]
+        stim = LFPyCell._hoc_stimlist[0]
 
         # play the above current amplitudes into the current clamp
         amps.play(stim._ref_amp, times, 1)  # pylint: disable=W0212
