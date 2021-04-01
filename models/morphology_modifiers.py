@@ -135,7 +135,9 @@ def replace_axon_with_hillock(sim=None, icell=None):
         sim.neuron.h.pt3dadd(x3d_ais[i], y3d_ais[i], z3d_ais[i], diam3d_ais[i], sec=icell.ais)
                                   
     icell.hillock.nseg = 1 + int(L_hillock / final_seg_length)
-    icell.ais.nseg = 1 + int(L_AIS / final_seg_length)                                            
+    icell.ais.nseg = 1 + int(L_AIS / final_seg_length)                                  
+                                  
+                                  
     # childsec.connect(parentsec, parentx, childx)
     icell.hillock.connect(icell.soma[0], 1.0, 0.0)
     icell.ais.connect(icell.hillock, 1.0, 0.0)
@@ -177,11 +179,8 @@ def fix_hallerman_morpho(sim=None, icell=None):
     sim.neuron.h.execute("create apic[69]", icell)
     sim.neuron.h.execute("create my[10]", icell)
     sim.neuron.h.execute("create node[10]", icell)
-<<<<<<< HEAD
     
-    # icell.soma[0].nseg = 9
-=======
->>>>>>> de43e013ad3b527b37893233afb6bac03de4d9aa
+    icell.soma[0].nseg = 9
 
     for i in range(0, 10):
         icell.node[i].nseg = 1
@@ -303,7 +302,7 @@ def fix_hallerman_morpho(sim=None, icell=None):
     icell.apic[66].connect(icell.apic[50], 1.0, 0.0)
     for i in range(67, 69):
         icell.apic[i].connect(icell.apic[66], 1.0, 0.0)
-            
+
     icell.axon[3].connect(icell.axon[2], 1.0, 0.0)
     icell.axon[4].connect(icell.axon[2], 1.0, 0.0)
     icell.axon[5].connect(icell.axon[4], 1.0, 0.0)
@@ -10251,69 +10250,49 @@ def fix_hallerman_morpho(sim=None, icell=None):
         icell.all.append(sec=icell.my[i])
         icell.myelinated.append(sec=icell.my[i])
 
-#     freq = 10000
-#     d_lambda = 0.1
-#     axial_res = 100.0
-#     membrane_capa = 1.0
-#     n_myelin_wraps = 5.0
-#     membrane_capa_myelinated = 1 / 11
+    freq = 1000
+    d_lambda = 0.1
+    axial_res = 100.0
+    membrane_capa = 1.0
+    n_myelin_wraps = 5.0
+    membrane_capa_myelinated = 1 / 11
 
-#     def compute_nseg(section, membrane_capa):
-#         if section.n3d() < 2:
-#             lambda_f = 1e5 * math.sqrt(section.diam/(4*math.pi*freq*axial_res*membrane_capa))
-#         else:
-#             x1 = section.arc3d(0)
-#             d1 = section.diam3d(0)
-#             lam = 0
-#             for i in range(1, section.n3d()):
-#                 x2 = section.arc3d(i)
-#                 d2 = section.diam3d(i)
-#                 lam = lam + (x2 - x1) / math.sqrt(d1 + d2)
-#                 x1, d1 = x2, d2
-#             lam = lam * math.sqrt(2) * 1e-5 * math.sqrt(4*math.pi*freq*axial_res*membrane_capa)
-#             lambda_f = section.L/lam
-#         section.nseg = int((section.L/(d_lambda*lambda_f)+0.9)/2)*2 + 1
+    def compute_nseg(section, membrane_capa):
+        if section.n3d() < 2:
+            lambda_f = 1e5 * math.sqrt(section.diam/(4*math.pi*freq*axial_res*membrane_capa))
+        else:
+            x1 = section.arc3d(0)
+            d1 = section.diam3d(0)
+            lam = 0
+            for i in range(1, section.n3d()):
+                x2 = section.arc3d(i)
+                d2 = section.diam3d(i)
+                lam = lam + (x2 - x1) / math.sqrt(d1 + d2)
+                x1, d1 = x2, d2
+            lam = lam * math.sqrt(2) * 1e-5 * math.sqrt(4*math.pi*freq*axial_res*membrane_capa)
+            lambda_f = section.L/lam
+        section.nseg = int((section.L/(d_lambda*lambda_f)+0.9)/2)*2 + 1
         # print(section,": nseg:",section.nseg)
-<<<<<<< HEAD
         
-=======
-    
-    nseg_basal = [
-        3, 5, 9, 3, 19, 13, 29, 5, 21, 43, 11, 33, 19, 7, 45, 25,
-        35, 3, 5, 7, 5, 3, 29, 3, 49, 17, 27, 31, 3, 7, 17, 9, 5,
-        5, 25, 33, 33
-    ]
-    nseg_apica = [
-        3, 29, 3, 17, 1, 37, 3, 13, 11, 3, 13, 11, 3, 11, 5, 7,
-        3, 7, 5, 7, 15, 21, 5, 5, 9, 9, 5, 5, 5, 17, 3, 31, 13,
-        15, 9, 11, 27, 29, 27, 25, 5, 53, 3, 3, 27, 33, 31, 7,
-        37, 67, 3, 29, 53, 5, 3, 17, 79, 9, 19, 31, 17, 11, 15,
-        17, 27, 21, 9, 21, 19
-    ]
-    nseg_collats = [13, 7, 225, 5, 15, 5, 147, 361]
-    nseg_mye = [23, 9, 13, 21, 21, 13, 13, 19, 15, 11]
-
->>>>>>> de43e013ad3b527b37893233afb6bac03de4d9aa
-    for index, section in enumerate(icell.somatic):
-        section.nseg = 9
     for index, section in enumerate(icell.axon_initial_segment):
         section.nseg = 21
+        # compute_nseg(section, membrane_capa)
     for index, section in enumerate(icell.nodal):
-        section.nseg = 1
+        compute_nseg(section, membrane_capa)
     for index, section in enumerate(icell.myelinated):
-        section.nseg = nseg_mye[index]
+        compute_nseg(section, membrane_capa_myelinated)
     for index, section in enumerate(icell.collaterals):
-        section.nseg = nseg_collats[index]
+        compute_nseg(section, membrane_capa)
     for index, section in enumerate(icell.apical):
-        section.nseg = nseg_apica[index]
+        compute_nseg(section, membrane_capa)
     for index, section in enumerate(icell.basal):
         compute_nseg(section, membrane_capa)  
     
     
     
-    for index, section in enumerate(icell.all):
-        sim.neuron.h.ion_style("ca_ion",0,1,0,0,0,sec=section)
-    #    h.ion_style("name_ion", c_style, e_style, einit, eadvance, cinit, sec=section)
+    #for index, section in enumerate(icell.basal):
+    #    access section
+    #    ion_style("ca_ion",0,1,0,0,0)
     
     #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.0)))
     #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](1.0)))
