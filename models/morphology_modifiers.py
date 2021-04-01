@@ -180,6 +180,8 @@ def fix_hallerman_morpho(sim=None, icell=None):
     sim.neuron.h.execute("create my[10]", icell)
     sim.neuron.h.execute("create node[10]", icell)
     
+    # icell.soma[0].nseg = 9
+
     for i in range(0, 10):
         icell.node[i].nseg = 1
         icell.node[i].L = 1
@@ -10272,6 +10274,8 @@ def fix_hallerman_morpho(sim=None, icell=None):
         section.nseg = int((section.L/(d_lambda*lambda_f)+0.9)/2)*2 + 1
         # print(section,": nseg:",section.nseg)
         
+    for index, section in enumerate(icell.somatic):
+        section.nseg = 9
     for index, section in enumerate(icell.axon_initial_segment):
         section.nseg = 21
         # compute_nseg(section, membrane_capa)
@@ -10288,9 +10292,9 @@ def fix_hallerman_morpho(sim=None, icell=None):
     
     
     
-    #for index, section in enumerate(icell.basal):
-    #    access section
-    #    ion_style("ca_ion",0,1,0,0,0)
+    for index, section in enumerate(icell.all):
+        sim.neuron.h.ion_style("ca_ion",0,1,0,0,0,sec=section)
+    #    h.ion_style("name_ion", c_style, e_style, einit, eadvance, cinit, sec=section)
     
     #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.0)))
     #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](1.0)))
