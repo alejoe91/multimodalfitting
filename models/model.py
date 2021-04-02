@@ -182,7 +182,7 @@ def define_parameters(model, release=False):
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
                 
-            elif param_config["dist_type"] in ["exp", "step_funct"]:
+            elif param_config["dist_type"] in ["exp", "step_funct", "user_defined"]:
 
                 if "soma_ref_point" in param_config:
                     ref_point = param_config["soma_ref_point"]
