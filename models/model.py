@@ -7,7 +7,7 @@ import LFPy
 
 import numpy as np
 
-from morphology_modifiers import replace_axon_with_hillock
+from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -15,9 +15,10 @@ config_dir = os.path.join(script_dir, "config")
 
 def define_mechanisms(model):
     """Defines mechanisms"""
-
+    
     path_mechs = pathlib.Path(f"{model}_model") / "mechanisms.json"
-
+    print(pathlib.Path(f"{model}_model") / "mechanisms.json")
+    
     mech_definitions = json.load(open(path_mechs))
 
     mechanisms = []
@@ -133,7 +134,7 @@ def define_parameters(model, release=False):
     Parameters
     ----------
     model: str
-            "hay" or "hallerman"
+            "hay" or "hallermann"
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the unfrozen parameters with bounds are
         returned (use False - default - for optimizations)
@@ -183,7 +184,8 @@ def define_parameters(model, release=False):
 
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
-            elif param_config["dist_type"] in ["exp", "step_funct"]:
+                
+            elif param_config["dist_type"] in ["exp", "step_funct", "user_defined"]:
 
                 if "soma_ref_point" in param_config:
                     ref_point = param_config["soma_ref_point"]
@@ -194,14 +196,20 @@ def define_parameters(model, release=False):
                     distribution=param_config["dist"],
                     soma_ref_location=ref_point
                 )
-
-            seclist_loc = [ephys.locations.NrnSeclistLocation(
-                param_config["sectionlist"],
-                seclist_name=param_config["sectionlist"]
-            )]
-
-            name = f"{param_config['param_name']}.{param_config['sectionlist']}"
-
+            
+            if not isinstance(param_config["sectionlist"], list):
+                param_config["sectionlist"] = [param_config["sectionlist"]]
+            
+            seclist_loc = []
+            for loc in param_config["sectionlist"]:
+                seclist_loc.append(ephys.locations.NrnSeclistLocation(
+                    loc,
+                    seclist_name=loc
+                ))
+            
+            str_loc = "_".join(e for e in param_config['sectionlist'])
+            name = f"{param_config['param_name']}_{str_loc}"
+            
             if param_config["type"] == "section":
                 parameters.append(
                     ephys.parameters.NrnSectionParameter(
@@ -212,6 +220,7 @@ def define_parameters(model, release=False):
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
+                        param_dependancies=param_config.get("dependencies", None)
                     )
                 )
             elif param_config["type"] == "range":
@@ -224,14 +233,17 @@ def define_parameters(model, release=False):
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
+                        param_dependancies=param_config.get("dependencies", None)
                     )
                 )
+            
         else:
             raise Exception(
                 "Param config type has to be global, section or range: %s"
                 % param_config
             )
-
+        
+        
     return parameters
 
 
@@ -242,7 +254,7 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     Parameters
     ----------
     model: str
-            "hay" or "hallerman"
+            "hay" or "hallermann"
     morph_modifiers: list of python functions
         The modifier functions to apply to the axon
     do_replace_axon: bool
@@ -252,8 +264,11 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     morphology: bluepyopt.ephys.morphologies.NrnFileMorphology
         The morphology object
     """
-
-    path_morpho = pathlib.Path(f"{model}_model") / "morphology.asc"
+    
+    if model == "hay":
+        path_morpho = pathlib.Path(f"{model}_model") / "morphology.asc"
+    elif model == "hallermann":
+        path_morpho = pathlib.Path(f"{model}_model") / "morphology.swc"
 
     return ephys.morphologies.NrnFileMorphology(
         str(path_morpho),
@@ -262,22 +277,14 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     )
 
 
-def create(model, morph_modifier="", v_init=-65., release=False):
+def create(model, v_init=-65., release=False):
     """
     Create Hay cell model
 
     Parameters
     ----------
     model: str
-            "hay" or "hallerman"
-    morph_modifier: str
-        The modifier to apply to the axon:
-            - "hillock": the axon is replaced with an axon hillock, an AIS, and
-                a myelinated linear axon.
-               The hillock morphology uses the original axon reconstruction.
-               The 'axon', 'ais', 'hillock', and 'myelin' sections are added.
-            - "taper": the axon is replaced with a tapered hillock
-            - "": the axon is replaced by a 2-segment axon stub
+            "hay" or "hallermann"
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the
         unfrozen parameters with bounds are returned (use False for
@@ -289,23 +296,24 @@ def create(model, morph_modifier="", v_init=-65., release=False):
         The LFPyCellModel object
     """
 
-    if morph_modifier == 'hillock':
-        morph_modifiers = [replace_axon_with_hillock]
-        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axonal',
-                         'myelinated', 'axon_initial_segment', 'hillockal']
-        secarray_names = ['soma', 'dend', 'apic', 'axon', 'myelin',
-                          'ais', 'hillock']
-        do_replace_axon = False
-
-    elif morph_modifier == "":
+    if model == "hay":
         morph_modifiers = None
         seclist_names = None
         secarray_names = None
         do_replace_axon = True
-
+    elif model == "hallermann":
+        morph_modifiers = [fix_hallerman_morpho]
+        seclist_names = ['all', 'somatic', 'axon_initial_segment', 'collaterals', 'basal', 'apical', 'nodal', 'myelinated']
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'my', 'node']
+        do_replace_axon = False
     else:
-        raise Exception("Unknown morph_modifier")
-
+        raise Exception("Unknown model")
+    
+    if model =="hallermann":
+        v_init = -85.
+    else:
+        v_init = -65.
+        
     cell = ephys.models.LFPyCellModel(
         model,
         v_init=v_init,

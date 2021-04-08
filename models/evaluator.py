@@ -24,7 +24,7 @@ def get_protocol_definitions(model):
     Parameters
     ----------
     model: str
-        "hay", "hallerman"
+        "hay", "hallermann"
 
     Returns
     -------
@@ -52,7 +52,7 @@ def get_feature_definitions(feature_file, feature_set=None):
     fetaures_dict: dict
         Dictionary with features definitions
     """
-    
+
     if ".pkl" in feature_file:
         feature_definitions = pickle.load(open(feature_file, 'rb'))
     elif ".json" in feature_file:
@@ -95,7 +95,6 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
         for recording_definition in protocol_definition["extra_recordings"]:
 
             if recording_definition["type"] == "somadistance":
-
                 location = ephys.locations.NrnSomaDistanceCompLocation(
                     name=recording_definition["name"],
                     soma_distance=recording_definition["somadistance"],
@@ -178,16 +177,28 @@ def define_stimuli_hay(protocol_name, protocol_definition):
     return stimuli
 
 
-def define_stimuli_hallerman(protocol_name, protocol_definition):
-    return []
+def define_stimuli_hallermann(protocol_name, protocol_definition):
     
+    stimuli = []
     
+    for stimulus_definition in protocol_definition["stimuli"]:
+
+        stimuli.append(ephys.stimuli.LFPySquarePulse(
+            step_amplitude=stimulus_definition['amp'],
+            step_delay=stimulus_definition['delay'],
+            step_duration=stimulus_definition['duration'],
+            location=soma_loc,
+            total_duration=stimulus_definition['totduration']))
+
+    return stimuli
+
+
 def define_protocols(
-    model,
-    feature_set=None,
-    feature_file=None,
-    electrode=None,
-    protocols_with_lfp=None
+        model,
+        feature_set=None,
+        feature_file=None,
+        electrode=None,
+        protocols_with_lfp=None
 ):
     """
     Defines protocols for a specified feature_Set (or file)
@@ -195,7 +206,7 @@ def define_protocols(
     Parameters
     ----------
     model: str
-        "hay", "hallerman"
+        "hay", "hallermann"
     feature_set: str
         "soma", "multiple", "extra", or "all"
     feature_file: str
@@ -230,16 +241,16 @@ def define_protocols(
             recordings = define_recordings(
                 protocol_name, protocol_definitions[protocol_name], None
             )
-        
+
         if model == 'hay':
             stimuli = define_stimuli_hay(
                 protocol_name, protocol_definitions[protocol_name]
             )
         else:
-            stimuli = define_stimuli_hallerman(
-                protocol_name, protocol_definitions[protocol_name]
+            stimuli = define_stimuli_hallermann(
+               protocol_name, protocol_definitions[protocol_name]
             )
-            
+
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
         )
@@ -254,7 +265,7 @@ def get_release_params(model):
     Parameters
     ----------
     model: str
-        "hay", "hallerman", "extra"
+        "hay", "hallermann", "extra"
 
     Returns
     -------
@@ -264,7 +275,7 @@ def get_release_params(model):
 
     # load release params
     release_params_file = pathlib.Path(f"{model}_model") / \
-        "parameters_release.json"
+                          "parameters_release.json"
 
     # load unfrozen params
     params_file = pathlib.Path(f"{model}_model") / "parameters.json"
@@ -303,7 +314,7 @@ def get_unfrozen_params_bounds(model):
     Parameters
     ----------
     model: str
-        "hay", "hallerman", "extra"
+        "hay", "hallermann", "extra"
 
     Returns
     -------
@@ -325,7 +336,7 @@ def get_unfrozen_params_bounds(model):
 
 
 def define_fitness_calculator(
-    protocols, feature_file, feature_set, probe=None
+        protocols, feature_file, feature_set, probe=None
 ):
     """
     Defines objective calculator
@@ -365,7 +376,8 @@ def define_fitness_calculator(
 
             for efel_feature_name, meanstd in features.items():
 
-                feature_name = '%s.%s.%s' % (protocol_name, location, efel_feature_name)
+                feature_name = '%s.%s.%s' % (
+                protocol_name, location, efel_feature_name)
 
                 stimulus = protocols[protocol_name].stimuli[0]
 
@@ -385,14 +397,16 @@ def define_fitness_calculator(
                 if protocol_name == 'bAP':
                     kwargs['stim_end'] = stimulus.total_duration
                 else:
-                    kwargs[ 'stim_end'] = stimulus.step_delay + stimulus.step_duration
+                    kwargs[
+                        'stim_end'] = stimulus.step_delay + stimulus.step_duration
 
                 if location == 'MEA':
 
                     feature = ephys.efeatures.extraFELFeature(
                         name=feature_name,
                         extrafel_feature_name=efel_feature_name,
-                        recording_names={'': '%s.%s.LFP' % (protocol_name, location)},
+                        recording_names={
+                            '': '%s.%s.LFP' % (protocol_name, location)},
                         somatic_recording_name=f'{protocol_name}.soma.v',
                         channel_locations=probe.positions,
                         channel_id=None,
@@ -429,8 +443,9 @@ def define_fitness_calculator(
 def create_evaluator(
         model,
         feature_set,
-        sample_id,
-        morph_modifier=""
+        sample_id=None,
+        morph_modifier="",
+        feature_file=None,
 ):
     """
         Prepares objects for optimization of test models.
@@ -440,7 +455,7 @@ def create_evaluator(
         Parameters
         ----------
         model: str
-            "hay" or "hallerman"
+            "hay" or "hallermann"
         feature_set: str
             "soma", "multiple", "extra", or "all"
         sample_id: int
@@ -458,23 +473,36 @@ def create_evaluator(
         -------
         CellEvaluator
         """
+    
+    if sample_id and feature_file:
+        raise Exception('Either feature_file or sample_id should be None')
 
-    sample_dir = pathlib.Path(f"{model}_model") / 'features' / f'random_{sample_id}'
+    sample_dir = pathlib.Path(
+        f"{model}_model") / 'features' / f'random_{sample_id}'
 
     probe = None
     electrode = None
     if feature_set == "extra":
         probe_file = sample_dir / 'probe.json'
         probe, electrode = model.define_electrode(probe_file=probe_file)
-
-    feature_file = sample_dir / f'{feature_set}.pkl'
-    fitness_protocols = define_protocols(feature_set, feature_file, electrode=electrode)
+    
+    if sample_id:
+        feature_file = sample_dir / f'{feature_set}.pkl'
+    
+    fitness_protocols = define_protocols(
+        feature_set, feature_file, electrode=electrode
+    )
 
     cell = model.create(model, morph_modifier, release=False)
 
-    sim = ephys.simulators.LFPySimulator(
-        LFPyCellModel=cell, cvode_active=True, electrode=electrode
-    )
+    if model == "hallermann":
+        sim = ephys.simulators.LFPySimulator(
+            LFPyCellModel=cell, cvode_active=False, electrode=electrode
+        )
+    else:
+        sim = ephys.simulators.LFPySimulator(
+            LFPyCellModel=cell, cvode_active=True, electrode=electrode
+        )
 
     fitness_calculator, _ = define_fitness_calculator(
         protocols=fitness_protocols,

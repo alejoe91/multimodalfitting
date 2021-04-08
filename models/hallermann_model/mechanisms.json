@@ -1,0 +1,73 @@
+{
+    "all": ["pas"],
+    "somatic": [
+        "pas",
+        "na",
+        "Kv",
+        "Kv7",
+        "kca",
+        "ca",
+        "cad",
+        "it2",
+        "Kv1",
+        "ih"
+    ],
+    "apical": [
+        "pas",
+        "na",
+        "Kv",
+        "Kv7",
+        "kca",
+        "cad",
+        "ca",
+        "it2",
+        "Kv1",
+        "ih"
+    ],
+    "basal": [
+        "pas",
+        "na",
+        "Kv",
+        "Kv1",
+        "Kv7",
+        "kca",
+        "cad",
+        "ca",
+        "it2",
+        "ih"
+    ],
+    "collaterals":[
+        "pas",
+        "nax",
+        "Kv1",
+        "ih",
+        "cad"
+    ],
+    "axon_initial_segment":[
+        "nax",
+        "na",
+        "Kv1",
+        "Kv7",
+        "cad",
+        "ca",
+        "it2",
+        "kca",
+        "ih"
+    ],
+    "myelinated":[
+        "pas",
+        "nax",
+        "Kv1",
+        "Kv7",
+        "cad",
+        "ih"
+    ],
+    "nodal":[
+        "pas",
+        "nax",
+        "Kv1",
+        "Kv7",
+        "cad",
+        "ih"
+    ]
+}
