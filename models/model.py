@@ -15,9 +15,10 @@ config_dir = os.path.join(script_dir, "config")
 
 def define_mechanisms(model):
     """Defines mechanisms"""
-
+    
     path_mechs = pathlib.Path(f"{model}_model") / "mechanisms.json"
-
+    print(pathlib.Path(f"{model}_model") / "mechanisms.json")
+    
     mech_definitions = json.load(open(path_mechs))
 
     mechanisms = []
@@ -56,6 +57,8 @@ def define_electrode(
 
     Parameters
     ----------
+    cell: LFPy.Cell
+        The LFP Cell associated to the electrode
     probe_type: str
         'linear' or  'planar'
     num_linear: int
@@ -75,8 +78,8 @@ def define_electrode(
 
     Returns
     -------
-    electrode: LFPy.RecExtElectrode
-        The LFPy electrode object
+    electrode: MEAutility.MEA object
+        The MEAutility electrode object
     """
     import MEAutility as mu
 
@@ -121,7 +124,7 @@ def define_electrode(
 
         probe = mu.return_mea(info=info)
 
-    return LFPy.RecExtElectrode(probe=probe)
+    return probe
 
 
 def define_parameters(model, release=False):
@@ -274,7 +277,7 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     )
 
 
-def create(model, morph_modifier="", release=False):
+def create(model, v_init=-65., release=False):
     """
     Create Hay cell model
 
@@ -282,14 +285,6 @@ def create(model, morph_modifier="", release=False):
     ----------
     model: str
             "hay" or "hallermann"
-    morph_modifier: str
-        The modifier to apply to the axon:
-            - "hillock": the axon is replaced with an axon hillock, an AIS, and
-                a myelinated linear axon.
-               The hillock morphology uses the original axon reconstruction.
-               The 'axon', 'ais', 'hillock', and 'myelin' sections are added.
-            - "taper": the axon is replaced with a tapered hillock
-            - "": the axon is replaced by a 2-segment axon stub
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the
         unfrozen parameters with bounds are returned (use False for
@@ -301,27 +296,18 @@ def create(model, morph_modifier="", release=False):
         The LFPyCellModel object
     """
 
-    if morph_modifier == 'hillock':
-        morph_modifiers = [replace_axon_with_hillock]
-        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axonal',
-                         'myelinated', 'axon_initial_segment', 'hillockal']
-        secarray_names = ['soma', 'dend', 'apic', 'axon', 'myelin',
-                          'ais', 'hillock']
-        do_replace_axon = False
-
-    elif morph_modifier == "":
+    if model == "hay":
         morph_modifiers = None
         seclist_names = None
         secarray_names = None
         do_replace_axon = True
-
-    elif morph_modifier == "hallermann":
+    elif model == "hallermann":
         morph_modifiers = [fix_hallerman_morpho]
         seclist_names = ['all', 'somatic', 'axon_initial_segment', 'collaterals', 'basal', 'apical', 'nodal', 'myelinated']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'my', 'node']
         do_replace_axon = False
     else:
-        raise Exception("Unknown morph_modifier")
+        raise Exception("Unknown model")
     
     if model =="hallermann":
         v_init = -85.

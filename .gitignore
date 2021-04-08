@@ -6,6 +6,7 @@ models/checkpoints/
 models/logs/
 .ideas/
 .idea/
+efeatures_extraction/efeatures/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
