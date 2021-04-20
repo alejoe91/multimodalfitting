@@ -22,7 +22,6 @@ def get_parser():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--feature_set", type=str, default="extra")
     parser.add_argument("--model", type=str, default="hay")
-    parser.add_argument("--morph_modifier", type=str, default="")
     parser.add_argument("--sample_id", type=int, required=True)
     parser.add_argument("--ipyparallel", action="store_true", default=False)
     return parser
@@ -64,21 +63,22 @@ def main():
     args = get_parser().parse_args()
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         stream=sys.stdout,
     )
 
     map_function = get_mapper(args)
 
-    evaluator = evaluator.create_evaluator(
-        model=args.model,
+    eva = evaluator.create_evaluator(
+        model_name=args.model,
         feature_set=args.feature_set,
-        sample_id=args.sample_id,
-        morph_modifier=args.morph_modifier
+        #sample_id=args.sample_id,
+        sample_id=None,
+        feature_file="./cultured_model/features.json"
     )
 
     opt = bluepyopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
-        evaluator=evaluator,
+        evaluator=eva,
         offspring_size=40,
         seed=args.seed,
         map_function=map_function,
@@ -86,7 +86,7 @@ def main():
         selector_name="multi_objective"
     )
 
-    cp_filename = get_cp_filename(args.model,, args.sample_id, args.feature_set, args.seed)
+    cp_filename = get_cp_filename(args.model, args.sample_id, args.feature_set, args.seed)
 
     if cp_filename.is_file():
         logger.info(f"Continuing from checkpoint: {cp_filename}")

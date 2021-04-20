@@ -381,7 +381,7 @@ def define_fitness_calculator(
     if feature_set == 'extra' and probe is None:
         raise Exception("Provide a MEAutility probe to use the 'extra' set.")
 
-    feature_definitions = get_feature_definitions(feature_set, feature_file)
+    feature_definitions = get_feature_definitions(feature_file, feature_set)
 
     objectives = []
     efeatures = {}
@@ -464,7 +464,6 @@ def create_evaluator(
         model_name,
         feature_set,
         sample_id=None,
-        morph_modifier="",
         feature_file=None,
 ):
     """
@@ -480,14 +479,6 @@ def create_evaluator(
             "soma", "multiple", "extra", or "all"
         sample_id: int
             The test sample ID
-        morph_modifier: str
-            The modifier to apply to the axon:
-                - "hillock": the axon is replaced with an axon hillock, an AIS,
-                and a myelinated linear axon.
-                   The hillock morphology uses the original axon reconstruction.
-                   The 'axon', 'ais', 'hillock', and 'myelin' sections are added
-                - "taper": the axon is replaced with a tapered hillock
-                - "": the axon is replaced by a 2-segment axon stub
 
         Returns
         -------
@@ -509,20 +500,22 @@ def create_evaluator(
         feature_file = sample_dir / f'{feature_set}.pkl'
     
     fitness_protocols = define_protocols(
-        feature_set, feature_file, electrode=electrode
+        model_name, feature_set, feature_file, electrode=electrode
     )
 
-    cell = model.create(model_name, morph_modifier, release=False)
+    cell = model.create(model_name, release=False)
 
-    if model_name == "hallermann" or model_name == "cultured":
+    if model_name == "hallermann":
         sim = ephys.simulators.LFPySimulator(
             LFPyCellModel=cell, cvode_active=False, electrode=electrode
         )
-    else:
+    elif model_name == "hay":
         sim = ephys.simulators.LFPySimulator(
             LFPyCellModel=cell, cvode_active=True, electrode=electrode
         )
-
+    else:
+        sim = ephys.simulators.NrnSimulator()
+        
     fitness_calculator, _ = define_fitness_calculator(
         protocols=fitness_protocols,
         feature_file=feature_file,
