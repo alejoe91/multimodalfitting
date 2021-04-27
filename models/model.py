@@ -13,12 +13,11 @@ script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
 
 
-def define_mechanisms(model):
+def define_mechanisms(model_name):
     """Defines mechanisms"""
     
-    path_mechs = pathlib.Path(f"{model}_model") / "mechanisms.json"
-    print(pathlib.Path(f"{model}_model") / "mechanisms.json")
-    
+    path_mechs = pathlib.Path(f"{model_name}_model") / "mechanisms.json"
+
     mech_definitions = json.load(open(path_mechs))
 
     mechanisms = []
@@ -81,6 +80,7 @@ def define_electrode(
     electrode: MEAutility.MEA object
         The MEAutility electrode object
     """
+
     import MEAutility as mu
 
     if probe_file is None:
@@ -127,13 +127,13 @@ def define_electrode(
     return probe
 
 
-def define_parameters(model, release=False):
+def define_parameters(model_name, release=False):
     """
     Defines parameters
 
     Parameters
     ----------
-    model: str
+    model_name: str
             "hay" or "hallermann"
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the unfrozen parameters with bounds are
@@ -145,7 +145,7 @@ def define_parameters(model, release=False):
         List of BPO parameters
     """
 
-    path_params = pathlib.Path(f"{model}_model")
+    path_params = pathlib.Path(f"{model_name}_model")
 
     if release:
         param_configs = json.load(open(path_params / "parameters_release.json"))
@@ -209,7 +209,8 @@ def define_parameters(model, release=False):
             
             str_loc = "_".join(e for e in param_config['sectionlist'])
             name = f"{param_config['param_name']}_{str_loc}"
-            
+            param_dependancies = param_config.get("dependencies", None)
+
             if param_config["type"] == "section":
                 parameters.append(
                     ephys.parameters.NrnSectionParameter(
@@ -220,9 +221,10 @@ def define_parameters(model, release=False):
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
-                        param_dependancies=param_config.get("dependencies", None)
+                        param_dependancies=param_dependancies
                     )
                 )
+
             elif param_config["type"] == "range":
                 parameters.append(
                     ephys.parameters.NrnRangeParameter(
@@ -233,7 +235,7 @@ def define_parameters(model, release=False):
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
-                        param_dependancies=param_config.get("dependencies", None)
+                        param_dependancies=param_dependancies
                     )
                 )
             
@@ -243,17 +245,16 @@ def define_parameters(model, release=False):
                 % param_config
             )
         
-        
     return parameters
 
 
-def define_morphology(model, morph_modifiers, do_replace_axon):
+def define_morphology(model_name, morph_modifiers, do_replace_axon):
     """
     Defines neuron morphology for the Hay model
 
     Parameters
     ----------
-    model: str
+    model_name: str
             "hay" or "hallermann"
     morph_modifiers: list of python functions
         The modifier functions to apply to the axon
@@ -265,10 +266,10 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
         The morphology object
     """
     
-    if model == "hay":
-        path_morpho = pathlib.Path(f"{model}_model") / "morphology.asc"
-    elif model == "hallermann":
-        path_morpho = pathlib.Path(f"{model}_model") / "morphology.swc"
+    if model_name == "hay":
+        path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.asc"
+    else:
+        path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.swc"
 
     return ephys.morphologies.NrnFileMorphology(
         str(path_morpho),
@@ -277,13 +278,13 @@ def define_morphology(model, morph_modifiers, do_replace_axon):
     )
 
 
-def create(model, v_init=-65., release=False):
+def create(model_name, release=False):
     """
     Create Hay cell model
 
     Parameters
     ----------
-    model: str
+    model_name: str
             "hay" or "hallermann"
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the
@@ -296,30 +297,35 @@ def create(model, v_init=-65., release=False):
         The LFPyCellModel object
     """
 
-    if model == "hay":
+    if model_name == "hay":
         morph_modifiers = None
         seclist_names = None
         secarray_names = None
         do_replace_axon = True
-    elif model == "hallermann":
+    elif model_name == "hallermann":
         morph_modifiers = [fix_hallerman_morpho]
         seclist_names = ['all', 'somatic', 'axon_initial_segment', 'collaterals', 'basal', 'apical', 'nodal', 'myelinated']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'my', 'node']
         do_replace_axon = False
     else:
-        raise Exception("Unknown model")
+        morph_modifiers = None
+        seclist_names = None
+        secarray_names = None
+        do_replace_axon = True
     
-    if model =="hallermann":
+    if model_name =="hallermann":
         v_init = -85.
-    else:
+    elif model_name =="hay":
         v_init = -65.
-        
+    elif model_name =="cultured": 
+        v_init = -72.
+
     cell = ephys.models.LFPyCellModel(
-        model,
+        model_name,
         v_init=v_init,
-        morph=define_morphology(model, morph_modifiers, do_replace_axon),
-        mechs=define_mechanisms(model),
-        params=define_parameters(model, release),
+        morph=define_morphology(model_name, morph_modifiers, do_replace_axon),
+        mechs=define_mechanisms(model_name),
+        params=define_parameters(model_name, release),
         seclist_names=seclist_names,
         secarray_names=secarray_names
     )

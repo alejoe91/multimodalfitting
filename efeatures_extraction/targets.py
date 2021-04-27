@@ -7,7 +7,7 @@ targets = {
     },
     "firepattern": {
         "amplitudes": [120, 200],  # Amplitudes will have to change if the rheobase shifted.
-        "tolerances": [10],
+        "tolerances": [20],
         "efeatures": [
             'mean_frequency',
             'burst_number',
@@ -51,7 +51,7 @@ targets = {
     },
     "APWaveform": {
         "amplitudes": [180, 260],  # Arbitrary choice
-        "tolerances": [10],
+        "tolerances": [20],
         "efeatures": [
             'AP_amplitude',
             'AP1_amp',

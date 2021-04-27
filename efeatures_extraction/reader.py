@@ -39,25 +39,3 @@ def wcp_reader(in_data):
         data.append(trace_data)
 
     return data
-
-# TO TEST THE READER
-# import matplotlib.pyplot as plt
-# import numpy
-#
-# in_data = {
-#     "filepath": "./exp_patch_data/cell1_run2.0.wcp",
-#     "i_unit": "pA",
-#     "t_unit": "s",
-#     "v_unit": "mV"
-# }
-#
-# data = wcp_reader(in_data)
-#
-# fig, ax = plt.subplots(nrows=2)
-#
-# for trace in data:
-#
-#     time = numpy.arange(len(trace["voltage"])) * trace["dt"]
-#
-#     ax[0].plot(time, trace["voltage"])
-#     ax[1].plot(time, trace["current"])

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --constraint=cpu
-#SBATCH --ntasks=20
+#SBATCH --ntasks=50
 #SBATCH --partition=prod
 #SBATCH --job-name=LFPy
 #SBATCH --time=0-24:00:00
@@ -16,7 +16,7 @@ LOGS=./logs/${SLURM_JOBID}
 mkdir -p $LOGS
 
 export IPYTHONDIR=./.ipython
-mkdir -p IPYTHONDIR
+mkdir -p ${IPYTHONDIR}
 
 export IPYTHON_PROFILE=benchmark.${SLURM_JOBID}
 
@@ -25,8 +25,8 @@ sleep 20
 srun --output="${LOGS}/engine.out" /gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/ipengine --profile=${IPYTHON_PROFILE} &
 sleep 20
 
-/gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/python3 2-run-optimizations.py --ipyparallel                    \
-                                                                           --seed=${OPT_SEED}               \
-                                                                           --feature_set=${OPT_FEATURE_SET} \
-                                                                           --sample_id=${OPT_SAMPLE_ID}     \
-                                                                           --model=${OPT_MODEL}
+/gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/python3 run_optimizations.py --ipyparallel                    \
+                                                                         --seed=${OPT_SEED}               \
+                                                                         --feature_set=${OPT_FEATURE_SET} \
+                                                                         --sample_id=${OPT_SAMPLE_ID}     \
+                                                                         --model=${OPT_MODEL}
