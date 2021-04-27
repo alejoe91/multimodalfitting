@@ -2,7 +2,8 @@ from targets import targets, ecode_to_index, ecodes_timings
 from pathlib import Path
 
 
-def build_wcp_metadata(cell_id, ephys_dir, repetition_as_different_cells=True):
+def build_wcp_metadata(cell_id, ephys_dir, repetition_as_different_cells=True,
+                       liquid_junction_potential=14.):
 
     files_metadata  = {}
 
@@ -30,7 +31,7 @@ def build_wcp_metadata(cell_id, ephys_dir, repetition_as_different_cells=True):
                 "i_unit": "pA",
                 "t_unit": "s",
                 "v_unit": "mV",
-                "ljp": 14.
+                "ljp": liquid_junction_potential
             }
 
             metadata.update(ecodes_timings[ecode])
