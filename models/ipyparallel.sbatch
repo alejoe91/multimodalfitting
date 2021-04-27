@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --constraint=cpu
-#SBATCH --ntasks=20
+#SBATCH --ntasks=50
 #SBATCH --partition=prod
 #SBATCH --job-name=LFPy
 #SBATCH --time=0-24:00:00
@@ -16,7 +16,7 @@ LOGS=./logs/${SLURM_JOBID}
 mkdir -p $LOGS
 
 export IPYTHONDIR=./.ipython
-mkdir -p IPYTHONDIR
+mkdir -p ${IPYTHONDIR}
 
 export IPYTHON_PROFILE=benchmark.${SLURM_JOBID}
 

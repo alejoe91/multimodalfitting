@@ -3,6 +3,7 @@ models/config/params/
 models/config/features/
 .ipython/
 models/checkpoints/
+models/optimization_results/
 models/logs/
 .ideas/
 .idea/

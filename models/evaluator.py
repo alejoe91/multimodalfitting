@@ -533,5 +533,6 @@ def create_evaluator(
         fitness_protocols=fitness_protocols,
         fitness_calculator=fitness_calculator,
         sim=sim,
-        timeout=900
+        #timeout=900
+        timeout=150
     )

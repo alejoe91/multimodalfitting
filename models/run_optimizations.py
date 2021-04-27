@@ -76,10 +76,10 @@ def main():
         sample_id=None,
         feature_file="./cultured_model/features.json"
     )
-
+    
     opt = bluepyopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
         evaluator=eva,
-        offspring_size=40,
+        offspring_size=20,
         seed=args.seed,
         map_function=map_function,
         weight_hv=0.4,
@@ -95,7 +95,7 @@ def main():
         logger.info(f"Saving checkpoint in: {cp_filename}")
         continue_cp = False
 
-    opt.run(max_ngen=20000, cp_filename=cp_filename, continue_cp=continue_cp)
+    opt.run(max_ngen=2000, cp_filename=cp_filename, continue_cp=continue_cp)
 
 
 if __name__ == '__main__':

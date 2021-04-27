@@ -14,6 +14,18 @@
         "CaDynamics_E2",
         "Ih"
     ],
+    "axonal": [
+        "Ca_LVAst",
+        "Ca_HVA",
+        "SKv3_1",
+        "SK_E2",
+        "K_Tst",
+        "K_Pst",
+        "Nap_Et2",
+        "NaTa_t",
+        "CaDynamics_E2",
+        "Ih"
+    ],
     "apical": [
         "Ih",
         "SK_E2",

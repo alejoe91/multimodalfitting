@@ -1,7 +1,7 @@
 # Get the output of bluepyefe and convert it in the json format needed by the evaluator and model
 import json
 
-protocols_of_interest = ["firepattern_120", "IV_-100"]
+protocols_of_interest = ["firepattern_120", "IV_-100", "APWaveform_260"]
 
 in_protocol_path = "../../efeatures_extraction/efeatures/protocols.json"
 in_efeatures_path = "../../efeatures_extraction/efeatures/features.json"
