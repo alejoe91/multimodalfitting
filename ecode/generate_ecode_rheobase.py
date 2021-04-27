@@ -71,7 +71,7 @@ soma_loc = ephys.locations.NrnSeclistCompLocation(
 
 
 def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
-                             feature_set="soma", **stim_kwargs):
+                             record_extra=False, **stim_kwargs):
     """
     Generates E-CODE protocols given a certain rheobase current
 
@@ -79,6 +79,12 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
     ----------
     rheobase_current: float
         Rheobase current in nA
+    delay_pre: float
+        Delay before stimulus onset in ms
+    delay_post: float
+        Delay after stimulus offset in ms
+    record_extra: bool
+        If True, LFPRecording is added to recordings
     stim_kwargs: dict
         Dictionary to update _default_params dict
 
@@ -236,7 +242,7 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
                     name=f"{ecode_protocol_name}-{i_stim}.soma.v", location=soma_loc, variable="v"
                 )
             ]
-            if feature_set == "extra":
+            if record_extra:
                 recordings.append(ephys.recordings.LFPRecording(f"{ecode_protocol_name}-{i_stim}.MEA.LFP"))
             protocol = ephys.protocols.SweepProtocol(
                 f"{ecode_protocol_name}-{i_stim}", [stimulus], recordings, cvode_active=True

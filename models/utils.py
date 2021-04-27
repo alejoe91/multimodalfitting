@@ -123,7 +123,7 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
                         kwargs['somatic_recording_name'] = f'{protocol_name}.soma.v'
                         kwargs['channel_locations'] = probe.positions
                         kwargs['extrafel_feature_name'] = efel_feature_name
-                        if channels is not 'map':
+                        if channels != 'map':
                             for ch in channels:
                                 kwargs['channel_id'] = int(ch)
                                 feature = feature_class(
@@ -181,7 +181,7 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
                     if verbose:
                         print(f"Feature {name} at {location} is None")
             else:
-                if channels is not 'map':
+                if channels != 'map':
                     val = feat.calculate_feature(responses)
                     if val is not None and val != 0:
                         if isinstance(feat, ephys.efeatures.eFELFeature):
@@ -202,8 +202,8 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
     return responses, feature_meanstd
 
 
-def calculate_eap(responses, protocol_name, protocols, fs=20, fcut=1,
-                  ms_cut=[2, 10], upsample=10, skip_first_spike=True, skip_last_spike=True,
+def calculate_eap(responses, protocol_name, protocols, response_id=0, fs=20, fcut=1,
+                  ms_cut=[2, 10], upsample=10, filt_type="filtfilt", skip_first_spike=True, skip_last_spike=True,
                   raise_warnings=False, verbose=False, **efel_kwargs):
     """
     Calculate extracellular action potential (EAP) by combining intracellular spike times and extracellular signals
@@ -242,14 +242,22 @@ def calculate_eap(responses, protocol_name, protocols, fs=20, fcut=1,
     eap: np.array
         The EAP (num_elec, num_samples)
     """
-    assert "Step" in protocol_name
-    stimulus = protocols[protocol_name].stimuli[0]
+    protocol_responses = [resp for resp in responses.keys() if protocol_name in resp]
+
+    if len(protocol_responses) > 1:
+        protocol = protocols[protocol_name].protocols[response_id]
+        response_name = f"{protocol_name}-{response_id}"
+    else:
+        protocol = protocols[protocol_name]
+        response_name = protocol_name
+
+    stimulus = protocol.stimuli[0]
     stim_start = stimulus.step_delay
     stim_end = stimulus.step_delay + stimulus.step_duration
     efel_kwargs['threshold'] = -20
 
-    somatic_recording_name = f'{protocol_name}.soma.v'
-    extra_recording_name = f'{protocol_name}.MEA.LFP'
+    somatic_recording_name = f'{response_name}.soma.v'
+    extra_recording_name = f'{response_name}.MEA.LFP'
 
     assert somatic_recording_name in responses.keys(), f"{somatic_recording_name} not found in responses"
     assert extra_recording_name in responses.keys(), f"{extra_recording_name} not found in responses"
@@ -279,7 +287,7 @@ def calculate_eap(responses, protocol_name, protocols, fs=20, fcut=1,
     if fcut is not None:
         if verbose:
             print('filter enabled')
-        response_filter = _filter_response(response_interp, fcut=fcut)
+        response_filter = _filter_response(response_interp, fcut=fcut, filt_type=filt_type)
     else:
         if verbose:
             print('filter disabled')
@@ -407,7 +415,7 @@ def _filter_response(response, fcut=[0.5, 6000], order=2, filt_type="lfilter"):
         btype = "bandpass"
         band = np.array(fcut) / fn
 
-    b, a = ss.butter(order, band, btype=btype)
+    b, a = ss.butter(order, fcut, btype=btype, fs=fs)
 
     if len(trace.shape) == 2:
         if filt_type == "filtfilt":
