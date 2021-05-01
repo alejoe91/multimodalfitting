@@ -318,7 +318,7 @@ def create(model_name, release=False):
     elif model_name =="hay":
         v_init = -65.
     elif model_name =="cultured": 
-        v_init = -72.
+        v_init = -70.
 
     cell = ephys.models.LFPyCellModel(
         model_name,
