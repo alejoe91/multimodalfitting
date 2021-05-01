@@ -95,7 +95,7 @@ targets = {
     "PosCheops": {  # Used for validation, need to check exact timings
         "amplitudes": [300],
         "tolerances": [10],
-        "efeatures": ['Spikecount'], # TODO: ISSUE HERE, CANNOT HAVE SEVERAL TIME THE SAME KEY
+        "efeatures": ['Spikecount'],  # TODO: ISSUE HERE, CANNOT HAVE SEVERAL TIME THE SAME KEY
         "location": "soma"
     }
 }

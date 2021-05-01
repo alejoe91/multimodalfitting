@@ -5,7 +5,7 @@ from pathlib import Path
 def build_wcp_metadata(cell_id, ephys_dir, repetition_as_different_cells=True,
                        liquid_junction_potential=14.):
 
-    files_metadata  = {}
+    files_metadata = {}
 
     if not repetition_as_different_cells:
         files_metadata[cell_id] = {}
@@ -44,5 +44,23 @@ def build_wcp_metadata(cell_id, ephys_dir, repetition_as_different_cells=True,
     return files_metadata
 
 
-def build_model_metadata(cell_id, ephys_dir, repetition_as_different_cells):
-    pass
+def build_model_metadata(cell_id, ephys_dir):
+    files_metadata = {}
+
+    files_metadata[cell_id] = {}
+
+    ephys_dir = Path(ephys_dir)
+
+    for protocol_folder in ephys_dir.iterdir():
+        if "extracellular" not in protocol_folder.name:
+
+            metadata = {
+                "folderpath": str(protocol_folder),
+                "i_unit": "nA",
+                "t_unit": "s",
+                "v_unit": "mV",
+            }
+            ecode = protocol_folder.name
+            files_metadata[cell_id][ecode] = [metadata]
+
+    return files_metadata

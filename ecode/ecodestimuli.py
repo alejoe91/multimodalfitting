@@ -1,7 +1,14 @@
 from bluepyopt.ephys.stimuli import Stimulus
+from bluepyopt.ephys.recordings import Recording
+from bluepyopt.ephys.responses import Response
+
 import LFPy
 import numpy as np
+import pandas
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class sAHP(Stimulus):
     """sAHP current clamp injection"""
@@ -101,10 +108,9 @@ class sAHP(Stimulus):
 
         self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
                                             idx=sec_index,
-                                            pptype='IClamp',  # ,
-                                            # amp=self.step_amplitude,
-                                            # delay=self.step_delay,
-                                            dur=self.total_duration)
+                                            pptype='IClamp',
+                                            dur=self.total_duration,
+                                            record_current=True)
 
         stim = LFPyCell._hoc_stimlist[0]
 
@@ -213,7 +219,9 @@ class HyperDepol(Stimulus):
         self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
                                             idx=sec_index,
                                             pptype='IClamp',
-                                            dur=self.total_duration)
+                                            dur=self.total_duration,
+                                            record_current=True)
+
         stim = LFPyCell._hoc_stimlist[0]
 
         amps.play(
@@ -337,7 +345,8 @@ class PosCheops(Stimulus):
         self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
                                             idx=sec_index,
                                             pptype='IClamp',
-                                            dur=self.total_duration)
+                                            dur=self.total_duration,
+                                            record_current=True)
         stim = LFPyCell._hoc_stimlist[0]
 
         current_vec.play(
@@ -419,7 +428,8 @@ class NoiseOU3(Stimulus):
         self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
                                             idx=sec_index,
                                             pptype='IClamp',
-                                            dur=self.total_duration)
+                                            dur=self.total_duration,
+                                            record_current=True)
 
         stim = LFPyCell._hoc_stimlist[0]
 
@@ -443,3 +453,111 @@ class NoiseOU3(Stimulus):
         return "NoiseOU3 from %s located at %s" % (
             self.filename,
             self.location)
+
+
+#### Stim response and recording ###
+class TimeCurrentResponse(Response):
+
+    """Response to stimulus"""
+
+    def __init__(self, name, time=None, current=None):
+        """Constructor
+
+        Args:
+            name (str): name of this object
+            time (list of floats): time series
+            current (list of floats): current series
+        """
+
+        super(TimeCurrentResponse, self).__init__(name)
+
+        self.response = pandas.DataFrame()
+        self.response["time"] = pandas.Series(time)
+        self.response["current"] = pandas.Series(current)
+
+    def read_csv(self, filename):
+        """Load response from csv file"""
+
+        self.response = pandas.read_csv(filename)
+
+    def to_csv(self, filename):
+        """Write response to csv file"""
+
+        self.response.to_csv(filename)
+
+    def __getitem__(self, index):
+        """Return item at index"""
+
+        return self.response.__getitem__(index)
+
+    # This plot has to be generalised to several subplots
+    def plot(self, axes):
+        """Plot the response"""
+
+        axes.plot(
+            self.response["time"],
+            self.response["current"],
+            label="%s" % self.name,
+        )
+
+
+class StimRecording(Recording):
+
+    """Stimulus response"""
+
+    location = "stimulus"
+    variable = "i"
+
+    def __init__(self, name=None):
+        """Constructor
+
+        Args:
+            name (str): name of this object
+        """
+
+        super(StimRecording, self).__init__(name=name)
+
+        self.cell = None
+        self.tvector = None
+        self.time = None
+
+        self.instantiated = False
+
+    @property
+    def response(self):
+        """Return recording response"""
+
+        if not self.instantiated:
+            return None
+        self.tvector = self.cell.tvec
+        # if len(self.cell.pointprocesses) > 1:
+        #     raise Exception
+        return TimeCurrentResponse(
+            self.name, self.tvector, self.cell.pointprocesses[0].i
+        )
+
+    def instantiate(self, sim=None, icell=None, LFPyCell=None):
+        import LFPy
+
+        """Instantiate recording"""
+
+        logger.debug(
+            "Adding recording of %s at %s", self.variable, self.location
+        )
+
+        assert isinstance(
+            LFPyCell, LFPy.Cell
+        ), "LFPRecording is only available for LFPCellModel"
+        self.cell = LFPyCell
+        self.tvector = None
+        self.instantiated = True
+
+    def destroy(self, sim=None):
+        """Destroy recording"""
+        self.tvector = None
+        self.instantiated = False
+
+    def __str__(self):
+        """String representation"""
+
+        return "%s: %s at %s" % (self.name, self.variable, self.location)

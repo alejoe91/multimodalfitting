@@ -1,9 +1,18 @@
-from ecodestimuli import sAHP, HyperDepol, PosCheops
+from ecodestimuli import sAHP, HyperDepol, PosCheops, StimRecording
 import bluepyopt.ephys as ephys
-import numpy as np
-from copy import deepcopy
 import efel
+
+import numpy as np
+import pandas as pd
+import time
+from copy import deepcopy
 from collections import OrderedDict
+from pathlib import Path
+import sys
+
+sys.path.append(Path(__file__).parent / "models")
+
+from utils import calculate_eap
 
 # define default params
 
@@ -71,7 +80,7 @@ soma_loc = ephys.locations.NrnSeclistCompLocation(
 
 
 def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
-                             record_extra=False, **stim_kwargs):
+                             record_extra=False, protocols_with_lfp=None, **stim_kwargs):
     """
     Generates E-CODE protocols given a certain rheobase current
 
@@ -85,6 +94,9 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
         Delay after stimulus offset in ms
     record_extra: bool
         If True, LFPRecording is added to recordings
+    protocols_with_lfp: list or None
+        If None and record_extra is True, all protocols will record LFP.
+        If list and record_extra is True, selected protocols will record LFP.
     stim_kwargs: dict
         Dictionary to update _default_params dict
 
@@ -237,20 +249,22 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
         # define somatic recording
         protocols = []
         for i_stim, stimulus in enumerate(stimuli):
-            recordings = [
-                ephys.recordings.CompRecording(
-                    name=f"{ecode_protocol_name}-{i_stim}.soma.v", location=soma_loc, variable="v"
-                )
-            ]
+            recordings = []
+            recordings.append(ephys.recordings.CompRecording(name=f"{ecode_protocol_name}-{i_stim}.soma.v",
+                                                             location=soma_loc, variable="v"))
+            recordings.append(StimRecording(name=f"{ecode_protocol_name}-{i_stim}.stim.i"))
             if record_extra:
-                recordings.append(ephys.recordings.LFPRecording(f"{ecode_protocol_name}-{i_stim}.MEA.LFP"))
+                if protocols_with_lfp is None:
+                    recordings.append(ephys.recordings.LFPRecording(f"{ecode_protocol_name}-{i_stim}.MEA.LFP"))
+                else:
+                    if ecode_protocol_name in protocols_with_lfp:
+                        recordings.append(ephys.recordings.LFPRecording(f"{ecode_protocol_name}-{i_stim}.MEA.LFP"))
             protocol = ephys.protocols.SweepProtocol(
                 f"{ecode_protocol_name}-{i_stim}", [stimulus], recordings, cvode_active=True
             )
             protocols.append(protocol)
         ecode_protocols[ecode_protocol_name] = ephys.protocols.SequenceProtocol(name=ecode_protocol_name,
                                                                                 protocols=protocols)
-
     return ecode_protocols
 
 
@@ -332,8 +346,101 @@ def compute_rheobase_for_model(cell, sim, step_duration=270, delay=250, step_min
     return rheobase_current, protocols, responses
 
 
-def generate_ecode_stimuli_from_data(wcp_files, delay_pre=250, delay_post=250,
-                                     **stim_kwargs):
-    import neo
+def run_ecode_protocols(protocols, cell, sim, resample_rate_khz=40):
+    """
+    Runs ecode protocols and resamples responses.
 
-    pass
+    Parameters
+    ----------
+    protocols: dict
+        Dictionary of BluePyOpt protocols
+    cell: LFPyCellModel
+        BluePyOpt LFPy cell model
+    sim: LFPySimulator
+        BluePyOpt simulator
+    resample_rate_khz: float
+        Resample rate in kHz
+
+    Returns
+    -------
+    resampled_responses: dict
+        Dictionary with resampled responses for each protocol
+    """
+    ecode_responses = {}
+    for i, (protocol_name, protocol) in enumerate(protocols.items()):
+        ecode_responses[protocol_name] = {}
+        print(f"Running protocol {protocol_name}")
+        t_start = time.time()
+        response = protocol.run(cell_model=cell, param_values={}, sim=sim)
+        ecode_responses[protocol_name].update(response)
+        print(f"Elapsed time {protocol_name}: {time.time() - t_start}")
+
+    responses_interp_dict = dict()
+    for protocol_name, responses in ecode_responses.items():
+        responses_interp = dict()
+        for response_name, response in responses.items():
+            response_interp = interpolate_response(response, resample_rate_khz)
+            responses_interp[response_name] = response_interp
+        responses_interp_dict[protocol_name] = responses_interp
+
+    return responses_interp_dict
+
+
+def save_intracellular_responses(responses_dict, output_folder):
+    output_folder = Path(output_folder)
+    output_folder.mkdir(exist_ok=True, parents=True)
+
+    for protocol_name, response in responses_dict.items():
+        print(f"Saving {protocol_name}")
+        (output_folder / protocol_name).mkdir(exist_ok=True, parents=True)
+        dataframes_sweep = dict()
+        for i, (resp_name, resp) in enumerate(response.items()):
+            sweep = int(resp_name.split(".")[0].split('-')[1])
+            if sweep not in dataframes_sweep.keys():
+                dataframes_sweep[sweep] = pd.DataFrame()
+            if "LFP" not in resp_name:
+                for k, v in resp.items():
+                    dataframes_sweep[sweep][k] = v
+        for sweep, df in dataframes_sweep.items():
+            df.to_csv(output_folder / protocol_name / f"{protocol_name}-{sweep}.csv")
+
+
+def save_extracellular_template(responses, protocols, protocol_name,
+                                probe, output_folder, response_id=0,  **eap_kwargs):
+    eap = calculate_eap(responses, protocol_name, protocols, response_id=response_id, **eap_kwargs)
+    locations = probe.positions
+
+    output_folder = Path(output_folder)
+    (output_folder / "extracellular").mkdir(exist_ok=True, parents=True)
+    np.save(output_folder / "extracellular" / "template.npy", eap)
+    np.save(output_folder / "extracellular" / "locations.npy", locations)
+
+    return eap, locations
+
+
+def interpolate_response(response, fs=20.0):
+    from scipy.interpolate import interp1d
+    import pandas as pd
+
+    x = response["time"]
+    xnew = np.arange(np.min(x), np.max(x), 1.0 / fs)
+
+    if isinstance(response.response, pd.DataFrame):
+        other_columns = [k for k in list(response.response.columns) if k != "time"]
+    else:
+        other_columns = [k for k in list(response.response.keys()) if k != "time"]
+
+    response_new = dict()
+    response_new["time"] = xnew
+
+    for other in other_columns:
+        y = np.array(response[other])
+        if y.ndim > 1:  # e.g. LFP responses
+            f = interp1d(x, y, axis=1)
+        else:
+            f = interp1d(x, y)
+        ynew = f(xnew)  # use interpolation function returned by `interp1d`
+        response_new[other] = ynew
+
+    return response_new
+

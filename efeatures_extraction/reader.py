@@ -1,5 +1,6 @@
 import numpy as np
 import neo
+from pathlib import Path
 
 from bluepyefe.reader import _check_metadata
 
@@ -41,28 +42,37 @@ def wcp_reader(in_data):
     return data
 
 
-def model_reader(in_data):
-    """Reader for modeled npz data
+def model_csv_reader(in_data):
+    """Reader for modeled csv data
 
     Args:
         in_data (dict): of the format
         {
-            "filepath": "./XXX.npz",
-            "i_unit": "pA",
+            "folderpath": "./XXX",
+            "i_unit": "nA",
             "t_unit": "s",
             "v_unit": "mV",
         }
     """
+    import pandas as pd
 
     _check_metadata(
         in_data,
-        model_reader.__name__,
-        ["filepath", "i_unit", "v_unit", "t_unit"],
+        model_csv_reader.__name__,
+        ["folderpath", "i_unit", "v_unit", "t_unit"],
     )
 
     # Read file
-    data = np.load(in_data["filepath"])
+    data = []
+    protocol_folder = Path(in_data["folderpath"])
+    for file in protocol_folder.iterdir():
+        sweep_df = pd.read_csv(file)
+        trace_data = {
+            "voltage": np.array(sweep_df["voltage"]),
+            "current": np.array(sweep_df["current"]),
+            "dt": 1 / np.median(np.diff(sweep_df["time"]))
+        }
 
-    #TODO
+        data.append(trace_data)
 
     return data
