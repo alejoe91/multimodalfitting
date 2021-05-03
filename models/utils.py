@@ -202,8 +202,8 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
     return responses, feature_meanstd
 
 
-def calculate_eap(responses, protocol_name, protocols, response_id=0, fs=20, fcut=1,
-                  ms_cut=[2, 10], upsample=10, filt_type="filtfilt", skip_first_spike=True, skip_last_spike=True,
+def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1,
+                  ms_cut=[2, 10], filt_type="filtfilt", skip_first_spike=True, skip_last_spike=True,
                   raise_warnings=False, verbose=False, **efel_kwargs):
     """
     Calculate extracellular action potential (EAP) by combining intracellular spike times and extracellular signals
@@ -216,6 +216,8 @@ def calculate_eap(responses, protocol_name, protocols, response_id=0, fs=20, fcu
         The protocol to use to compute the EAP (must be a Step)
     protocols: list
         The list of protocols (used to extract stimuli information)
+    sweep_id: int
+        In case of sweep protocols, the sweep id to use.
     fs: float
         The final sampling frequency in kHz (default 20 kHz)
     fcut: float or list of 2 floats
@@ -223,8 +225,10 @@ def calculate_eap(responses, protocol_name, protocols, response_id=0, fs=20, fcu
         If list of 2 floats, the high-pass and low-pass filter cutoff
     ms_cut: list of 2 floats
         Ms to cutout before and after peak
-    upsample: int
-        The upsampling factor
+    filt_type: str
+        Filter type:
+            - 'lfilter': forward pass
+            - 'filtfilt': forward-backward pass
     skip_first_spike: bool
         If True, the first spike is not used to compute the EAP
     skip_last_spike: bool
@@ -245,8 +249,8 @@ def calculate_eap(responses, protocol_name, protocols, response_id=0, fs=20, fcu
     protocol_responses = [resp for resp in responses.keys() if protocol_name in resp]
 
     if len(protocol_responses) > 1:
-        protocol = protocols[protocol_name].protocols[response_id]
-        response_name = f"{protocol_name}-{response_id}"
+        protocol = protocols[protocol_name].protocols[sweep_id]
+        response_name = f"{protocol_name}-{sweep_id}"
     else:
         protocol = protocols[protocol_name]
         response_name = protocol_name
@@ -295,16 +299,8 @@ def calculate_eap(responses, protocol_name, protocols, response_id=0, fs=20, fcu
 
     ewf = _get_waveforms(response_filter, peak_times, ms_cut)
     mean_wf = np.mean(ewf, axis=0)
-    if upsample is not None:
-        if verbose:
-            print('upsample')
-        assert upsample > 0
-        upsample = int(upsample)
-        mean_wf_up = _upsample_wf(mean_wf, upsample)
-    else:
-        mean_wf_up = mean_wf
 
-    return mean_wf_up
+    return mean_wf
 
 
 ## HELPER FUNCTIONS FOR EAP##
