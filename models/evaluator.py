@@ -396,13 +396,17 @@ def define_fitness_calculator(
 
                 feature_name = '%s.%s.%s' % (
                 protocol_name, location, efel_feature_name)
-
-                stimulus = protocols[protocol_name].stimuli[0]
+                
+                if protocols[protocol_name].stimuli[0].step_delay > 0.:
+                    stimulus = protocols[protocol_name].stimuli[0]
+                else:
+                    stimulus = protocols[protocol_name].stimuli[1]
 
                 kwargs = {
                     'exp_mean': meanstd[0],
                     'exp_std': meanstd[1],
-                    'stim_start': stimulus.step_delay
+                    'stim_start': stimulus.step_delay,
+                    'stimulus_current': stimulus.step_amplitude
                 }
 
                 if location == 'soma':
@@ -444,6 +448,9 @@ def define_fitness_calculator(
                         name=feature_name,
                         efel_feature_name=efel_feature_name,
                         recording_names=recording_names,
+                        max_score=250,
+                        force_max_score=True,
+                        int_settings={'strict_stiminterval': True},
                         **kwargs
                     )
 

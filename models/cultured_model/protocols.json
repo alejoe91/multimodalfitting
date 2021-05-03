@@ -21,15 +21,15 @@
       {
         "delay": 0.0,
         "amp": -0.08507513254880905,
-        "duration": 3487.2598980791845,
-        "totduration": 3487.2598980791845
+        "duration": 3750,
+        "totduration": 3750
       },
       {
-        "delay": 250.0,
+        "delay": 500.0,
         "amp": -0.1152189411330114,
         "thresh_perc": -93.81252155277929,
         "duration": 3000.0,
-        "totduration": 3487.2598980791845
+        "totduration": 3750
       }
     ]
   },
@@ -38,15 +38,15 @@
       {
         "delay": 0.0,
         "amp": -0.08507513254880905,
-        "duration": 398.08,
-        "totduration": 398.08
+        "duration": 700.0,
+        "totduration": 700.0
       },
       {
-        "delay": 150.00000000000003,
+        "delay": 500.0,
         "amp": 0.31995578833376576,
         "thresh_perc": 260.51150092020794,
-        "duration": 49.99999999999997,
-        "totduration": 398.08
+        "duration": 50.0,
+        "totduration": 700.0
       }
     ]
   }

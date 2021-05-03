@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --constraint=cpu
-#SBATCH --ntasks=50
+#SBATCH --ntasks=30
 #SBATCH --partition=prod
 #SBATCH --job-name=LFPy
 #SBATCH --time=0-24:00:00

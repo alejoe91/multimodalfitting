@@ -79,7 +79,7 @@ def main():
     
     opt = bluepyopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
         evaluator=eva,
-        offspring_size=20,
+        offspring_size=30,
         seed=args.seed,
         map_function=map_function,
         weight_hv=0.4,

@@ -10,6 +10,67 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# define default params
+
+default_ecode_params = {
+    "IDthres": {
+        'duration': 270,
+        'from': 0.5,
+        'to': 1.3,
+        'step': 0.04,
+    },
+    "firepattern": {
+        'duration': 3600,
+        'from': 1.2,
+        'to': 2,
+        'step': 0.8,
+    },
+    "IV": {
+        'duration': 3000,
+        'from': -1.4,
+        'to': 0.6,
+        'step': 0.2,
+    },
+    "IDrest": {
+        'duration': 1350,
+        'from': 0.5,
+        'to': 3,
+        'step': 0.25,
+    },
+    "APWaveform": {
+        'duration': 50,
+        'from': 2,
+        'to': 3,
+        'step': 0.25,
+    },
+    "HyperDepol": {
+        'hyper_duration': 450,
+        'hyper_from': -0.4,
+        'hyper_to': -1.6,
+        'hyper_step': -0.4,
+        'depol_duration': 270,
+        'depol_amp': 1
+    },
+    "sAHP": {
+        'phase1_duration': 250,
+        'phase1_amp': 0.4,
+        'phase2_duration': 225,
+        'phase2_from': 1.5,
+        'phase2_to': 3,
+        'phase2_step': 0.5,
+        'phase3_duration': 450,
+        'phase3_amp': 0.4
+    },
+    "PosCheops": {
+        'amp': 3,
+        'duration1': 4000,
+        'duration2': 2000,
+        'duration3': 1330,
+        'delay': 1500,
+    },
+}
+
+
 class sAHP(Stimulus):
     """sAHP current clamp injection"""
 

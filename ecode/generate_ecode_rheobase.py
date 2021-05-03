@@ -1,4 +1,4 @@
-from ecodestimuli import sAHP, HyperDepol, PosCheops, StimRecording
+from ecodestimuli import sAHP, HyperDepol, PosCheops, StimRecording, default_ecode_params
 import bluepyopt.ephys as ephys
 import efel
 
@@ -13,66 +13,6 @@ import sys
 sys.path.append(Path(__file__).parent / "models")
 
 from utils import calculate_eap
-
-# define default params
-
-_default_params = {
-    "IDthres": {
-        'duration': 270,
-        'from': 0.5,
-        'to': 1.3,
-        'step': 0.04,
-    },
-    "firepattern": {
-        'duration': 3600,
-        'from': 1.2,
-        'to': 2,
-        'step': 0.8,
-    },
-    "IV": {
-        'duration': 3000,
-        'from': -1.4,
-        'to': 0.6,
-        'step': 0.2,
-    },
-    "IDrest": {
-        'duration': 1350,
-        'from': 0.5,
-        'to': 3,
-        'step': 0.25,
-    },
-    "APWaveform": {
-        'duration': 50,
-        'from': 2,
-        'to': 3,
-        'step': 0.25,
-    },
-    "HyperDepol": {
-        'hyper_duration': 450,
-        'hyper_from': -0.4,
-        'hyper_to': -1.6,
-        'hyper_step': -0.4,
-        'depol_duration': 270,
-        'depol_amp': 1
-    },
-    "sAHP": {
-        'phase1_duration': 250,
-        'phase1_amp': 0.4,
-        'phase2_duration': 225,
-        'phase2_from': 1.5,
-        'phase2_to': 3,
-        'phase2_step': 0.5,
-        'phase3_duration': 450,
-        'phase3_amp': 0.4
-    },
-    "PosCheops": {
-        'amp': 3,
-        'duration1': 4000,
-        'duration2': 2000,
-        'duration3': 1330,
-        'delay': 1500,
-    },
-}
 
 soma_loc = ephys.locations.NrnSeclistCompLocation(
     name="soma", seclist_name="somatic", sec_index=0, comp_x=0.5
@@ -98,7 +38,7 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
         If None and record_extra is True, all protocols will record LFP.
         If list and record_extra is True, selected protocols will record LFP.
     stim_kwargs: dict
-        Dictionary to update _default_params dict
+        Dictionary to update default_ecode_params dict
 
     Returns
     -------
@@ -107,10 +47,10 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
     """
     ecode_stimuli = {}
 
-    params = deepcopy(_default_params)
+    params = deepcopy(default_ecode_params)
     params.update(stim_kwargs)
 
-    # 8 - IDthresh
+    # 8 - IDthres
     steps = np.arange(params["IDthres"]["from"], params["IDthres"]["to"] + 0.0001, params["IDthres"]["step"])
     amplitude_steps = steps * rheobase_current
     duration = params["IDthres"]["duration"]
@@ -123,7 +63,7 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
                                                  location=soma_loc)
         stimuli.append(stimulus)
 
-    ecode_stimuli["IDthresh"] = stimuli
+    ecode_stimuli["IDthres"] = stimuli
 
     # 9 - firepattern
     steps = np.arange(params["firepattern"]["from"], params["firepattern"]["to"] + 0.0001,
@@ -387,6 +327,17 @@ def run_ecode_protocols(protocols, cell, sim, resample_rate_khz=40):
 
 
 def save_intracellular_responses(responses_dict, output_folder):
+    """
+
+    Parameters
+    ----------
+    responses_dict
+    output_folder
+
+    Returns
+    -------
+
+    """
     output_folder = Path(output_folder)
     output_folder.mkdir(exist_ok=True, parents=True)
 

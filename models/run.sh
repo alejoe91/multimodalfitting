@@ -9,7 +9,7 @@ export OPT_MODEL='cultured'
       #export OPT_FEATURE_SET=${feature_set}
       export OPT_FEATURE_SET='soma'
 
-      for seed in {1..5}; do
+      for seed in {1..10}; do
 
           export OPT_SEED=${seed}
 
