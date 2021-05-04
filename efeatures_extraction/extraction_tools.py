@@ -2,6 +2,7 @@ import numpy as np
 import neo
 from pathlib import Path
 import json
+from copy import deepcopy
 
 from bluepyefe.reader import _check_metadata
 from bluepyopt.ephys.extra_features_utils import calculate_features, all_1D_features
@@ -421,7 +422,8 @@ def get_targets(timings):
 
 def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
                           out_protocol_path, out_efeatures_path,
-                          protocols_of_interest=None, std_from_mean=None):
+                          epsilon=1e-3, protocols_of_interest=None,
+                          std_from_mean=None):
     """
     Converts protocols and features from BluePyEfe to BPO format.
 
@@ -435,6 +437,8 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
         Path to output protocols json file
     out_efeatures_path: str or Path
         Path to output efeatures json file
+    epsilon: float
+        Value to substitute to features with 0 std (default 1e-3)
     protocols_of_interest: list or None
         If not None, list of protocols to export
     std_from_mean: float or None
@@ -451,18 +455,14 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
     in_protocols = json.load(open(in_protocol_path, 'r'))
     in_efeatures = json.load(open(in_efeatures_path, 'r'))
 
-    in_locations = []
-    for protocol_name, feature_dict in in_efeatures.items():
-        for location_name in feature_dict.keys():
-            if location_name not in in_locations:
-                in_locations.append(location_name)
-
     out_protocols = {}
     out_efeatures = {}
-    print(f"Found {in_locations} locations")
 
-    for loc_name in in_locations:
-        out_efeatures = {loc_name: {}}
+    feature_set = "soma"
+    out_efeatures[feature_set] = {}
+
+    out_protocols = {}
+    out_efeatures = {"soma": {}}
 
     if protocols_of_interest is None:
         protocols_of_interest = list(in_protocols.keys())
@@ -480,13 +480,15 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
             out_protocols[protocol_name] = {'stimuli': stimuli}
 
             # Convert the format of the efeatures
+            efeatures_def = {}
             for loc_name, features in in_efeatures[protocol_name].items():
-                efeatures_def = {}
                 for feature in features:
                     efeatures_def[feature['feature']] = feature['val']
                     if std_from_mean is not None:
                         efeatures_def[feature['feature']][1] = std_from_mean * efeatures_def[feature['feature']][0]
-                out_efeatures[loc_name][protocol_name] = {loc_name: efeatures_def}
+                    if efeatures_def[feature['feature']][1] == 0:
+                        efeatures_def[feature['feature']][1] = epsilon
+                out_efeatures[feature_set][protocol_name] = {loc_name: efeatures_def}
 
     s = json.dumps(out_protocols, indent=2)
     with open(out_protocol_path, "w") as fp:
@@ -522,18 +524,30 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_path):
     """
     efeatures_dict = json.load(open(efeatures_path))
 
-    efeatures_dict["MEA"] = {}
-    efeatures_dict["MEA"][protocol_name] = {}
+    feature_set = "extra"
+    new_efeatures_dict = efeatures_dict
+
+    available_feature_sets = list(efeatures_dict.keys())
+    assert len(available_feature_sets) == 1
+    new_efeatures_dict[feature_set] = deepcopy(efeatures_dict[available_feature_sets[0]])
+    print(new_efeatures_dict.keys())
+
+    if protocol_name not in list(new_efeatures_dict[feature_set].keys()):
+        # create protocol if non existing
+        new_efeatures_dict[feature_set][protocol_name] = {}
+
+    # create MEA location
+    new_efeatures_dict[feature_set][protocol_name]["MEA"] = {}
 
     for extra_feat_name, feature_values in extra_features.items():
         feature_list = feature_values.tolist()
-        efeatures_dict["MEA"][protocol_name][extra_feat_name] = [feature_list, None]
+        new_efeatures_dict[feature_set][protocol_name]["MEA"][extra_feat_name] = [feature_list, None]
 
-    s = json.dumps(efeatures_dict, indent=2)
+    s = json.dumps(new_efeatures_dict, indent=2)
     with open(efeatures_path, "w") as fp:
         fp.write(s)
 
-    return efeatures_dict
+    return new_efeatures_dict
 
 
 def compute_extra_features(eap, fs, upsample=1, feature_list=None):
