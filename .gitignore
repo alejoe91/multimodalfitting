@@ -5,6 +5,7 @@ models/config/features/
 models/checkpoints/
 models/optimization_results/
 models/logs/
+data/
 .ideas/
 .idea/
 efeatures_extraction/efeatures/

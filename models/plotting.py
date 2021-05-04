@@ -252,7 +252,8 @@ def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1",
     return ax
 
 
-def plot_eap(responses, protocols, probe, color="C0", protocol_name="Step1", norm=True, figsize=(7, 12), ax=None):
+def plot_eap(responses, protocols, probe, color="C0", protocol_name="Step1", norm=True, figsize=(7, 12), ax=None,
+             **calculate_eap_kwargs):
     """
     Plots single extracellular action potential (EAP)
 
@@ -283,7 +284,8 @@ def plot_eap(responses, protocols, probe, color="C0", protocol_name="Step1", nor
     if ax is None:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
-    eap = utils.calculate_eap(responses=responses, protocols=protocols, protocol_name=protocol_name)
+    eap = utils.calculate_eap(responses=responses, protocols=protocols, protocol_name=protocol_name,
+                              **calculate_eap_kwargs)
     if norm:
         eap = eap / np.max(np.abs(eap), 1, keepdims=True)
         vscale = 2

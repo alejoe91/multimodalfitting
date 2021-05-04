@@ -261,7 +261,7 @@ def define_protocols(
             stimuli = define_stimuli_hay(
                 protocol_name, protocol_definitions[protocol_name]
             )
-        elif model_name == 'hallerman':
+        elif model_name == 'hallermann':
             stimuli = define_stimuli_hallermann(
                protocol_name, protocol_definitions[protocol_name]
             )
