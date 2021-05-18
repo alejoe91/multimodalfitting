@@ -1,0 +1,170 @@
+{
+    "bAP": {
+        "stimuli": [
+            {
+                "delay": 95,
+                "amp": 1.9,
+                "duration": 5,
+                "totduration": 400
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 400,
+                "type": "somadistance",
+                "name": "dend1",
+                "seclist_name": "apical"
+            },
+            {
+                "var": "v",
+                "somadistance": 620,
+                "type": "somadistance",
+                "name": "dend2",
+                "seclist_name": "apical"
+            }
+        ]
+    },
+    "BAC": {
+        "stimuli": [
+            {
+                "delay": 95,
+                "amp": 1.9,
+                "duration": 5,
+                "totduration": 400
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 400,
+                "type": "somadistance",
+                "name": "dend1",
+                "seclist_name": "apical"
+            },
+            {
+                "var": "v",
+                "somadistance": 620,
+                "type": "somadistance",
+                "name": "dend2",
+                "seclist_name": "apical"
+            }
+        ]
+    },
+    "EPSP": {
+        "stimuli": [
+            {
+                "delay": 95,
+                "amp": 1.9,
+                "duration": 5,
+                "totduration": 400
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 400,
+                "type": "somadistance",
+                "name": "dend1",
+                "seclist_name": "apical"
+            },
+            {
+                "var": "v",
+                "somadistance": 620,
+                "type": "somadistance",
+                "name": "dend2",
+                "seclist_name": "apical"
+            }
+        ]
+    },
+    "CaBurst": {
+        "stimuli": [
+            {
+                "delay": 95,
+                "amp": 1.9,
+                "duration": 5,
+                "totduration": 400
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 400,
+                "type": "somadistance",
+                "name": "dend1",
+                "seclist_name": "apical"
+            },
+            {
+                "var": "v",
+                "somadistance": 620,
+                "type": "somadistance",
+                "name": "dend2",
+                "seclist_name": "apical"
+            }
+        ]
+    },
+    "Step1": {
+        "stimuli": [
+            {
+                "delay": 700,
+                "amp": 0.793,
+                "duration": 2000,
+                "totduration": 3000
+            },
+            {
+                "delay": 0,
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 15,
+                "type": "somadistance",
+                "name": "hillock10",
+                "seclist_name": "hillockal"
+            },
+            {
+                "var": "v",
+                "somadistance": 30,
+                "type": "somadistance",
+                "name": "aisrec30",
+                "seclist_name": "axon_initial_segment"
+            }
+        ]
+    },
+    "Step_AIS": {
+        "stimuli": [
+            {
+                "delay": 700,
+                "amp": 0.793,
+                "duration": 2000,
+                "totduration": 3000
+            },
+            {
+                "delay": 0,
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
+            }
+        ],
+        "extra_recordings": [
+            {
+                "var": "v",
+                "somadistance": 15,
+                "type": "somadistance",
+                "name": "hillock10",
+                "seclist_name": "hillockal"
+            },
+            {
+                "var": "v",
+                "somadistance": 30,
+                "type": "somadistance",
+                "name": "aisrec30",
+                "seclist_name": "axon_initial_segment"
+            }
+        ]
+    }
+}

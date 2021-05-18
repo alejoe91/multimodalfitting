@@ -255,7 +255,7 @@ def define_morphology(model_name, morph_modifiers, do_replace_axon):
     Parameters
     ----------
     model_name: str
-            "hay" or "hallermann"
+            "hay", "hay_ais" or "hallermann"
     morph_modifiers: list of python functions
         The modifier functions to apply to the axon
     do_replace_axon: bool
@@ -266,7 +266,7 @@ def define_morphology(model_name, morph_modifiers, do_replace_axon):
         The morphology object
     """
     
-    if model_name == "hay":
+    if (model_name == "hay") or (model_name == "hay_ais"):
         path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.asc"
     else:
         path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.swc"
@@ -307,6 +307,11 @@ def create(model_name, release=False):
         seclist_names = ['all', 'somatic', 'axon_initial_segment', 'collaterals', 'basal', 'apical', 'nodal', 'myelinated']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'my', 'node']
         do_replace_axon = False
+    elif model_name == "hay_ais":
+        morph_modifiers = [replace_axon_with_hillock]
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin' ] #["soma", "dend", "apic", "axon", "myelin"]
+        do_replace_axon = False
     else:
         morph_modifiers = None
         seclist_names = None
@@ -319,6 +324,8 @@ def create(model_name, release=False):
         v_init = -65.
     elif model_name =="cultured": 
         v_init = -70.
+    elif model_name =="hay_ais":
+        v_init = -65.
 
     cell = ephys.models.LFPyCellModel(
         model_name,

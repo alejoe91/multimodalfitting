@@ -2,16 +2,16 @@
     "Step1": {
         "stimuli": [
             {
-                "delay": 515,
-                "amp": 5.5,
-                "duration": 3,
-                "totduration": 540
+                "delay": 700,
+                "amp": 6.432,
+                "duration": 2000,
+                "totduration": 3000
             },
             {
                 "delay": 0,
-                "amp": 0,
-                "duration": 540,
-                "totduration": 540
+                "amp": 0.0,
+                "duration": 3000,
+                "totduration": 3000
             }
         ],
         "extra_recordings": [
@@ -20,13 +20,6 @@
                 "somadistance": 30,
                 "type": "somadistance",
                 "name": "ais30",
-                "seclist_name": "axon_initial_segment"
-            },
-            {
-                "var": "v",
-                "somadistance": 60,
-                "type": "somadistance",
-                "name": "ais60",
                 "seclist_name": "axon_initial_segment"
             }
         ]

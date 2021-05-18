@@ -164,7 +164,7 @@
     {
         "param_name": "gbar_na",
         "mech": "na",
-        "value": 500,
+        "value": 5000,
         "dist_type": "uniform",
         "mech_param": "gbar_na",
         "type": "range",

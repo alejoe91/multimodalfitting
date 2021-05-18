@@ -138,7 +138,7 @@ def define_stimuli_hay(protocol_name, protocol_definition):
     stimuli = []
     for stimulus_definition in protocol_definition["stimuli"]:
 
-        if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP']:
+        if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP', 'Step_AIS']:
             stimuli.append(ephys.stimuli.LFPySquarePulse(
                 step_amplitude=stimulus_definition['amp'],
                 step_delay=stimulus_definition['delay'],
@@ -266,6 +266,10 @@ def define_protocols(
                protocol_name, protocol_definitions[protocol_name]
             )
         elif model_name == 'cultured':
+            stimuli = define_stimuli_cultured(
+                protocol_name, protocol_definitions[protocol_name]
+            )
+        elif model_name == 'hay_ais':
             stimuli = define_stimuli_cultured(
                 protocol_name, protocol_definitions[protocol_name]
             )
@@ -481,7 +485,7 @@ def create_evaluator(
         Parameters
         ----------
         model_name: str
-            "hay" or "hallermann"
+            "hay", "hay_ais" or "hallermann"
         feature_set: str
             "soma", "multiple", "extra", or "all"
         sample_id: int
@@ -517,6 +521,10 @@ def create_evaluator(
             LFPyCellModel=cell, cvode_active=False, electrode=electrode
         )
     elif model_name == "hay":
+        sim = ephys.simulators.LFPySimulator(
+            LFPyCellModel=cell, cvode_active=True, electrode=electrode
+        )
+    elif model_name == "hay_ais":
         sim = ephys.simulators.LFPySimulator(
             LFPyCellModel=cell, cvode_active=True, electrode=electrode
         )
