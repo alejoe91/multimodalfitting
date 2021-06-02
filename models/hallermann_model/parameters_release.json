@@ -112,11 +112,11 @@
         "sectionlist": ["apical", "basal"]
     },
     {
-        "param_name": "gcabar_it2",
-        "mech": "it2",
+        "param_name": "gcabar_it2_d96",
+        "mech": "it2_d96",
         "value": 0.3,
         "dist_type": "uniform",
-        "mech_param": "gcabar_it2",
+        "mech_param": "gcabar_it2_d96",
         "type": "range",
         "sectionlist": "basal"
     },
@@ -144,11 +144,11 @@
         "sectionlist": ["apical", "somatic", "myelinated"]
     },
     {
-        "param_name": "gcabar_it2",
-        "mech": "it2",
+        "param_name": "gcabar_it2_d96",
+        "mech": "it2_d96",
         "value": 0.9,
         "dist_type": "uniform",
-        "mech_param": "gcabar_it2",
+        "mech_param": "gcabar_it2_d96",
         "type": "range",
         "sectionlist": "apical"
     },
@@ -189,11 +189,11 @@
         "sectionlist": "somatic"
     },
     {
-        "param_name": "gcabar_it2",
-        "mech": "it2",
+        "param_name": "gcabar_it2_d96",
+        "mech": "it2_d96",
         "value": 0.2,
         "dist_type": "uniform",
-        "mech_param": "gcabar_it2",
+        "mech_param": "gcabar_it2_d96",
         "type": "range",
         "sectionlist": "somatic"
     },
@@ -263,11 +263,11 @@
         "sectionlist": "axon_initial_segment"
     },
     {
-        "param_name": "gcabar_it2",
-        "mech": "it2",
+        "param_name": "gcabar_it2_d96",
+        "mech": "it2_d96",
         "value": 0,
         "dist_type": "uniform",
-        "mech_param": "gcabar_it2",
+        "mech_param": "gcabar_it2_d96",
         "type": "range",
         "sectionlist": "axon_initial_segment"
     },

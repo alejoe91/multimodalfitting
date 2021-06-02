@@ -15,7 +15,6 @@ soma_loc = ephys.locations.NrnSeclistCompLocation(
     name="soma", seclist_name="somatic", sec_index=0, comp_x=0.5
 )
 
-
 def get_protocol_definitions(model_name):
     """
     Returns protocol definitions
@@ -100,15 +99,23 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
                     soma_distance=recording_definition["somadistance"],
                     seclist_name=recording_definition["seclist_name"],
                 )
-
-                var = recording_definition["var"]
-                recordings.append(
-                    ephys.recordings.CompRecording(
-                        name="%s.%s.%s" % (protocol_name, location.name, var),
-                        location=location,
-                        variable=recording_definition["var"],
-                    )
+            
+            elif recording_definition["type"] == "nrnseclistcomp":
+                location = ephys.locations.NrnSeclistCompLocation(
+                    name=recording_definition["name"],
+                    comp_x=recording_definition["comp_x"],
+                    seclist_name=recording_definition["seclist_name"],
+                    sec_index=recording_definition["sec_index"]
                 )
+
+            var = recording_definition["var"]
+            recordings.append(
+                ephys.recordings.CompRecording(
+                    name="%s.%s.%s" % (protocol_name, location.name, var),
+                    location=location,
+                    variable=recording_definition["var"],
+                )
+            )
 
     if electrode:
         recordings.append(
@@ -138,7 +145,7 @@ def define_stimuli_hay(protocol_name, protocol_definition):
     stimuli = []
     for stimulus_definition in protocol_definition["stimuli"]:
 
-        if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP', 'Step_AIS']:
+        if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP']:
             stimuli.append(ephys.stimuli.LFPySquarePulse(
                 step_amplitude=stimulus_definition['amp'],
                 step_delay=stimulus_definition['delay'],
@@ -269,8 +276,8 @@ def define_protocols(
             stimuli = define_stimuli_cultured(
                 protocol_name, protocol_definitions[protocol_name]
             )
-        elif model_name == 'hay_ais':
-            stimuli = define_stimuli_cultured(
+        elif model_name == 'hay_ais' or  model_name == 'hay_ais_mickael':
+            stimuli = define_stimuli_hay(
                 protocol_name, protocol_definitions[protocol_name]
             )
 
@@ -518,13 +525,13 @@ def create_evaluator(
 
     if model_name == "hallermann":
         sim = ephys.simulators.LFPySimulator(
-            LFPyCellModel=cell, cvode_active=False, electrode=electrode
+            LFPyCellModel=cell, cvode_active=True, electrode=electrode
         )
     elif model_name == "hay":
         sim = ephys.simulators.LFPySimulator(
             LFPyCellModel=cell, cvode_active=True, electrode=electrode
         )
-    elif model_name == "hay_ais":
+    elif model_name == "hay_ais" or model_name == "hay_ais_mickael":
         sim = ephys.simulators.LFPySimulator(
             LFPyCellModel=cell, cvode_active=True, electrode=electrode
         )

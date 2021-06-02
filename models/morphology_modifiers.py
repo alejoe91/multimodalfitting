@@ -166,25 +166,6 @@ def replace_axon_with_hillock(sim=None, icell=None):
         % (L_hillock, L_AIS, diams_hillock, diams_AIS)
     )
 
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.0556)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.1556)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.2556)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.3556)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.4556)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.6556)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.7556)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.8556)))
-    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.ais(0.9556)))
-    # print(sim.neuron.h.topology())
-    # print(sim.neuron.h.psection(sec=icell.soma[0]))
-    
-    # print(sim.neuron.h.psection(sec=icell.axon[0]))
-    # print(sim.neuron.h.psection(sec=icell.apic[0]))
-    # print(sim.neuron.h.psection(sec=icell.dend[0]))
-    # print(sim.neuron.h.psection(sec=icell.my[0]))
-    # print(sim.neuron.h.psection(sec=icell.node[0]))
-
-
 def fix_hallerman_morpho(sim=None, icell=None):
     """ Loads the Hallerman morphology """
 

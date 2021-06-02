@@ -353,7 +353,7 @@ def _plot_map(temp_map, locations, cmap, bg, ax, label_color):
     if len(y_un) == 1:
         pitch_x = np.min(np.diff(x_un))
         pitch_y = pitch_x
-    elif len(x_un) == 2:
+    elif len(x_un) == 1:
         pitch_y = np.min(np.diff(y_un))
         pitch_x = pitch_y
     else:

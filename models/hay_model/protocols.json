@@ -117,6 +117,24 @@
                 "duration": 3000,
                 "totduration": 3000
             }
-        ]
-    }
+            ],
+            "extra_recordings": [
+                {
+                    "var": "v",
+                    "comp_x": 0.5,
+                    "type": "nrnseclistcomp",
+                    "name": "axonal_v",
+                    "seclist_name": "axonal",
+                    "sec_index": 0
+                },
+                {
+                    "var": "cai",
+                    "comp_x": 0.5,
+                    "type": "nrnseclistcomp",
+                    "name": "soma_mid_cai",
+                    "seclist_name": "somatic",
+                    "sec_index": 0
+                }
+            ]
+        }
 }

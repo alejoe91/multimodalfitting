@@ -248,13 +248,14 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
     """
     protocol_responses = [resp for resp in responses.keys() if protocol_name in resp]
 
-    if len(protocol_responses) > 1:
+    if len(protocol_responses) > 1 and isinstance(protocols[protocol_name], ephys.protocols.SequenceProtocol):
         protocol = protocols[protocol_name].protocols[sweep_id]
         response_name = f"{protocol_name}-{sweep_id}"
     else:
         protocol = protocols[protocol_name]
         response_name = protocol_name
-
+    
+    print(response_name)
     stimulus = protocol.stimuli[0]
     stim_start = stimulus.step_delay
     stim_end = stimulus.step_delay + stimulus.step_duration
