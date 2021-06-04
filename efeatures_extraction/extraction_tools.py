@@ -485,7 +485,7 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
                 for feature in features:
                     efeatures_def[feature['feature']] = feature['val']
                     if std_from_mean is not None:
-                        efeatures_def[feature['feature']][1] = np.abs(std_from_mean * efeatures_def[feature['feature']][0])
+                        efeatures_def[feature['feature']][1] = std_from_mean * efeatures_def[feature['feature']][0]
                     if efeatures_def[feature['feature']][1] == 0:
                         efeatures_def[feature['feature']][1] = epsilon
                 out_efeatures[feature_set][protocol_name] = {loc_name: efeatures_def}

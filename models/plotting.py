@@ -73,7 +73,6 @@ def plot_responses(responses, protocol_names=None,
     min_v = 200
 
     for index, (resp_name) in enumerate(protocol_keys):
-        resoinse = resp_to_plot[resp_name]
         c = index // nrows
         r = np.mod(index, nrows)
         response = responses[resp_name]
@@ -167,21 +166,40 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
         else:
             cm = plt.get_cmap(cmap)
             color = cm(i / len(responses_list))
+        # print(i, responses_list)
         for index, resp_name in enumerate(sorted(resp_no_mea)):
             c = index // nrows
             r = np.mod(index, nrows)
+            # print(resp_name)
             response = responses[resp_name]
-            axes[r, c].plot(response['time'], response['voltage'], label=resp_name, color=color)
-            axes[r, c].set_title(resp_name)
-            if np.max(response['voltage']) > max_v:
-                max_v = np.max(response['voltage'])
-            if np.min(response['voltage']) < min_v:
-                min_v = np.min(response['voltage'])
-        for ax in axes[r + 1:, c]:
-            ax.axis("off")
+            if response is not None:
+                if ncols > 1:
+                    axes[r, c].plot(response['time'], response['voltage'], label=resp_name, color=color)
+                    axes[r, c].set_title(resp_name)
+                elif ncols == 1 and nrows == 1:
+                    axes.plot(response['time'], response['voltage'], label=resp_name, color=color)
+                    axes.set_title(resp_name)
+                else:
+                    axes[r].plot(response['time'], response['voltage'], label=resp_name, color=color)
+                    axes[r].set_title(resp_name)
+                if np.max(response['voltage']) > max_v:
+                    max_v = np.max(response['voltage'])
+                if np.min(response['voltage']) < min_v:
+                    min_v = np.min(response['voltage'])
 
-        for axr in axes:
-            for ax in axr:
+        if ncols > 1:
+            for ax in axes[r + 1:, c]:
+                ax.axis("off")
+            for axr in axes:
+                for ax in axr:
+                    ax.set_ylim(min_v - 10, max_v + 10)
+        elif ncols == 1 and nrows == 1:
+            axes.axis("off")
+            axes.set_ylim(min_v - 10, max_v + 10)
+        else:
+            for ax in axes[r + 1:]:
+                ax.axis("off")
+            for ax in axes:
                 ax.set_ylim(min_v - 10, max_v + 10)
 
     fig.tight_layout()
@@ -191,8 +209,8 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
         return fig
 
 
-def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1",
-                       colors="C0", norm=True, figsize=(7, 12), ax=None):
+def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1", sweep_id=0,
+                       colors="C0", norm=True, figsize=(7, 12), resample_rate_khz=20, ax=None, **eap_kwargs):
     """
     Plots multiple extracellular action potentials (EAPs)
 
@@ -231,7 +249,12 @@ def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1",
 
     eaps = []
     for i, fitted in enumerate(responses_list):
-        eap = utils.calculate_eap(responses=fitted, protocols=protocols, protocol_name=protocol_name)
+        try:
+            eap = utils.calculate_eap(fitted, protocol_name, protocols, sweep_id=sweep_id,
+                                      fs=resample_rate_khz, **eap_kwargs)
+        except:
+            eap = np.zeros(eaps[-1].shape)
+        # eap = utils.calculate_eap(responses=fitted, protocols=protocols, protocol_name=protocol_name)
         if norm:
             eap = eap / np.max(np.abs(eap), 1, keepdims=True)
         eaps.append(eap)
@@ -246,7 +269,7 @@ def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1",
                 max_eap = np.max(np.abs(eap))
         vscale = 1.5 * max_eap
 
-    for eap in eaps:
+    for i, eap in enumerate(eaps):
         ax = mu.plot_mea_recording(eap, probe, colors=colors[i], ax=ax, vscale=vscale)
 
     return ax

@@ -15,6 +15,7 @@ soma_loc = ephys.locations.NrnSeclistCompLocation(
     name="soma", seclist_name="somatic", sec_index=0, comp_x=0.5
 )
 
+
 def get_protocol_definitions(model_name):
     """
     Returns protocol definitions
@@ -99,7 +100,7 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
                     soma_distance=recording_definition["somadistance"],
                     seclist_name=recording_definition["seclist_name"],
                 )
-            
+
             elif recording_definition["type"] == "nrnseclistcomp":
                 location = ephys.locations.NrnSeclistCompLocation(
                     name=recording_definition["name"],
@@ -143,43 +144,51 @@ def define_stimuli_hay(protocol_name, protocol_definition):
 
     """
     stimuli = []
+    # for stimulus_definition in protocol_definition["stimuli"]:
+    #
+    #     if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP']:
+    #         stimuli.append(ephys.stimuli.LFPySquarePulse(
+    #             step_amplitude=stimulus_definition['amp'],
+    #             step_delay=stimulus_definition['delay'],
+    #             step_duration=stimulus_definition['duration'],
+    #             location=soma_loc,
+    #             total_duration=stimulus_definition['totduration']))
+    #
+    #     if protocol_name in ['EPSP', 'BAC']:
+    #         loc_api = ephys.locations.NrnSomaDistanceCompLocation(
+    #             name=protocol_name,
+    #             soma_distance=620,
+    #             seclist_name="apical",
+    #         )
+    #
+    #         stimuli.append(ephys.stimuli.LFPySquarePulse(
+    #             step_amplitude=stimulus_definition['amp'],
+    #             step_delay=stimulus_definition['delay'],
+    #             step_duration=stimulus_definition['duration'],
+    #             location=loc_api,
+    #             total_duration=stimulus_definition['totduration']))
+    #
+    #     if protocol_name in ['CaBurst']:
+    #         loc_api = ephys.locations.NrnSomaDistanceCompLocation(
+    #             name=protocol_name,
+    #             soma_distance=620,
+    #             seclist_name="apical",
+    #         )
+    #
+    #         stimuli.append(ephys.stimuli.LFPySquarePulse(
+    #             step_amplitude=stimulus_definition['amp'],
+    #             step_delay=stimulus_definition['delay'],
+    #             step_duration=stimulus_definition['duration'],
+    #             location=loc_api,
+    #             total_duration=stimulus_definition['totduration']))
     for stimulus_definition in protocol_definition["stimuli"]:
 
-        if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP']:
-            stimuli.append(ephys.stimuli.LFPySquarePulse(
-                step_amplitude=stimulus_definition['amp'],
-                step_delay=stimulus_definition['delay'],
-                step_duration=stimulus_definition['duration'],
-                location=soma_loc,
-                total_duration=stimulus_definition['totduration']))
-
-        if protocol_name in ['EPSP', 'BAC']:
-            loc_api = ephys.locations.NrnSomaDistanceCompLocation(
-                name=protocol_name,
-                soma_distance=620,
-                seclist_name="apical",
-            )
-
-            stimuli.append(ephys.stimuli.LFPySquarePulse(
-                step_amplitude=stimulus_definition['amp'],
-                step_delay=stimulus_definition['delay'],
-                step_duration=stimulus_definition['duration'],
-                location=loc_api,
-                total_duration=stimulus_definition['totduration']))
-
-        if protocol_name in ['CaBurst']:
-            loc_api = ephys.locations.NrnSomaDistanceCompLocation(
-                name=protocol_name,
-                soma_distance=620,
-                seclist_name="apical",
-            )
-
-            stimuli.append(ephys.stimuli.LFPySquarePulse(
-                step_amplitude=stimulus_definition['amp'],
-                step_delay=stimulus_definition['delay'],
-                step_duration=stimulus_definition['duration'],
-                location=loc_api,
-                total_duration=stimulus_definition['totduration']))
+        stimuli.append(ephys.stimuli.LFPySquarePulse(
+            step_amplitude=stimulus_definition['amp'],
+            step_delay=stimulus_definition['delay'],
+            step_duration=stimulus_definition['duration'],
+            location=soma_loc,
+            total_duration=stimulus_definition['totduration']))
 
     return stimuli
 
@@ -365,7 +374,7 @@ def get_unfrozen_params_bounds(model_name):
 
 
 def define_fitness_calculator(
-        protocols, feature_file, feature_set, probe=None
+        protocols, feature_file, feature_set, probe=None, **extra_kwargs
 ):
     """
     Defines objective calculator
@@ -417,8 +426,11 @@ def define_fitness_calculator(
                     'exp_mean': meanstd[0],
                     'exp_std': meanstd[1],
                     'stim_start': stimulus.step_delay,
-                    'stimulus_current': stimulus.step_amplitude
+
                 }
+
+                if location != 'MEA':
+                    kwargs['stimulus_current'] = stimulus.step_amplitude
 
                 if location == 'soma':
                     kwargs['threshold'] = -20
@@ -437,6 +449,8 @@ def define_fitness_calculator(
                     recording_names = '%s.%s.LFP' % (protocol_name, location)
                     somatic_recording_name = f'{protocol_name}.soma.v'
 
+                    kwargs.update(extra_kwargs)
+
                     feature = ephys.efeatures.extraFELFeature(
                         name=feature_name,
                         extrafel_feature_name=efel_feature_name,
@@ -444,10 +458,6 @@ def define_fitness_calculator(
                         somatic_recording_name=somatic_recording_name,
                         channel_locations=probe.positions,
                         channel_id=None,
-                        fs=20,
-                        fcut=1,
-                        ms_cut=[3, 10],
-                        upsample=10,
                         **kwargs
                     )
 
@@ -481,59 +491,47 @@ def define_fitness_calculator(
 def create_evaluator(
         model_name,
         feature_set,
-        sample_id=None,
-        feature_file=None,
+        feature_file,
+        probe_type=None,
+        protocols_with_lfp=None,
+        **extra_kwargs
 ):
     """
-        Prepares objects for optimization of test models.
-        Features are assumed to be pkl files in 'config_dir'/random_'sample_id'
-            /'feature_set'.pkl
+    Prepares objects for optimization of test models.
+    Features are assumed to be pkl files in 'config_dir'/random_'sample_id'
+        /'feature_set'.pkl
 
-        Parameters
-        ----------
-        model_name: str
-            "hay", "hay_ais" or "hallermann"
-        feature_set: str
-            "soma", "multiple", "extra", or "all"
-        sample_id: int
-            The test sample ID
+    Parameters
+    ----------
+    model_name: str
+        "hay", "hay_ais", or "hallermann"
+    feature_set: str
+        "soma", "multiple", "extra", or "all"
+    sample_id: int
+        The test sample ID
 
-        Returns
-        -------
-        CellEvaluator
-        """
-    
-    if sample_id and feature_file:
-        raise Exception('Either feature_file or sample_id should be None')
-
-    sample_dir = pathlib.Path(f"{model_name}_model") / 'features' / f'random_{sample_id}'
-
+    Returns
+    -------
+    CellEvaluator
+    """
     probe = None
-    electrode = None
     if feature_set == "extra":
-        probe_file = sample_dir / 'probe.json'
-        probe, electrode = model.define_electrode(probe_file=probe_file)
-    
-    if sample_id:
-        feature_file = sample_dir / f'{feature_set}.pkl'
+        assert probe_type is not None
+        probe = model.define_electrode(probe_type=probe_type)
     
     fitness_protocols = define_protocols(
-        model_name, feature_set, feature_file, electrode=electrode
+        model_name, feature_set, feature_file, electrode=probe, protocols_with_lfp=protocols_with_lfp
     )
 
     cell = model.create(model_name, release=False)
 
     if model_name == "hallermann":
         sim = ephys.simulators.LFPySimulator(
-            LFPyCellModel=cell, cvode_active=True, electrode=electrode
+            LFPyCellModel=cell, cvode_active=False, electrode=probe
         )
     elif model_name == "hay":
         sim = ephys.simulators.LFPySimulator(
-            LFPyCellModel=cell, cvode_active=True, electrode=electrode
-        )
-    elif model_name == "hay_ais" or model_name == "hay_ais_mickael":
-        sim = ephys.simulators.LFPySimulator(
-            LFPyCellModel=cell, cvode_active=True, electrode=electrode
+            LFPyCellModel=cell, cvode_active=True, electrode=probe
         )
     else:
         sim = ephys.simulators.NrnSimulator()
@@ -543,6 +541,7 @@ def create_evaluator(
         feature_file=feature_file,
         feature_set=feature_set,
         probe=probe,
+        **extra_kwargs
     )
 
     param_names = [
@@ -555,6 +554,5 @@ def create_evaluator(
         fitness_protocols=fitness_protocols,
         fitness_calculator=fitness_calculator,
         sim=sim,
-        #timeout=900
         timeout=150
     )
