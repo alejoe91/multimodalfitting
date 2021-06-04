@@ -254,8 +254,7 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
     else:
         protocol = protocols[protocol_name]
         response_name = protocol_name
-    
-    print(response_name)
+
     stimulus = protocol.stimuli[0]
     stim_start = stimulus.step_delay
     stim_end = stimulus.step_delay + stimulus.step_duration
@@ -412,7 +411,7 @@ def _filter_response(response, fcut=[0.5, 6000], order=2, filt_type="lfilter"):
         btype = "bandpass"
         band = np.array(fcut) / fn
 
-    b, a = ss.butter(order, fcut, btype=btype, fs=fs)
+    b, a = ss.butter(order, band, btype=btype)
 
     if len(trace.shape) == 2:
         if filt_type == "filtfilt":

@@ -1,140 +1,53 @@
 {
-    "bAP": {
-        "stimuli": [
-            {
-                "delay": 95,
-                "amp": 1.9,
-                "duration": 5,
-                "totduration": 400
-            }
-        ],
-        "extra_recordings": [
-            {
-                "var": "v",
-                "somadistance": 400,
-                "type": "somadistance",
-                "name": "dend1",
-                "seclist_name": "apical"
-            },
-            {
-                "var": "v",
-                "somadistance": 620,
-                "type": "somadistance",
-                "name": "dend2",
-                "seclist_name": "apical"
-            }
-        ]
-    },
-    "BAC": {
-        "stimuli": [
-            {
-                "delay": 95,
-                "amp": 1.9,
-                "duration": 5,
-                "totduration": 400
-            }
-        ],
-        "extra_recordings": [
-            {
-                "var": "v",
-                "somadistance": 400,
-                "type": "somadistance",
-                "name": "dend1",
-                "seclist_name": "apical"
-            },
-            {
-                "var": "v",
-                "somadistance": 620,
-                "type": "somadistance",
-                "name": "dend2",
-                "seclist_name": "apical"
-            }
-        ]
-    },
-    "EPSP": {
-        "stimuli": [
-            {
-                "delay": 95,
-                "amp": 1.9,
-                "duration": 5,
-                "totduration": 400
-            }
-        ],
-        "extra_recordings": [
-            {
-                "var": "v",
-                "somadistance": 400,
-                "type": "somadistance",
-                "name": "dend1",
-                "seclist_name": "apical"
-            },
-            {
-                "var": "v",
-                "somadistance": 620,
-                "type": "somadistance",
-                "name": "dend2",
-                "seclist_name": "apical"
-            }
-        ]
-    },
-    "CaBurst": {
-        "stimuli": [
-            {
-                "delay": 95,
-                "amp": 1.9,
-                "duration": 5,
-                "totduration": 400
-            }
-        ],
-        "extra_recordings": [
-            {
-                "var": "v",
-                "somadistance": 400,
-                "type": "somadistance",
-                "name": "dend1",
-                "seclist_name": "apical"
-            },
-            {
-                "var": "v",
-                "somadistance": 620,
-                "type": "somadistance",
-                "name": "dend2",
-                "seclist_name": "apical"
-            }
-        ]
-    },
-    "Step1": {
-        "stimuli": [
-            {
-                "delay": 700,
-                "amp": 0.793,
-                "duration": 2000,
-                "totduration": 3000
-            },
-            {
-                "delay": 0,
-                "amp": 0.0,
-                "duration": 3000,
-                "totduration": 3000
-            }
-            ],
-            "extra_recordings": [
-                {
-                    "var": "v",
-                    "comp_x": 0.5,
-                    "type": "nrnseclistcomp",
-                    "name": "axonal_v",
-                    "seclist_name": "axonal",
-                    "sec_index": 0
-                },
-                {
-                    "var": "cai",
-                    "comp_x": 0.5,
-                    "type": "nrnseclistcomp",
-                    "name": "soma_mid_cai",
-                    "seclist_name": "somatic",
-                    "sec_index": 0
-                }
-            ]
-        }
+  "firepattern_200": {
+    "stimuli": [
+      {
+        "delay": 0.0,
+        "amp": 0.0,
+        "duration": 4094.350000014895,
+        "totduration": 4094.350000014895
+      },
+      {
+        "delay": 250.0000000009095,
+        "amp": 0.68,
+        "thresh_perc": 204.08163265306115,
+        "duration": 3600.0000000130967,
+        "totduration": 4094.350000014895
+      }
+    ]
+  },
+  "IV_-100": {
+    "stimuli": [
+      {
+        "delay": 0.0,
+        "amp": 0.0,
+        "duration": 3499.0500000127295,
+        "totduration": 3499.0500000127295
+      },
+      {
+        "delay": 250.0000000009095,
+        "amp": -0.34,
+        "thresh_perc": -102.04081632653057,
+        "duration": 3000.000000010914,
+        "totduration": 3499.0500000127295
+      }
+    ]
+  },
+  "APWaveform_260": {
+    "stimuli": [
+      {
+        "delay": 0.0,
+        "amp": 0.0,
+        "duration": 548.9750000000078,
+        "totduration": 548.9750000000078
+      },
+      {
+        "delay": 250.00000000000355,
+        "amp": 0.8500000000000001,
+        "thresh_perc": 255.10204081632648,
+        "duration": 50.00000000000071,
+        "totduration": 548.9750000000078
+      }
+    ]
+  }
 }
