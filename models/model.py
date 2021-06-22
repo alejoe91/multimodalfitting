@@ -185,7 +185,7 @@ def define_parameters(model_name, release=False):
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
                 
-            elif param_config["dist_type"] in ["exp", "step_funct", "user_defined"]:
+            elif param_config["dist_type"] in ["exp", "step_funct", "user_defined", "sig_increase", "sig_decrease", "decay"]:
 
                 if "soma_ref_point" in param_config:
                     ref_point = param_config["soma_ref_point"]
@@ -255,7 +255,7 @@ def define_morphology(model_name, morph_modifiers, do_replace_axon):
     Parameters
     ----------
     model_name: str
-            "hay" or "hallermann"
+            "hay", "hay_ais" or "hallermann"
     morph_modifiers: list of python functions
         The modifier functions to apply to the axon
     do_replace_axon: bool
@@ -266,8 +266,8 @@ def define_morphology(model_name, morph_modifiers, do_replace_axon):
         The morphology object
     """
     
-    if model_name == "hay":
-        path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.asc"
+    if (model_name == "hay") or (model_name == "hay_ais"):
+        path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.asc" #"cell2.asc" #
     else:
         path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.swc"
 
@@ -307,6 +307,11 @@ def create(model_name, release=False):
         seclist_names = ['all', 'somatic', 'axon_initial_segment', 'collaterals', 'basal', 'apical', 'nodal', 'myelinated']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'my', 'node']
         do_replace_axon = False
+    elif model_name == "hay_ais":
+        morph_modifiers = [replace_axon_with_hillock]
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin' ]
+        do_replace_axon = False
     else:
         morph_modifiers = None
         seclist_names = None
@@ -319,6 +324,8 @@ def create(model_name, release=False):
         v_init = -65.
     elif model_name =="cultured": 
         v_init = -70.
+    elif model_name =="hay_ais":
+        v_init = -80.
 
     cell = ephys.models.LFPyCellModel(
         model_name,

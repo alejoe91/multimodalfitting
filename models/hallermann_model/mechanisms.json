@@ -8,7 +8,7 @@
         "kca",
         "ca",
         "cad",
-        "it2",
+        "it2_d96",
         "Kv1",
         "ih"
     ],
@@ -20,7 +20,7 @@
         "kca",
         "cad",
         "ca",
-        "it2",
+        "it2_d96",
         "Kv1",
         "ih"
     ],
@@ -33,7 +33,7 @@
         "kca",
         "cad",
         "ca",
-        "it2",
+        "it2_d96",
         "ih"
     ],
     "collaterals":[
@@ -50,7 +50,7 @@
         "Kv7",
         "cad",
         "ca",
-        "it2",
+        "it2_d96",
         "kca",
         "ih"
     ],

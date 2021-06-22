@@ -209,7 +209,7 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
 
 
 def compute_rheobase_for_model(cell, sim, step_duration=270, delay=250, step_min=0.1, step_max=1,
-                               step_increment=0.02):
+                               step_increment=0.02, isolate=True):
     """
     
     Parameters
@@ -261,7 +261,7 @@ def compute_rheobase_for_model(cell, sim, step_duration=270, delay=250, step_min
     responses = []
     for i, protocol in enumerate(protocols):
         print(f"Running protocol {protocol.name}")
-        response = protocol.run(cell_model=cell, param_values={}, sim=sim)
+        response = protocol.run(cell_model=cell, param_values={}, sim=sim, isolate=isolate)
         responses.append(response)
 
         # make efel object

@@ -69,7 +69,7 @@ def replace_axon_with_hillock(sim=None, icell=None):
             sim.neuron.h.pt3dadd(list_x3d[i], list_y3d[i], list_z3d[i], list_diam3d[i], sec=section)    
 
     L_hillock = 10 # define the desired hillock length 
-    L_AIS = 35  # define the desired length of AIS
+    L_AIS = 40 # changed from 35 to make nseg odd. define the desired length of AIS
     L_total = L_hillock + L_AIS
     final_seg_length = 5  # the final length of the segments during the simulation
     
@@ -114,10 +114,10 @@ def replace_axon_with_hillock(sim=None, icell=None):
 
          
     '''In this third part, we will delete all the axon sections, create hillock and ais section, add the 3d info to these new sections, and connect them'''
-                                  
+                   
     for section in icell.axonal:
-        sim.neuron.h.delete_section(sec=section)    
-    
+        sim.neuron.h.delete_section(sec=section)
+
     #  new axon array
     sim.neuron.h.execute("create hillock", icell)
     sim.neuron.h.execute("create ais", icell)
@@ -150,7 +150,7 @@ def replace_axon_with_hillock(sim=None, icell=None):
     icell.all.append(sec=icell.myelin[0])
     icell.myelin[0].nseg = 5
     icell.myelin[0].L = 1000
-    icell.myelin[0].diam = diams[count - 1]
+    icell.myelin[0].diam = 0.2 #diams[count-1]
     icell.myelin[0].connect(icell.ais, 1.0, 0.0)
 
                                   
@@ -165,7 +165,6 @@ def replace_axon_with_hillock(sim=None, icell=None):
         "Replace axon with hillock of length %f and AIS of length %f, diameters are %s for the hillock and %s for the AIS"
         % (L_hillock, L_AIS, diams_hillock, diams_AIS)
     )
-
 
 def fix_hallerman_morpho(sim=None, icell=None):
     """ Loads the Hallerman morphology """
@@ -10250,7 +10249,7 @@ def fix_hallerman_morpho(sim=None, icell=None):
         icell.all.append(sec=icell.my[i])
         icell.myelinated.append(sec=icell.my[i])
 
-    freq = 1000
+    freq = 10000
     d_lambda = 0.1
     axial_res = 100.0
     membrane_capa = 1.0
@@ -10294,7 +10293,14 @@ def fix_hallerman_morpho(sim=None, icell=None):
     #    access section
     #    ion_style("ca_ion",0,1,0,0,0)
     
-    #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.0)))
-    #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](1.0)))
-    #print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.4)))
+    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.0)))
+    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](1.0)))
+    # print(sim.neuron.h.distance(icell.soma[0](0.5), icell.axon[0](0.4)))
     # print(sim.neuron.h.topology())
+    # print(sim.neuron.h.psection(sec=icell.soma[0]))
+    
+    # print(sim.neuron.h.psection(sec=icell.axon[0]))
+    # print(sim.neuron.h.psection(sec=icell.apic[0]))
+    # print(sim.neuron.h.psection(sec=icell.dend[0]))
+    # print(sim.neuron.h.psection(sec=icell.my[0]))
+    # print(sim.neuron.h.psection(sec=icell.node[0]))

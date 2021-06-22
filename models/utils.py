@@ -1,10 +1,81 @@
 import numpy as np
 import json
 import os
-
+from copy import deepcopy
 import bluepyopt.ephys as ephys
 import time
 
+
+_ais_recordings = [
+    {
+        "var": "v",
+        "comp_x": 0,
+        "type": "nrnseclistcomp",
+        "name": "hillock_begin_v",
+        "seclist_name": "hillockal",
+        "sec_index": 0
+    },
+    {
+        "var": "v",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "hillock_mid_v",
+        "seclist_name": "hillockal",
+        "sec_index": 0
+    },
+    {
+        "var": "v",
+        "comp_x": 0,
+        "type": "nrnseclistcomp",
+        "name": "ais_begin_v",
+        "seclist_name": "axon_initial_segment",
+        "sec_index": 0
+    },
+    {
+        "var": "v",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "ais_mid_v",
+        "seclist_name": "axon_initial_segment",
+        "sec_index": 0
+    },
+    {
+        "var": "v",
+        "comp_x": 1,
+        "type": "nrnseclistcomp",
+        "name": "ais_end_v",
+        "seclist_name": "axon_initial_segment",
+        "sec_index": 0
+    },
+    {
+        "var": "i_membrane",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "hillock_mid_imembrane",
+        "seclist_name": "hillockal",
+        "sec_index": 0
+    },
+    {
+        "var": "i_membrane",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "ais_mid_imembrane",
+        "seclist_name": "axon_initial_segment",
+        "sec_index": 0
+    },
+    {
+        "var": "i_membrane",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "soma_mid_imembrane",
+        "seclist_name": "somatic",
+        "sec_index": 0
+    }
+]
+
+
+def get_ais_extra_recordings():
+    return deepcopy(_ais_recordings)
 
 # Helper function to turn feature dicitonary into a list
 def vectorize_features(feature_list):
@@ -248,7 +319,7 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
     """
     protocol_responses = [resp for resp in responses.keys() if protocol_name in resp]
 
-    if len(protocol_responses) > 1:
+    if len(protocol_responses) > 1 and isinstance(protocols[protocol_name], ephys.protocols.SequenceProtocol):
         protocol = protocols[protocol_name].protocols[sweep_id]
         response_name = f"{protocol_name}-{sweep_id}"
     else:
@@ -411,7 +482,7 @@ def _filter_response(response, fcut=[0.5, 6000], order=2, filt_type="lfilter"):
         btype = "bandpass"
         band = np.array(fcut) / fn
 
-    b, a = ss.butter(order, fcut, btype=btype, fs=fs)
+    b, a = ss.butter(order, band, btype=btype)
 
     if len(trace.shape) == 2:
         if filt_type == "filtfilt":
