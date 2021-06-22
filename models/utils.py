@@ -1,10 +1,81 @@
 import numpy as np
 import json
 import os
-
+from copy import deepcopy
 import bluepyopt.ephys as ephys
 import time
 
+
+_ais_recordings = [
+    {
+        "var": "v",
+        "comp_x": 0,
+        "type": "nrnseclistcomp",
+        "name": "hillock_begin_v",
+        "seclist_name": "hillockal",
+        "sec_index": 0
+    },
+    {
+        "var": "v",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "hillock_mid_v",
+        "seclist_name": "hillockal",
+        "sec_index": 0
+    },
+    {
+        "var": "v",
+        "comp_x": 0,
+        "type": "nrnseclistcomp",
+        "name": "ais_begin_v",
+        "seclist_name": "axon_initial_segment",
+        "sec_index": 0
+    },
+    {
+        "var": "v",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "ais_mid_v",
+        "seclist_name": "axon_initial_segment",
+        "sec_index": 0
+    },
+    {
+        "var": "v",
+        "comp_x": 1,
+        "type": "nrnseclistcomp",
+        "name": "ais_end_v",
+        "seclist_name": "axon_initial_segment",
+        "sec_index": 0
+    },
+    {
+        "var": "i_membrane",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "hillock_mid_imembrane",
+        "seclist_name": "hillockal",
+        "sec_index": 0
+    },
+    {
+        "var": "i_membrane",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "ais_mid_imembrane",
+        "seclist_name": "axon_initial_segment",
+        "sec_index": 0
+    },
+    {
+        "var": "i_membrane",
+        "comp_x": 0.5,
+        "type": "nrnseclistcomp",
+        "name": "soma_mid_imembrane",
+        "seclist_name": "somatic",
+        "sec_index": 0
+    }
+]
+
+
+def get_ais_extra_recordings():
+    return deepcopy(_ais_recordings)
 
 # Helper function to turn feature dicitonary into a list
 def vectorize_features(feature_list):

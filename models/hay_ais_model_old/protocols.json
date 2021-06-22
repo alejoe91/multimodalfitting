@@ -320,10 +320,18 @@
                 "sec_index": 0
             },
             {
-                "var": "ina_NaTg",
+                "var": "ina_Nap_Et2",
                 "comp_x": 0.5,
                 "type": "nrnseclistcomp",
-                "name": "hil_currentNaTg",
+                "name": "hil_currentNap_Et2",
+                "seclist_name": "hillockal",
+                "sec_index": 0
+            },
+            {
+                "var": "ina_NaTa_t",
+                "comp_x": 0.5,
+                "type": "nrnseclistcomp",
+                "name": "hil_currentNaTa_t",
                 "seclist_name": "hillockal",
                 "sec_index": 0
             }

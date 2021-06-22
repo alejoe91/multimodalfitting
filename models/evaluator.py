@@ -3,6 +3,7 @@
 import json
 import pickle
 import pathlib
+from pathlib import Path
 import bluepyopt.ephys as ephys
 
 import logging
@@ -16,7 +17,7 @@ soma_loc = ephys.locations.NrnSeclistCompLocation(
 )
 
 
-def get_protocol_definitions(model_name):
+def get_protocol_definitions(model_name, protocols_file=None):
     """
     Returns protocol definitions
 
@@ -24,13 +25,20 @@ def get_protocol_definitions(model_name):
     ----------
     model_name: str
         "hay", "hallermann"
+    protocols_file: str/Path
+        If given, protocols are loaded from the json file
 
     Returns
     -------
     protocols_dict: dict
         Dictionary with protocol definitions
     """
-    path_protocols = pathlib.Path(f"{model_name}_model") / "protocols.json"
+    if protocols_file is None:
+        path_protocols = pathlib.Path(f"{model_name}_model") / "protocols.json"
+    else:
+        assert Path(protocols_file).is_file(), "The protocols file does not exist"
+        assert Path(protocols_file).suffix == ".json", "The protocols file must be a json file"
+        path_protocols = protocols_file
 
     return json.load(open(path_protocols))
 
@@ -65,7 +73,7 @@ def get_feature_definitions(feature_file, feature_set=None):
     return feature_definitions
 
 
-def define_recordings(protocol_name, protocol_definition, electrode=None):
+def define_recordings(protocol_name, protocol_definition, electrode=None, extra_recordings=None):
     """
     Defines recordings for the specified protocol
 
@@ -118,6 +126,35 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
                 )
             )
 
+    if extra_recordings is not None:
+        # check for substring
+        if protocol_name in extra_recordings:
+            for recording_definition in extra_recordings[protocol_name]:
+
+                if recording_definition["type"] == "somadistance":
+                    location = ephys.locations.NrnSomaDistanceCompLocation(
+                        name=recording_definition["name"],
+                        soma_distance=recording_definition["somadistance"],
+                        seclist_name=recording_definition["seclist_name"],
+                    )
+
+                elif recording_definition["type"] == "nrnseclistcomp":
+                    location = ephys.locations.NrnSeclistCompLocation(
+                        name=recording_definition["name"],
+                        comp_x=recording_definition["comp_x"],
+                        seclist_name=recording_definition["seclist_name"],
+                        sec_index=recording_definition["sec_index"]
+                    )
+
+                var = recording_definition["var"]
+                recordings.append(
+                    ephys.recordings.CompRecording(
+                        name="%s.%s.%s" % (protocol_name, location.name, var),
+                        location=location,
+                        variable=recording_definition["var"],
+                    )
+                )
+
     if electrode:
         recordings.append(
             ephys.recordings.LFPRecording("%s.MEA.LFP" % protocol_name)
@@ -126,14 +163,12 @@ def define_recordings(protocol_name, protocol_definition, electrode=None):
     return recordings
 
 
-def define_stimuli_hay(protocol_name, protocol_definition):
+def define_stimuli(protocol_definition):
     """
     Defines stimuli associated with a specified protocol
 
     Parameters
     ----------
-    protocol_name: str
-        The protocol name
     protocol_definition: dict
         Dictionary with protocol definitions (used to access "extra_recordings")
 
@@ -143,74 +178,6 @@ def define_stimuli_hay(protocol_name, protocol_definition):
         List of defined stimuli for the specified protocol_name
 
     """
-    stimuli = []
-    # for stimulus_definition in protocol_definition["stimuli"]:
-    #
-    #     if protocol_name in ['BAC', 'Step1', 'Step2', 'Step3', 'bAP']:
-    #         stimuli.append(ephys.stimuli.LFPySquarePulse(
-    #             step_amplitude=stimulus_definition['amp'],
-    #             step_delay=stimulus_definition['delay'],
-    #             step_duration=stimulus_definition['duration'],
-    #             location=soma_loc,
-    #             total_duration=stimulus_definition['totduration']))
-    #
-    #     if protocol_name in ['EPSP', 'BAC']:
-    #         loc_api = ephys.locations.NrnSomaDistanceCompLocation(
-    #             name=protocol_name,
-    #             soma_distance=620,
-    #             seclist_name="apical",
-    #         )
-    #
-    #         stimuli.append(ephys.stimuli.LFPySquarePulse(
-    #             step_amplitude=stimulus_definition['amp'],
-    #             step_delay=stimulus_definition['delay'],
-    #             step_duration=stimulus_definition['duration'],
-    #             location=loc_api,
-    #             total_duration=stimulus_definition['totduration']))
-    #
-    #     if protocol_name in ['CaBurst']:
-    #         loc_api = ephys.locations.NrnSomaDistanceCompLocation(
-    #             name=protocol_name,
-    #             soma_distance=620,
-    #             seclist_name="apical",
-    #         )
-    #
-    #         stimuli.append(ephys.stimuli.LFPySquarePulse(
-    #             step_amplitude=stimulus_definition['amp'],
-    #             step_delay=stimulus_definition['delay'],
-    #             step_duration=stimulus_definition['duration'],
-    #             location=loc_api,
-    #             total_duration=stimulus_definition['totduration']))
-    for stimulus_definition in protocol_definition["stimuli"]:
-
-        stimuli.append(ephys.stimuli.LFPySquarePulse(
-            step_amplitude=stimulus_definition['amp'],
-            step_delay=stimulus_definition['delay'],
-            step_duration=stimulus_definition['duration'],
-            location=soma_loc,
-            total_duration=stimulus_definition['totduration']))
-
-    return stimuli
-
-
-def define_stimuli_hallermann(protocol_name, protocol_definition):
-    
-    stimuli = []
-    
-    for stimulus_definition in protocol_definition["stimuli"]:
-
-        stimuli.append(ephys.stimuli.LFPySquarePulse(
-            step_amplitude=stimulus_definition['amp'],
-            step_delay=stimulus_definition['delay'],
-            step_duration=stimulus_definition['duration'],
-            location=soma_loc,
-            total_duration=stimulus_definition['totduration']))
-
-    return stimuli
-
-
-def define_stimuli_cultured(protocol_name, protocol_definition):
-
     stimuli = []
 
     for stimulus_definition in protocol_definition["stimuli"]:
@@ -228,8 +195,10 @@ def define_protocols(
         model_name,
         feature_set=None,
         feature_file=None,
+        protocols_file=None,
         electrode=None,
-        protocols_with_lfp=None
+        protocols_with_lfp=None,
+        extra_recordings=None
 ):
     """
     Defines protocols for a specified feature_Set (or file)
@@ -241,7 +210,9 @@ def define_protocols(
     feature_set: str
         "soma", "multiple", "extra", or "all"
     feature_file: str
-        Path to a feature pkl file to load protocols from
+        Path to a feature json file to load protocols from
+    protocols_file: str
+        Path to a feature json file to load protocols from
     electrode: LFPy.RecExtElectrode
         If given, the MEA recording is added
     protocols_with_lfp: list or None
@@ -253,8 +224,7 @@ def define_protocols(
     protocols: dict
         Dictionary with defined protocols
     """
-
-    protocol_definitions = get_protocol_definitions(model_name)
+    protocol_definitions = get_protocol_definitions(model_name, protocols_file)
     feature_definitions = get_feature_definitions(feature_file, feature_set)
 
     protocols = {}
@@ -266,29 +236,14 @@ def define_protocols(
 
         if protocol_name in protocols_with_lfp:
             recordings = define_recordings(
-                protocol_name, protocol_definitions[protocol_name], electrode
+                protocol_name, protocol_definitions[protocol_name], electrode, extra_recordings
             )
         else:
             recordings = define_recordings(
-                protocol_name, protocol_definitions[protocol_name], None
+                protocol_name, protocol_definitions[protocol_name], None, extra_recordings
             )
 
-        if model_name == 'hay':
-            stimuli = define_stimuli_hay(
-                protocol_name, protocol_definitions[protocol_name]
-            )
-        elif model_name == 'hallermann':
-            stimuli = define_stimuli_hallermann(
-               protocol_name, protocol_definitions[protocol_name]
-            )
-        elif model_name == 'cultured':
-            stimuli = define_stimuli_cultured(
-                protocol_name, protocol_definitions[protocol_name]
-            )
-        elif model_name == 'hay_ais' or  model_name == 'hay_ais_mickael':
-            stimuli = define_stimuli_hay(
-                protocol_name, protocol_definitions[protocol_name]
-            )
+        stimuli = define_stimuli(protocol_definitions[protocol_name])
 
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
@@ -492,23 +447,42 @@ def create_evaluator(
         model_name,
         feature_set,
         feature_file,
+        protocol_file,
         probe_type=None,
         protocols_with_lfp=None,
+        extra_recordings=None,
         **extra_kwargs
 ):
     """
-    Prepares objects for optimization of test models.
-    Features are assumed to be pkl files in 'config_dir'/random_'sample_id'
-        /'feature_set'.pkl
+    Prepares objects for optimization of the model.
 
     Parameters
     ----------
     model_name: str
         "hay", "hay_ais", or "hallermann"
     feature_set: str
-        "soma", "multiple", "extra", or "all"
-    sample_id: int
-        The test sample ID
+        "soma", "extra"
+    feature_file: str or Path
+        Path to feature json file
+    protocol_file: str or Path
+        Path to feature json file
+    probe_type: str or MEAutility.MEA
+        If string, it can be "linear" or "planar", otherwise any MEAutility.MEA objects can be used
+    protocols_with_lfp: list or None
+        If given, the list of protocols to compute LFP from
+    extra_recordings: dict or None
+        If given, it specifies a set of extra recordings to add to a specific protocol. It needs to be in the form of:
+        extra_recordings = {"protocol_name": [
+                {
+                "var": "v",
+                "comp_x": 0.5,
+                "type": "nrnseclistcomp",
+                "name": "apical_middle",
+                "seclist_name": "apical",
+                "sec_index": 0
+                },
+        ]}
+    extra_kwargs: keyword arguments for computing extracellular signals.
 
     Returns
     -------
@@ -520,7 +494,8 @@ def create_evaluator(
         probe = model.define_electrode(probe_type=probe_type)
     
     fitness_protocols = define_protocols(
-        model_name, feature_set, feature_file, electrode=probe, protocols_with_lfp=protocols_with_lfp
+        model_name, feature_set, feature_file, protocols_file=protocol_file,
+        electrode=probe, protocols_with_lfp=protocols_with_lfp, extra_recordings=extra_recordings
     )
 
     cell = model.create(model_name, release=False)

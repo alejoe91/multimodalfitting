@@ -4,14 +4,13 @@
     ],
     "somatic": [
         "Ca_LVAst",
-        "Ca_HVA",
+        "Ca_HVA2",
         "SKv3_1",
         "SK_E2",
         "K_Tst",
         "K_Pst",
-        "Nap_Et2",
-        "NaTa_t",
-        "CaDynamics_E2",
+        "NaTg",
+        "CaDynamics_DC0",
         "Ih",
         "extracellular"
     ],
@@ -19,31 +18,32 @@
         "Ih",
         "SK_E2",
         "Ca_LVAst",
-        "Ca_HVA",
+        "Ca_HVA2",
         "SKv3_1",
-        "NaTa_t",
-        "Im",
-        "CaDynamics_E2"
+        "NaTg",
+        "CaDynamics_DC0"
     ],
     "basal": [
-        "Ih"
+        "Ih",
+        "Ca_HVA2",
+        "Ca_LVAst",
+        "CaDynamics_DC0"
     ],
     "hillockal": [
         "Ca_LVAst",
-        "Ca_HVA",
+        "Ca_HVA2",
         "SKv3_1",
         "SK_E2",
         "K_Tst",
         "K_Pst",
-        "Nap_Et2",
-        "NaTa_t",
-        "CaDynamics_E2",
+        "NaTg",
+        "CaDynamics_DC0",
         "Ih",
         "extracellular"
     ],
     "axon_initial_segment": [
         "Ca_LVAst",
-        "Ca_HVA",
+        "Ca_HVA2",
         "SKv3_1",
         "SK_E2",
         "K_Tst",
@@ -52,7 +52,7 @@
         "Na12Hu2009",
         "KdShu2007",
         "Na16Hu2009",
-        "CaDynamics_E2",
+        "CaDynamics_DC0",
         "extracellular"
     ]
 }
