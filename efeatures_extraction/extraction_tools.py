@@ -8,32 +8,67 @@ from bluepyefe.reader import _check_metadata
 from bluepyopt.ephys.extra_features_utils import calculate_features, all_1D_features
 
 ###### BUILD METADATA #####
+def get_ecode_protocol_names():
+    return ecodes_wcp_timings.keys()
 
-def build_wcp_metadata(cell_id, ephys_dir, repetition_as_different_cells=True,
+def build_wcp_metadata(cell_id, files_list, ecode_timings, repetition_as_different_cells=False,
                        liquid_junction_potential=14.):
+    """
+    Builds metadata for experimental data in wcp format.
+
+    Parameters
+    ----------
+    cell_id: str
+        Name of the cell (arbutrary)
+    files_list: list if dict
+        List (one element for each run) of dictionaries indicating the files associated to different protocols:
+        Example:
+        files_list = [
+            # run1
+            {"firepattern": path-to-firepattern-run1.wcp
+            ...
+            },
+            # run2
+            {"firepattern": path-to-firepattern-run2.wcp
+            ...
+            },
+        ]
+    ecode_timings: dict
+        Dictionary with timings associated to the different ecode protocols
+    repetition_as_different_cells: bool
+        Whether different repetitions should be considered as different cells (False by default)
+    liquid_junction_potential: float
+        The liquid juncion potential for the experiment (default 14 mV)
+
+    Returns
+    -------
+    files_metadata: dict
+        Dictionary with extracted metadata
+
+    """
 
     files_metadata = {}
 
     if not repetition_as_different_cells:
         files_metadata[cell_id] = {}
 
-    for repetition in range(2, 5):
-
+    for i_rep, repetition_dict in enumerate(files_list):
         if repetition_as_different_cells:
-            current_id = f"{cell_id}_rep{repetition}"
+            current_id = f"{cell_id}_rep{i_rep}"
             files_metadata[current_id] = {}
         else:
             current_id = cell_id
 
-        for ecode in ecode_to_index:
-
-            file_path = Path(ephys_dir) / f"{cell_id}_run{repetition}.{ecode_to_index[ecode]}.wcp"
+        for ecode_protocol in repetition_dict:
+            file_path = repetition_dict[ecode_protocol]
+            # file_path = Path(ephys_dir) / f"{cell_id}_run{repetition}.{ecode_to_index[ecode]}.wcp"
+            # print(file_path.name)
 
             if not file_path.is_file():
                 print(f"Missing trace {file_path}")
                 continue
 
-            metadata= {
+            metadata = {
                 "filepath": str(file_path),
                 "i_unit": "pA",
                 "t_unit": "s",
@@ -41,12 +76,12 @@ def build_wcp_metadata(cell_id, ephys_dir, repetition_as_different_cells=True,
                 "ljp": liquid_junction_potential
             }
 
-            metadata.update(ecodes_wcp_timings[ecode])
+            metadata.update(ecode_timings[ecode_protocol])
 
-            if ecode not in files_metadata[current_id]:
-                files_metadata[current_id][ecode] = [metadata]
+            if ecode_protocol not in files_metadata[current_id]:
+                files_metadata[current_id][ecode_protocol] = [metadata]
             else:
-                files_metadata[current_id][ecode].append(metadata)
+                files_metadata[current_id][ecode_protocol].append(metadata)
 
     return files_metadata
 
@@ -380,7 +415,7 @@ def get_targets(timings):
             "location": "soma"
         },
         "APWaveform": {
-            "amplitudes": [180, 260],  # Arbitrary choice
+            "amplitudes": [200, 230, 260, 290, 320, 350],  # Arbitrary choice
             "tolerances": [20],
             "efeatures": [
                 'AP_amplitude',
@@ -395,14 +430,14 @@ def get_targets(timings):
             "location": "soma"
         },
         "HyperDepol": {  # Used for validation
-            "amplitudes": [-120],  # Arbitrary choice
+            "amplitudes": [-160, -120, -80, -40],  # Arbitrary choice
             "tolerances": [10],
             "efeatures": _get_hyper_depol_efeatures(timings),
             "location": "soma"
         },
         "sAHP": {
             # Used for validation, It's not obvious in Mikael's schema if the percentage is relative to the base or to the first step
-            "amplitudes": [250],  # Arbitrary choice
+            "amplitudes": [150, 200, 250, 300],  # Arbitrary choice
             "tolerances": [10],
             "efeatures": _get_sahp_efeatures(timings),
             "location": "soma"

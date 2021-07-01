@@ -7,7 +7,7 @@ import LFPy
 
 import numpy as np
 
-from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho
+from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho, fix_morphology_exp
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -118,7 +118,6 @@ def define_electrode(
             probe.move(probe_center)
 
     else:
-
         with probe_file.open('r') as f:
             info = json.load(f)
 
@@ -127,14 +126,14 @@ def define_electrode(
     return probe
 
 
-def define_parameters(model_name, release=False):
+def define_parameters(model_name, parameter_file=None, release=False):
     """
     Defines parameters
 
     Parameters
     ----------
     model_name: str
-            "hay" or "hallermann"
+            "hay", "hay_ais", or "hallermann"
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the unfrozen parameters with bounds are
         returned (use False - default - for optimizations)
@@ -147,11 +146,15 @@ def define_parameters(model_name, release=False):
 
     path_params = pathlib.Path(f"{model_name}_model")
 
-    if release:
-        param_configs = json.load(open(path_params / "parameters_release.json"))
+    if parameter_file is None:
+        if release:
+            param_configs = json.load(open(path_params / "parameters_release.json"))
+        else:
+            param_configs = json.load(open(path_params / "parameters.json"))
     else:
-        param_configs = json.load(open(path_params / "parameters.json"))
-
+        parameter_file = pathlib.Path(parameter_file)
+        assert parameter_file.is_file(), "Parameter file doesn't exist"
+        param_configs = json.load(open(parameter_file))
     parameters = []
 
     for param_config in param_configs:
@@ -278,7 +281,7 @@ def define_morphology(model_name, morph_modifiers, do_replace_axon):
     )
 
 
-def create(model_name, release=False):
+def create(model_name, release=False, v_init=None):
     """
     Create Hay cell model
 
@@ -310,22 +313,27 @@ def create(model_name, release=False):
     elif model_name == "hay_ais":
         morph_modifiers = [replace_axon_with_hillock]
         seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
-        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin' ]
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin']
+        do_replace_axon = False
+    elif model_name == "exp":
+        morph_modifiers = [replace_axon_with_hillock]
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated',
+                         'axonal']
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin']
         do_replace_axon = False
     else:
         morph_modifiers = None
         seclist_names = None
         secarray_names = None
         do_replace_axon = True
-    
-    if model_name =="hallermann":
-        v_init = -85.
-    elif model_name =="hay":
-        v_init = -65.
-    elif model_name =="cultured": 
-        v_init = -70.
-    elif model_name =="hay_ais":
-        v_init = -80.
+
+    if v_init is None:
+        if model_name =="hallermann":
+            v_init = -85.
+        elif model_name =="hay":
+            v_init = -65.
+        elif model_name =="hay_ais":
+            v_init = -80.
 
     cell = ephys.models.LFPyCellModel(
         model_name,
@@ -333,6 +341,53 @@ def create(model_name, release=False):
         morph=define_morphology(model_name, morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(model_name),
         params=define_parameters(model_name, release),
+        seclist_names=seclist_names,
+        secarray_names=secarray_names
+    )
+
+    return cell
+
+
+def create_experimental_model(morphology_file, parameters_file=None, release=False, v_init=None):
+    """
+    Create Hay cell model
+
+    Parameters
+    ----------
+    model_name: str
+            "hay" or "hallermann"
+    release: bool
+        If True, the frozen release parameters are returned. Otherwise, the
+        unfrozen parameters with bounds are returned (use False for
+        optimizations).
+
+    Returns
+    -------
+    cell: bluepyopt.ephys.models.LFPyCellModel
+        The LFPyCellModel object
+    """
+
+
+    morph_modifiers = [fix_morphology_exp]
+    seclist_names = ['all', 'somatic', 'dendritic', 'axon_initial_segment', 'axonal']
+    secarray_names = ['soma', 'dend', 'ais', 'axon']
+    do_replace_axon = False
+    model_name = "experimental"
+
+    v_init = -70
+
+    morphology = ephys.morphologies.NrnFileMorphology(
+        str(morphology_file),
+        morph_modifiers=morph_modifiers,
+        do_replace_axon=do_replace_axon
+    )
+
+    cell = ephys.models.LFPyCellModel(
+        model_name,
+        v_init=v_init,
+        morph=morphology,
+        mechs=define_mechanisms(model_name),
+        params=define_parameters(model_name, parameters_file, release),
         seclist_names=seclist_names,
         secarray_names=secarray_names
     )
