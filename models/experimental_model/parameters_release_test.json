@@ -152,21 +152,21 @@
     },
     {
         "param_name": "cm",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "type": "section",
         "dist_type": "uniform",
         "value": 2.25
     },
     {
         "param_name": "ek",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "type": "section",
         "dist_type": "uniform",
         "value": -85
     },
     {
         "param_name": "ena",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "type": "section",
         "dist_type": "uniform",
         "value": 50
@@ -178,7 +178,7 @@
         "dist_type": "exp",
         "mech_param": "gIhbar",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 0.005025
     },
     {
@@ -187,7 +187,7 @@
         "dist_type": "uniform",
         "mech_param": "decay",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 110.0
     },
     {
@@ -196,7 +196,7 @@
         "dist_type": "uniform",
         "mech_param": "gamma",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 0.02525
     },
     {
@@ -205,7 +205,7 @@
         "dist_type": "uniform",
         "mech_param": "gSK_E2bar",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 0.025
     },
     {
@@ -214,7 +214,7 @@
         "dist_type": "uniform",
         "mech_param": "gSKv3_1bar",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 0.1
     },
     {
@@ -223,7 +223,7 @@
         "dist_type": "uniform",
         "mech_param": "gNaTa_tbar",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 0.1
     },
     {
@@ -232,14 +232,14 @@
         "dist_type": "uniform",
         "mech_param": "gImbar",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 0.00025
     },
     {
         "param_name": "g_pas",
         "type": "section",
         "dist_type": "uniform",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 3.7500000000000003e-05
     },
     {
@@ -249,7 +249,7 @@
         "dist_type": "step_funct",
         "mech_param": "gCa_LVAstbar",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 0.05
     },
     {
@@ -259,7 +259,7 @@
         "dist_type": "step_funct",
         "mech_param": "gCa_HVAbar",
         "type": "range",
-        "sectionlist": "dendritic",
+        "sectionlist": "basal",
         "value": 0.00125
     },
     {

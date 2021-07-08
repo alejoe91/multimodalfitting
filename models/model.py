@@ -7,7 +7,7 @@ import LFPy
 
 import numpy as np
 
-from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho, fix_morphology_exp
+from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho, fix_morphology_exp, fix_morphology_exp2
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -84,7 +84,6 @@ def define_electrode(
     import MEAutility as mu
 
     if probe_file is None:
-
         assert probe_type in ['linear', 'planar']
 
         if probe_type == 'linear':
@@ -118,6 +117,7 @@ def define_electrode(
             probe.move(probe_center)
 
     else:
+        probe_file = pathlib.Path(probe_file)
         with probe_file.open('r') as f:
             info = json.load(f)
 
@@ -188,7 +188,8 @@ def define_parameters(model_name, parameter_file=None, release=False):
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
                 
-            elif param_config["dist_type"] in ["exp", "step_funct", "user_defined", "sig_increase", "sig_decrease", "decay"]:
+            elif param_config["dist_type"] in ["exp", "step_funct", "user_defined", "sig_increase", "sig_decrease",
+                                               "decay"]:
 
                 if "soma_ref_point" in param_config:
                     ref_point = param_config["soma_ref_point"]
@@ -368,13 +369,37 @@ def create_experimental_model(morphology_file, parameters_file=None, release=Fal
     """
 
 
-    morph_modifiers = [fix_morphology_exp]
-    seclist_names = ['all', 'somatic', 'dendritic', 'axon_initial_segment', 'axonal']
-    secarray_names = ['soma', 'dend', 'ais', 'axon']
+    morph_modifiers = [fix_morphology_exp]  # [fix_morphology_exp]
+    # seclist_names = ['all', 'somatic', 'dendritic', 'apical', 'axon_initial_segment', 'axonal']
+    # secarray_names = ['soma', 'dend', 'apic', 'dend_7', 'axon']
+
+    seclist_names = [
+        "all",
+        "somatic",
+        "basal",
+        "apical",
+        "axonal",
+        "axon_initial_segment"
+    ]
+
+    secarray_names = ["soma", "dend", "apic", "axon", "ais"]
+
+    # seclist_names = [
+    #     "all",
+    #     "somatic",
+    #     "basal",
+    #     "apical",
+    #     "axonal",
+    #     "axon_initial_segment"
+    # ]
+    #
+    # secarray_names = ["soma", "dend", "apic", "axon", "ais"]
+
     do_replace_axon = False
     model_name = "experimental"
 
-    v_init = -70
+    if v_init is None:
+        v_init = -70
 
     morphology = ephys.morphologies.NrnFileMorphology(
         str(morphology_file),

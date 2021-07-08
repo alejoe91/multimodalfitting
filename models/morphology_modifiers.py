@@ -4,34 +4,90 @@ import math
 logger = logging.getLogger(__name__)
 
 
+# def fix_morphology_exp_old(sim=None, icell=None):
+#     """Fix exp morphology by renaming 'dend_7' -> 'ais'"""
+#
+#     # 1) rename dend_7 to ais
+#     sec_ais = sim.neuron.h.Section(name="ais[0]")
+#
+#     print("here")
+#
+#     for sec in icell.allsec():
+#         if "dend_7" in sec.name():
+#             n3d = sec.n3d()
+#             for i in range(n3d):
+#                 sim.neuron.h.pt3dadd(sec.x3d(i), sec.y3d(i), sec.z3d(i), sec.diam3d(i), sec=sec_ais)
+#             parentseg_ais = sec.parentseg()
+#             children_ais = sec.children()
+#             sim.neuron.h.pt3dclear(sec=sec)
+#             sim.neuron.h.delete_section(sec=sec)
+#
+#             sec_ais.connect(parentseg_ais.sec, 1.0, 0.0)
+#             for child in children_ais:
+#                 child.connect(sec_ais, 1.0, 0.0)
+#             icell.axon_initial_segment.append(sec_ais)
+#         elif "soma" in sec.name():
+#             icell.somatic.append(sec)
+#         elif "dend" in sec.name():
+#             icell.dendritic.append(sec)
+#         elif "axon" in sec.name():
+#             icell.axonal.append(sec)
+
 def fix_morphology_exp(sim=None, icell=None):
-    """Fix exp morphology by renaming 'dend_7' -> 'ais'"""
+    """Fix exp morphology by renaming 'apic' -> 'ais'"""
 
-    # 1) rename dend_7 to ais, and apic to dend
-    sec_ais = sim.neuron.h.Section(name="ais")
+    # 1) rename apic to ais
+    sim.neuron.h.execute("create ais[1]", icell)
+    sec_ais = icell.ais[0]
+    # sec_ais = sim.neuron.h.Section(name="experimental[0].ais[0]")
 
-    print("here")
+    for sec in icell.apical:
+        n3d = sec.n3d()
+        for i in range(n3d):
+            sim.neuron.h.pt3dadd(sec.x3d(i), sec.y3d(i), sec.z3d(i), sec.diam3d(i), sec=sec_ais)
+        parentseg_ais = sec.parentseg()
+        children_ais = sec.children()
+        sim.neuron.h.pt3dclear(sec=sec)
+        sim.neuron.h.delete_section(sec=sec)
 
-    for sec in icell.allsec():
-        if "dend_7" in sec.name():
-            n3d = sec.n3d()
-            for i in range(n3d):
-                sim.neuron.h.pt3dadd(sec.x3d(i), sec.y3d(i), sec.z3d(i), sec.diam3d(i), sec=sec_ais)
-            parentseg_ais = sec.parentseg()
-            children_ais = sec.children()
-            sim.neuron.h.pt3dclear(sec=sec)
-            sim.neuron.h.delete_section(sec=sec)
+        sec_ais.connect(parentseg_ais.sec, 1.0, 0.0)
+        for child in children_ais:
+            child.connect(sec_ais, 1.0, 0.0)
+            
+        icell.axon_initial_segment.append(sec=sec_ais)
+        icell.all.append(sec=sec_ais)
 
-            sec_ais.connect(parentseg_ais.sec, 1.0, 0.0)
-            for child in children_ais:
-                child.connect(sec_ais, 1.0, 0.0)
-            icell.axon_initial_segment.append(sec_ais)
-        elif "soma" in sec.name():
-            icell.somatic.append(sec)
-        elif "dend" in sec.name():
-            icell.dendritic.append(sec)
-        elif "axon" in sec.name():
-            icell.axonal.append(sec)
+    for section in icell.apical:
+        sim.neuron.h.delete_section(sec=section)
+
+
+def fix_morphology_exp2(sim=None, icell=None):
+    """Fix exp morphology by renaming 'apic' -> 'ais'"""
+
+    # 1) rename dend_7 to ais
+    sim.neuron.h.execute("create ais[1]", icell)
+    sec_ais = icell.ais[0]
+    # sec_ais = sim.neuron.h.Section(name="experimental[0].ais[0]")
+
+    # for sec in icell.dend_7:
+    sec = icell.dend_7
+    n3d = sec.n3d()
+    for i in range(n3d):
+        sim.neuron.h.pt3dadd(sec.x3d(i), sec.y3d(i), sec.z3d(i), sec.diam3d(i), sec=sec_ais)
+    parentseg_ais = sec.parentseg()
+    children_ais = sec.children()
+    sim.neuron.h.pt3dclear(sec=sec)
+    sim.neuron.h.delete_section(sec=sec)
+
+    sec_ais.connect(parentseg_ais.sec, 1.0, 0.0)
+    for child in children_ais:
+        child.connect(sec_ais, 1.0, 0.0)
+
+    icell.axon_initial_segment.append(sec=sec_ais)
+    icell.all.append(sec=sec_ais)
+
+    for section in icell.apical:
+        sim.neuron.h.delete_section(sec=section)
 
 
 def replace_axon_with_hillock(sim=None, icell=None, l_hillock=10, l_ais=40,
@@ -56,9 +112,11 @@ def replace_axon_with_hillock(sim=None, icell=None, l_hillock=10, l_ais=40,
             list_z3d.append(sim.neuron.h.z3d(i, sec=section))
             list_diam3d.append(sim.neuron.h.diam3d(i, sec=section))
 
-        interpolation_number = 7  # this number define the number of interpolations made. The higher it is, the most precise will be the axon 3d definition.
-        for j in range(
-                interpolation_number):  # we create 4 intp lists to store the values corresponding at the middle between each existing values
+        # this number define the number of interpolations made. The higher it is,
+        # the most precise will be the axon 3d definition.
+        interpolation_number = 7
+                # we create 4 intp lists to store the values corresponding at the middle between each existing values
+        for j in range(interpolation_number):
             list_x3d_intp = []
             list_y3d_intp = []
             list_z3d_intp = []
@@ -69,7 +127,8 @@ def replace_axon_with_hillock(sim=None, icell=None, l_hillock=10, l_ais=40,
                 list_y3d_intp.append((list_y3d[i] + list_y3d[i + 1]) / 2)
                 list_z3d_intp.append((list_z3d[i] + list_z3d[i + 1]) / 2)
                 list_diam3d_intp.append((list_diam3d[i] + list_diam3d[i + 1]) / 2)
-            # we create 4 new lists to store the existing values and the values in between to obtain the lists interpolated
+            # we create 4 new lists to store the existing values and the values in between to obtain the lists
+            # interpolated
             list_x3d_new = []
             list_y3d_new = []
             list_z3d_new = []
@@ -127,8 +186,9 @@ def replace_axon_with_hillock(sim=None, icell=None, l_hillock=10, l_ais=40,
             if i == 0:
                 dist_from_soma = dist_from_soma
             else:
+                                # this line increase the distance from the soma at each new 3d info point
                 dist_from_soma = dist_from_soma + sim.neuron.h.arc3d(i, sec=section) - sim.neuron.h.arc3d(i - 1,
-                                                                                                          sec=section)  # this line increase the distance from the soma at each new 3d info point
+                                                                                                          sec=section)
 
             if dist_from_soma <= L_hillock:
                 x3d_hillock.append(sim.neuron.h.x3d(i, sec=section))
