@@ -193,13 +193,25 @@ def define_parameters(model_name, parameter_file=None, release=False):
 
                 if "soma_ref_point" in param_config:
                     ref_point = param_config["soma_ref_point"]
+                    scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
+                        distribution=param_config["dist"],
+                        soma_ref_location=ref_point
+                    )
+                elif "ref_section" in param_config:
+                    assert "ref_point" in param_config, "'ref_section' missing from param config"
+                    ref_point = param_config["ref_point"]
+                    ref_section = param_config["ref_section"]
+                    scaler = ephys.parameterscalers.NrnSegmentSectionDistanceScaler(
+                        distribution=param_config["dist"],
+                        ref_section=ref_section,
+                        ref_location=ref_point
+                    )
                 else:
                     ref_point = 0.5
-
-                scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
-                    distribution=param_config["dist"],
-                    soma_ref_location=ref_point
-                )
+                    scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
+                        distribution=param_config["dist"],
+                        soma_ref_location=ref_point
+                    )
             
             if not isinstance(param_config["sectionlist"], list):
                 param_config["sectionlist"] = [param_config["sectionlist"]]

@@ -1,0 +1,52 @@
+{
+    "all": [
+        "pas"
+    ],
+    "somatic": [
+        "Ca_LVAst",
+        "Ca_HVA",
+        "SKv3_1",
+        "SK_E2",
+        "K_Tst",
+        "K_Pst",
+        "Nap_Et2",
+        "NaTa_t",
+        "CaDynamics_E2",
+        "Ih"
+    ],
+    "axonal": [
+        "Ca_LVAst",
+        "Ca_HVA",
+        "SKv3_1",
+        "SK_E2",
+        "K_Tst",
+        "K_Pst",
+        "Nap_Et2",
+        "NaTa_t",
+        "CaDynamics_E2",
+        "Ih"
+    ],
+    "basal": [
+        "Ih",
+        "SK_E2",
+        "Ca_LVAst",
+        "Ca_HVA",
+        "SKv3_1",
+        "NaTa_t",
+        "Im",
+        "CaDynamics_E2"
+    ],
+    "axon_initial_segment": [
+        "Ca_LVAst",
+        "Ca_HVA2",
+        "SKv3_1",
+        "SK_E2",
+        "K_Tst",
+        "K_Pst",
+        "Nap_Et2",
+        "Na12Hu2009",
+        "Na16Hu2009",
+        "KdShu2007",
+        "CaDynamics_DC0"
+    ]
+}

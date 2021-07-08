@@ -1,52 +1,49 @@
 {
-    "all": [
-        "pas"
+    "basal": [
+        "CaDynamics_DC0",
+        "Ca_HVA2",
+        "Ca_LVAst",
+        "NaTg",
+        "SKv3_1",
+        "Ih"
     ],
     "somatic": [
+        "CaDynamics_DC0",
+        "Ca_HVA2",
         "Ca_LVAst",
-        "Ca_HVA",
         "SKv3_1",
         "SK_E2",
-        "K_Tst",
         "K_Pst",
-        "Nap_Et2",
-        "NaTa_t",
-        "CaDynamics_E2",
+        "K_Tst",
+        "NaTg",
         "Ih"
     ],
     "axonal": [
+        "CaDynamics_DC0",
+        "Ca_HVA2",
         "Ca_LVAst",
-        "Ca_HVA",
         "SKv3_1",
         "SK_E2",
-        "K_Tst",
         "K_Pst",
+        "K_Tst",
         "Nap_Et2",
-        "NaTa_t",
-        "CaDynamics_E2",
-        "Ih"
-    ],
-    "basal": [
-        "Ih",
-        "SK_E2",
-        "Ca_LVAst",
-        "Ca_HVA",
-        "SKv3_1",
-        "NaTa_t",
-        "Im",
-        "CaDynamics_E2"
+        "KdShu2007",
+        "Na16Hu2009"
     ],
     "axon_initial_segment": [
-        "Ca_LVAst",
+        "CaDynamics_DC0",
         "Ca_HVA2",
+        "Ca_LVAst",
         "SKv3_1",
         "SK_E2",
-        "K_Tst",
         "K_Pst",
-        "Nap_Et2",
+        "K_Tst",
         "Na12Hu2009",
-        "Na16Hu2009",
+        "Nap_Et2",
         "KdShu2007",
-        "CaDynamics_DC0"
+        "Na16Hu2009"
+    ],
+    "all": [
+        "pas"
     ]
 }
