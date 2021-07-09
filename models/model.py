@@ -7,7 +7,7 @@ import LFPy
 
 import numpy as np
 
-from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho, fix_morphology_exp, fix_morphology_exp2
+from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho, fix_morphology_exp
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -407,10 +407,8 @@ def create_experimental_model(morphology_file, parameters_file=None, release=Fal
     """
 
 
-    morph_modifiers = [fix_morphology_exp]  # [fix_morphology_exp]
-    # seclist_names = ['all', 'somatic', 'dendritic', 'apical', 'axon_initial_segment', 'axonal']
-    # secarray_names = ['soma', 'dend', 'apic', 'dend_7', 'axon']
-
+    morph_modifiers = [fix_morphology_exp]
+    
     seclist_names = [
         "all",
         "somatic",
@@ -422,16 +420,6 @@ def create_experimental_model(morphology_file, parameters_file=None, release=Fal
 
     secarray_names = ["soma", "dend", "apic", "axon", "ais"]
 
-    # seclist_names = [
-    #     "all",
-    #     "somatic",
-    #     "basal",
-    #     "apical",
-    #     "axonal",
-    #     "axon_initial_segment"
-    # ]
-    #
-    # secarray_names = ["soma", "dend", "apic", "axon", "ais"]
 
     do_replace_axon = False
     model_name = "experimental"
