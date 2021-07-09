@@ -77,11 +77,8 @@
         "type": "range",
         "sectionlist": "basal",
         "dist_type": "decay",
-        "dist": "math.exp({distance}*{constant})*{value}",
+        "dist": "math.exp({distance}*(-0.003520882309604751))*{value}",
         "soma_ref_point": 0.5,
-        "parameters": [
-            "constant"
-        ],
         "value": 3.5000000000000004e-05
     },
     {

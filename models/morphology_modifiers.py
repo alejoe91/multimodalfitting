@@ -4,42 +4,12 @@ import math
 logger = logging.getLogger(__name__)
 
 
-# def fix_morphology_exp_old(sim=None, icell=None):
-#     """Fix exp morphology by renaming 'dend_7' -> 'ais'"""
-#
-#     # 1) rename dend_7 to ais
-#     sec_ais = sim.neuron.h.Section(name="ais[0]")
-#
-#     print("here")
-#
-#     for sec in icell.allsec():
-#         if "dend_7" in sec.name():
-#             n3d = sec.n3d()
-#             for i in range(n3d):
-#                 sim.neuron.h.pt3dadd(sec.x3d(i), sec.y3d(i), sec.z3d(i), sec.diam3d(i), sec=sec_ais)
-#             parentseg_ais = sec.parentseg()
-#             children_ais = sec.children()
-#             sim.neuron.h.pt3dclear(sec=sec)
-#             sim.neuron.h.delete_section(sec=sec)
-#
-#             sec_ais.connect(parentseg_ais.sec, 1.0, 0.0)
-#             for child in children_ais:
-#                 child.connect(sec_ais, 1.0, 0.0)
-#             icell.axon_initial_segment.append(sec_ais)
-#         elif "soma" in sec.name():
-#             icell.somatic.append(sec)
-#         elif "dend" in sec.name():
-#             icell.dendritic.append(sec)
-#         elif "axon" in sec.name():
-#             icell.axonal.append(sec)
-
-def fix_morphology_exp(sim=None, icell=None):
-    """Fix exp morphology by renaming 'apic' -> 'ais'"""
+def fix_morphology_exp(sim=None, icell=None, nseg_ais=50):
+    """Fix exp morphology by renaming 'apic' -> 'ais' and by setting the number of ais segments."""
 
     # 1) rename apic to ais
     sim.neuron.h.execute("create ais[1]", icell)
     sec_ais = icell.ais[0]
-    # sec_ais = sim.neuron.h.Section(name="experimental[0].ais[0]")
 
     for sec in icell.apical:
         n3d = sec.n3d()
@@ -56,35 +26,9 @@ def fix_morphology_exp(sim=None, icell=None):
             
         icell.axon_initial_segment.append(sec=sec_ais)
         icell.all.append(sec=sec_ais)
-
-    for section in icell.apical:
-        sim.neuron.h.delete_section(sec=section)
-
-
-def fix_morphology_exp2(sim=None, icell=None):
-    """Fix exp morphology by renaming 'apic' -> 'ais'"""
-
-    # 1) rename dend_7 to ais
-    sim.neuron.h.execute("create ais[1]", icell)
-    sec_ais = icell.ais[0]
-    # sec_ais = sim.neuron.h.Section(name="experimental[0].ais[0]")
-
-    # for sec in icell.dend_7:
-    sec = icell.dend_7
-    n3d = sec.n3d()
-    for i in range(n3d):
-        sim.neuron.h.pt3dadd(sec.x3d(i), sec.y3d(i), sec.z3d(i), sec.diam3d(i), sec=sec_ais)
-    parentseg_ais = sec.parentseg()
-    children_ais = sec.children()
-    sim.neuron.h.pt3dclear(sec=sec)
-    sim.neuron.h.delete_section(sec=sec)
-
-    sec_ais.connect(parentseg_ais.sec, 1.0, 0.0)
-    for child in children_ais:
-        child.connect(sec_ais, 1.0, 0.0)
-
-    icell.axon_initial_segment.append(sec=sec_ais)
-    icell.all.append(sec=sec_ais)
+        
+        for index, section in enumerate(icell.axon_initial_segment):
+            section.nseg = nseg_ais
 
     for section in icell.apical:
         sim.neuron.h.delete_section(sec=section)

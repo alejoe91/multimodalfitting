@@ -183,7 +183,7 @@ def define_parameters(model_name, parameter_file=None, release=False):
                 )
             )
 
-        elif param_config["type"] in ["section", "range"]:
+        elif param_config["type"] in ["section", "range", "meta"]:
 
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
@@ -191,11 +191,17 @@ def define_parameters(model_name, parameter_file=None, release=False):
             elif param_config["dist_type"] in ["exp", "step_funct", "user_defined", "sig_increase", "sig_decrease",
                                                "decay"]:
 
+                if "parameters" in param_config:
+                    dist_param_names = param_config["parameters"]
+                else:
+                    dist_param_names = None
+
                 if "soma_ref_point" in param_config:
                     ref_point = param_config["soma_ref_point"]
                     scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
                         distribution=param_config["dist"],
-                        soma_ref_location=ref_point
+                        soma_ref_location=ref_point,
+                        dist_param_names=dist_param_names
                     )
                 elif "ref_section" in param_config:
                     assert "ref_point" in param_config, "'ref_section' missing from param config"
@@ -204,15 +210,20 @@ def define_parameters(model_name, parameter_file=None, release=False):
                     scaler = ephys.parameterscalers.NrnSegmentSectionDistanceScaler(
                         distribution=param_config["dist"],
                         ref_section=ref_section,
-                        ref_location=ref_point
+                        ref_location=ref_point,
+                        dist_param_names=dist_param_names
                     )
                 else:
                     ref_point = 0.5
                     scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
                         distribution=param_config["dist"],
-                        soma_ref_location=ref_point
+                        soma_ref_location=ref_point,
+                        dist_param_names=dist_param_names
                     )
-            
+
+            if "sectionlist" not in param_config:  # for meta parameters
+                param_config["sectionlist"] = []
+
             if not isinstance(param_config["sectionlist"], list):
                 param_config["sectionlist"] = [param_config["sectionlist"]]
             
@@ -222,10 +233,14 @@ def define_parameters(model_name, parameter_file=None, release=False):
                     loc,
                     seclist_name=loc
                 ))
-            
-            str_loc = "_".join(e for e in param_config['sectionlist'])
-            name = f"{param_config['param_name']}_{str_loc}"
-            param_dependancies = param_config.get("dependencies", None)
+
+            if len(seclist_loc) > 0:
+                str_loc = "_".join(e for e in param_config['sectionlist'])
+                name = f"{param_config['param_name']}_{str_loc}"
+                param_dependancies = param_config.get("dependencies", None)
+            else:
+                name = param_config['param_name']
+                param_dependancies = param_config.get("dependencies", None)
 
             if param_config["type"] == "section":
                 parameters.append(
@@ -254,10 +269,21 @@ def define_parameters(model_name, parameter_file=None, release=False):
                         param_dependancies=param_dependancies
                     )
                 )
-            
+            elif param_config["type"] == "meta":
+                print("Adding meta parameter", name, name.split("_")[0])
+                parameters.append(
+                    ephys.parameters.MetaParameter(
+                        name=name,
+                        obj=scaler,
+                        attr_name=name.split("_")[0], #name.split("_")[0],
+                        frozen=frozen,
+                        bounds=bounds,
+                        value=value
+                    )
+                )
         else:
             raise Exception(
-                "Param config type has to be global, section or range: %s"
+                "Param config type has to be global, section, range, or meta: %s"
                 % param_config
             )
         
