@@ -7,7 +7,7 @@ import LFPy
 
 import numpy as np
 
-from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho
+from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho, fix_morphology_exp
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -84,7 +84,6 @@ def define_electrode(
     import MEAutility as mu
 
     if probe_file is None:
-
         assert probe_type in ['linear', 'planar']
 
         if probe_type == 'linear':
@@ -118,7 +117,7 @@ def define_electrode(
             probe.move(probe_center)
 
     else:
-
+        probe_file = pathlib.Path(probe_file)
         with probe_file.open('r') as f:
             info = json.load(f)
 
@@ -127,14 +126,14 @@ def define_electrode(
     return probe
 
 
-def define_parameters(model_name, release=False):
+def define_parameters(model_name, parameter_file=None, release=False):
     """
     Defines parameters
 
     Parameters
     ----------
     model_name: str
-            "hay" or "hallermann"
+            "hay", "hay_ais", or "hallermann"
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the unfrozen parameters with bounds are
         returned (use False - default - for optimizations)
@@ -147,11 +146,15 @@ def define_parameters(model_name, release=False):
 
     path_params = pathlib.Path(f"{model_name}_model")
 
-    if release:
-        param_configs = json.load(open(path_params / "parameters_release.json"))
+    if parameter_file is None:
+        if release:
+            param_configs = json.load(open(path_params / "parameters_release.json"))
+        else:
+            param_configs = json.load(open(path_params / "parameters.json"))
     else:
-        param_configs = json.load(open(path_params / "parameters.json"))
-
+        parameter_file = pathlib.Path(parameter_file)
+        assert parameter_file.is_file(), "Parameter file doesn't exist"
+        param_configs = json.load(open(parameter_file))
     parameters = []
 
     for param_config in param_configs:
@@ -180,23 +183,47 @@ def define_parameters(model_name, release=False):
                 )
             )
 
-        elif param_config["type"] in ["section", "range"]:
+        elif param_config["type"] in ["section", "range", "meta"]:
 
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
                 
-            elif param_config["dist_type"] in ["exp", "step_funct", "user_defined", "sig_increase", "sig_decrease", "decay"]:
+            elif param_config["dist_type"] in ["exp", "step_funct", "user_defined", "sig_increase", "sig_decrease",
+                                               "decay"]:
+
+                if "parameters" in param_config:
+                    dist_param_names = param_config["parameters"]
+                else:
+                    dist_param_names = None
 
                 if "soma_ref_point" in param_config:
                     ref_point = param_config["soma_ref_point"]
+                    scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
+                        distribution=param_config["dist"],
+                        soma_ref_location=ref_point,
+                        dist_param_names=dist_param_names
+                    )
+                elif "ref_section" in param_config:
+                    assert "ref_point" in param_config, "'ref_section' missing from param config"
+                    ref_point = param_config["ref_point"]
+                    ref_section = param_config["ref_section"]
+                    scaler = ephys.parameterscalers.NrnSegmentSectionDistanceScaler(
+                        distribution=param_config["dist"],
+                        ref_section=ref_section,
+                        ref_location=ref_point,
+                        dist_param_names=dist_param_names
+                    )
                 else:
                     ref_point = 0.5
+                    scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
+                        distribution=param_config["dist"],
+                        soma_ref_location=ref_point,
+                        dist_param_names=dist_param_names
+                    )
 
-                scaler = ephys.parameterscalers.NrnSegmentSomaDistanceScaler(
-                    distribution=param_config["dist"],
-                    soma_ref_location=ref_point
-                )
-            
+            if "sectionlist" not in param_config:  # for meta parameters
+                param_config["sectionlist"] = []
+
             if not isinstance(param_config["sectionlist"], list):
                 param_config["sectionlist"] = [param_config["sectionlist"]]
             
@@ -206,10 +233,14 @@ def define_parameters(model_name, release=False):
                     loc,
                     seclist_name=loc
                 ))
-            
-            str_loc = "_".join(e for e in param_config['sectionlist'])
-            name = f"{param_config['param_name']}_{str_loc}"
-            param_dependancies = param_config.get("dependencies", None)
+
+            if len(seclist_loc) > 0:
+                str_loc = "_".join(e for e in param_config['sectionlist'])
+                name = f"{param_config['param_name']}_{str_loc}"
+                param_dependancies = param_config.get("dependencies", None)
+            else:
+                name = param_config['param_name']
+                param_dependancies = param_config.get("dependencies", None)
 
             if param_config["type"] == "section":
                 parameters.append(
@@ -238,10 +269,21 @@ def define_parameters(model_name, release=False):
                         param_dependancies=param_dependancies
                     )
                 )
-            
+            elif param_config["type"] == "meta":
+                # print("Adding meta parameter", name, name.split("_")[0])
+                parameters.append(
+                    ephys.parameters.MetaParameter(
+                        name=name,
+                        obj=scaler,
+                        attr_name=name, #.split("_")[0], #name.split("_")[0],
+                        frozen=frozen,
+                        bounds=bounds,
+                        value=value
+                    )
+                )
         else:
             raise Exception(
-                "Param config type has to be global, section or range: %s"
+                "Param config type has to be global, section, range, or meta: %s"
                 % param_config
             )
         
@@ -278,7 +320,7 @@ def define_morphology(model_name, morph_modifiers, do_replace_axon):
     )
 
 
-def create(model_name, release=False):
+def create(model_name, release=False, v_init=None):
     """
     Create Hay cell model
 
@@ -310,22 +352,27 @@ def create(model_name, release=False):
     elif model_name == "hay_ais":
         morph_modifiers = [replace_axon_with_hillock]
         seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
-        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin' ]
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin']
+        do_replace_axon = False
+    elif model_name == "exp":
+        morph_modifiers = [replace_axon_with_hillock]
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated',
+                         'axonal']
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin']
         do_replace_axon = False
     else:
         morph_modifiers = None
         seclist_names = None
         secarray_names = None
         do_replace_axon = True
-    
-    if model_name =="hallermann":
-        v_init = -85.
-    elif model_name =="hay":
-        v_init = -65.
-    elif model_name =="cultured": 
-        v_init = -70.
-    elif model_name =="hay_ais":
-        v_init = -80.
+
+    if v_init is None:
+        if model_name =="hallermann":
+            v_init = -85.
+        elif model_name =="hay":
+            v_init = -65.
+        elif model_name =="hay_ais":
+            v_init = -80.
 
     cell = ephys.models.LFPyCellModel(
         model_name,
@@ -333,6 +380,68 @@ def create(model_name, release=False):
         morph=define_morphology(model_name, morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(model_name),
         params=define_parameters(model_name, release),
+        seclist_names=seclist_names,
+        secarray_names=secarray_names
+    )
+
+    return cell
+
+
+def create_experimental_model(morphology_file, parameters_file=None, release=False, v_init=None):
+    """
+    Create Hay cell model
+
+    Parameters
+    ----------
+    model_name: str
+            "hay" or "hallermann"
+    release: bool
+        If True, the frozen release parameters are returned. Otherwise, the
+        unfrozen parameters with bounds are returned (use False for
+        optimizations).
+
+    Returns
+    -------
+    cell: bluepyopt.ephys.models.LFPyCellModel
+        The LFPyCellModel object
+    """
+
+
+    morph_modifiers = [fix_morphology_exp]
+
+    seclist_names = [
+        "all",
+        "somatic",
+        "basal",
+        "apical",
+        "axonal",
+        "axon_initial_segment"
+    ]
+
+    secarray_names = ["soma", "dend", "apic", "axon", "ais"]
+
+
+    do_replace_axon = False
+    model_name = "experimental"
+
+    if v_init is None:
+        v_init = -70
+        ljp = -14
+        # add LJP
+        v_init += ljp
+
+    morphology = ephys.morphologies.NrnFileMorphology(
+        str(morphology_file),
+        morph_modifiers=morph_modifiers,
+        do_replace_axon=do_replace_axon
+    )
+
+    cell = ephys.models.LFPyCellModel(
+        model_name,
+        v_init=v_init,
+        morph=morphology,
+        mechs=define_mechanisms(model_name),
+        params=define_parameters(model_name, parameters_file, release),
         seclist_names=seclist_names,
         secarray_names=secarray_names
     )

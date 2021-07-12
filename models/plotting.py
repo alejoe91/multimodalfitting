@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import utils
 import MEAutility as mu
+from copy import deepcopy
 
 import re
 
@@ -351,7 +352,7 @@ def plot_feature_map(feature, probe, cmap='viridis', log=False,
         ax = fig.add_subplot(111)
 
     locations = np.array([np.dot(probe.positions, probe.main_axes[0]), np.dot(probe.positions, probe.main_axes[1])]).T
-    temp_map = feature
+    temp_map = deepcopy(feature)
 
     if log:
         if np.any(temp_map < 1):
@@ -361,27 +362,38 @@ def plot_feature_map(feature, probe, cmap='viridis', log=False,
     # normalize
     temp_map -= np.min(temp_map)
     temp_map /= np.ptp(temp_map)
+    pitch = probe.pitch
 
-    ax = _plot_map(temp_map, locations, cmap, bg, ax, label_color)
+    ax = _plot_map(temp_map, locations, pitch, cmap, bg, ax, label_color)
 
     return ax
 
 
-def _plot_map(temp_map, locations, cmap, bg, ax, label_color):
+def _plot_map(temp_map, locations, pitch, cmap, bg, ax, label_color):
     x = locations[:, 0]
     y = locations[:, 1]
-    x_un = np.unique(x)
-    y_un = np.unique(y)
 
-    if len(y_un) == 1:
-        pitch_x = np.min(np.diff(x_un))
-        pitch_y = pitch_x
-    elif len(x_un) == 1:
-        pitch_y = np.min(np.diff(y_un))
-        pitch_x = pitch_y
+    if pitch is None:
+        x_un = np.unique(x)
+        y_un = np.unique(y)
+
+        if len(y_un) == 1:
+            pitch_x = np.min(np.diff(x_un))
+            pitch_y = pitch_x
+        elif len(x_un) == 1:
+            pitch_y = np.min(np.diff(y_un))
+            pitch_x = pitch_y
+        else:
+            pitch_x = np.min(np.diff(x_un))
+            pitch_y = np.min(np.diff(y_un))
     else:
-        pitch_x = np.min(np.diff(x_un))
-        pitch_y = np.min(np.diff(y_un))
+        if np.isscalar(pitch):
+            pitch_x = pitch
+            pitch_y = pitch
+        else:
+            assert len(pitch) == 2
+            pitch_x = pitch[0]
+            pitch_y = pitch[1]
 
     elec_x = 0.9 * pitch_x
     elec_y = 0.9 * pitch_y

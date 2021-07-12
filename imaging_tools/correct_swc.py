@@ -5,10 +5,9 @@ swc_dtype = np.dtype([('id', "int32"), ('type', "int16"),
                       ('x', "float32"), ('y', "float32"), ('z', "float32"),
                       ('radius', "float32"), ('parent', "int32")])
 
-
 def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
                 min_diam_value=0.11, interp=True, smooth=True,
-                soma_radius=None):
+                soma_radius=None, reset_tags=[[4, 3], [7, 4]], save=True):
     """
     Correct an SWC morphology by interpolating missing diameters (below min_diam_value) and smoothing the
     diameters with a moving average (smooth_samples).
@@ -29,6 +28,11 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
         If True (default), diameters are smoothed
     soma_radius: float or None
         If given, the somatic radius is reset
+    reset_tags: list of lists
+        Resets tags. E.g. [[4, 3], [7, 4]] means that first all "4" tags are reset to "3", then all "7" tags are
+        reset to "4".
+    save: bool
+        If True, the output swc is saved to the output_swc_file
 
     """
     swc_data = np.loadtxt(input_swc_file, dtype=swc_dtype)
@@ -39,6 +43,8 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
     new_radii = deepcopy(swc_data["radius"])
     missing_idxs = np.array([], dtype="int")
     corrected_idxs = np.array([], dtype="int")
+    n_missing_values = 0
+
     for i_br, init in enumerate(initial_branches):
 
         if i_br < len(initial_branches) - 1:
@@ -53,7 +59,8 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
             min_radius_idxs = np.where(old_radii[idxs] < min_diam_value)
             if len(min_radius_idxs[0]) > 0:
                 min_radius_idxs = min_radius_idxs[0]
-                print(f"Path {i_br + 1} / {len(initial_branches)} has {len(min_radius_idxs)} missing values")
+                n_missing_values += len(min_radius_idxs)
+                # print(f"Path {i_br + 1} / {len(initial_branches)} has {len(min_radius_idxs)} missing values")
                 missing = idxs[min_radius_idxs]
                 missing_idxs = np.concatenate((missing_idxs, missing))
 
@@ -90,13 +97,17 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
                         corrected = np.concatenate((corrected, list(range(start_idx, end_idx))))
                         corrected_idxs = np.concatenate((corrected_idxs, list(range(start_idx, end_idx))))
 
-                if len(corrected) < len(missing):
-                    print(f"Path {i_br} missing values: {len(missing) - len(corrected)}")
+                # if len(corrected) < len(missing):
+                #     print(f"Path {i_br} missing values: {len(missing) - len(corrected)}")
+
 
         if smooth:
             # smooth
             new_radii[idxs] = np.convolve(new_radii[idxs], np.ones(smooth_samples) / \
                                           smooth_samples, mode='same')
+
+    if interp:
+        print(f"Interpolated diameters of {n_missing_values} out of {len(swc_data)} points")
 
     swc_corrected = deepcopy(swc_data)
     swc_corrected["radius"] = new_radii
@@ -104,4 +115,14 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
         soma_idx = np.where(swc_data["type"] == 1)[0]
         swc_corrected["radius"][soma_idx] = soma_radius
 
-    np.savetxt(output_swc_file, swc_corrected)
+    if reset_tags is not None:
+        for tags in reset_tags:
+            assert len(tags) == 2, "Each entry of 'reset_tags' should have 2 values."
+            swc_corrected["type"][swc_corrected["type"] == tags[0]] = tags[1]
+            print(f"Reset tag {tags[0]} to {tags[1]}")
+
+    if save:
+        print(f"Saving corrected morphology to {output_swc_file}")
+        np.savetxt(output_swc_file, swc_corrected)
+
+    return swc_corrected
