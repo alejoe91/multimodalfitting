@@ -20,10 +20,10 @@
             "__comment": "distribution based on Kole et al. 2006"
         },
         "decay": {
-            "fun": "math.exp({distance}*{constant})*{value}",
+            "fun": "math.exp({distance}*{constant_decay})*{value}",
             "soma_ref_point": 0.5,
             "parameters": [
-                "constant"
+                "constant_decay"
             ]
         },
         "sig_increase": {
@@ -42,7 +42,7 @@
     "parameters": {
         "__comment": "define constants as single values and params to optimize as tuples of bounds: [lower, upper]",
         "global":   [
-            {"name":"v_init",                 "val":-70},
+            {"name":"v_init",                 "val":-84},
             {"name":"celsius",                "val":34}
         ],
         "distribution_decay": [

@@ -270,12 +270,12 @@ def define_parameters(model_name, parameter_file=None, release=False):
                     )
                 )
             elif param_config["type"] == "meta":
-                print("Adding meta parameter", name, name.split("_")[0])
+                # print("Adding meta parameter", name, name.split("_")[0])
                 parameters.append(
                     ephys.parameters.MetaParameter(
                         name=name,
                         obj=scaler,
-                        attr_name=name.split("_")[0], #name.split("_")[0],
+                        attr_name=name, #.split("_")[0], #name.split("_")[0],
                         frozen=frozen,
                         bounds=bounds,
                         value=value
@@ -408,7 +408,7 @@ def create_experimental_model(morphology_file, parameters_file=None, release=Fal
 
 
     morph_modifiers = [fix_morphology_exp]
-    
+
     seclist_names = [
         "all",
         "somatic",
@@ -426,6 +426,9 @@ def create_experimental_model(morphology_file, parameters_file=None, release=Fal
 
     if v_init is None:
         v_init = -70
+        ljp = -14
+        # add LJP
+        v_init += ljp
 
     morphology = ephys.morphologies.NrnFileMorphology(
         str(morphology_file),
