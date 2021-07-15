@@ -22,8 +22,9 @@ def get_parser():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--feature_set", type=str, default="extra")
     parser.add_argument("--model", type=str, default="hay")
-    parser.add_argument("--sample_id", type=int, required=True)
     parser.add_argument("--ipyparallel", action="store_true", default=False)
+    parser.add_argument("--offspring_size", type=int, default=20)
+
     return parser
 
 
@@ -48,10 +49,10 @@ def get_mapper(args):
         return None
 
 
-def get_cp_filename(model, sample_id, feature_set, seed):
+def get_cp_filename(model, feature_set, seed):
 
     cp_filename = pathlib.Path('optimization_results') / 'checkpoints' / \
-        f'model={model}_sampleid={sample_id}_featureset={feature_set}_seed={seed}'
+        f'model={model}_featureset={feature_set}_seed={seed}'
 
     if not cp_filename.parent.is_dir():
         os.makedirs(cp_filename.parent)
@@ -69,24 +70,44 @@ def main():
 
     map_function = get_mapper(args)
 
+    probe_type = None
+    protocols_with_lfp = None
+    timeout = 300.
+    extra_kwargs = {}
+
+    if args.feature_set == "extra":
+        probe_type = "planar"
+        protocols_with_lfp = ['firepattern_200']
+        timeout = 900.
+
+    feature_file = f"../data/{args.model}_ecode_probe_planar/efeatures/features_BPO_test.json"
+    protocol_file = f"../data/{args.model}_ecode_probe_planar/efeatures/protocols_BPO_test.json"
+
     eva = evaluator.create_evaluator(
         model_name=args.model,
         feature_set=args.feature_set,
-        #sample_id=args.sample_id,
-        sample_id=None,
-        feature_file="./cultured_model/features.json"
+        feature_file=feature_file,
+        protocol_file=protocol_file,
+        probe_type=probe_type,
+        protocols_with_lfp=protocols_with_lfp,
+        extra_recordings=None,
+        timeout=timeout,
+        fs=20,
+        fcut=300,
+        ms_cut=[2, 10],
+        upsample=10
     )
     
     opt = bluepyopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
         evaluator=eva,
-        offspring_size=30,
+        offspring_size=args.offspring_size,
         seed=args.seed,
         map_function=map_function,
         weight_hv=0.4,
         selector_name="multi_objective"
     )
 
-    cp_filename = get_cp_filename(args.model, args.sample_id, args.feature_set, args.seed)
+    cp_filename = get_cp_filename(args.model, args.feature_set, args.seed)
 
     if cp_filename.is_file():
         logger.info(f"Continuing from checkpoint: {cp_filename}")
