@@ -393,12 +393,27 @@ def get_targets(timings):
         },
         "IDrest": {  # Not sure what to use it for, except to get the IF curve.
             "amplitudes": [50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
-            "tolerances": [10],
-            "efeatures": ['mean_frequency'],
+            "tolerances": [20],
+            "efeatures": [
+                'mean_frequency',
+                'burst_number',
+                'adaptation_index2',
+                'ISI_CV',
+                'ISI_log_slope',
+                'inv_time_to_first_spike',
+                'inv_first_ISI',
+                'inv_second_ISI',
+                'inv_third_ISI',
+                'inv_fourth_ISI',
+                'inv_fifth_ISI',
+                'AP_amplitude',
+                'AHP_depth',
+                'AHP_time_from_peak',
+            ],
             "location": "soma"
         },
         "IV": {
-            "amplitudes": [-100, -20, 0],  # -100 for the sag, -20 for the "passives", 0 for the RMP
+            "amplitudes": [-140, -120, -100, -80, -60, -40, -20, 0, 20, 40, 60],  # -100 for the sag, -20 for the "passives", 0 for the RMP
             "tolerances": [10],
             "efeatures": [
                 'Spikecount',
@@ -458,6 +473,7 @@ def get_targets(timings):
 def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
                           out_protocol_path, out_efeatures_path,
                           epsilon=1e-3, protocols_of_interest=None,
+                          exclude_features=None,
                           std_from_mean=None):
     """
     Converts protocols and features from BluePyEfe to BPO format.
@@ -476,6 +492,8 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
         Value to substitute to features with 0 std (default 1e-3)
     protocols_of_interest: list or None
         If not None, list of protocols to export
+    exclude_features: dict
+        Dictionary with efeatures to exclude from single protocols
     std_from_mean: float or None
         If not None, the std of features is std_from_mean times the mean
 
@@ -490,7 +508,6 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
     in_protocols = json.load(open(in_protocol_path, 'r'))
     in_efeatures = json.load(open(in_efeatures_path, 'r'))
 
-    out_protocols = {}
     out_efeatures = {}
 
     feature_set = "soma"
@@ -518,11 +535,19 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
             efeatures_def = {}
             for loc_name, features in in_efeatures[protocol_name].items():
                 for feature in features:
-                    efeatures_def[feature['feature']] = feature['val']
-                    if std_from_mean is not None:
-                        efeatures_def[feature['feature']][1] = std_from_mean * efeatures_def[feature['feature']][0]
-                    if efeatures_def[feature['feature']][1] == 0:
-                        efeatures_def[feature['feature']][1] = epsilon
+                    add_feature = True
+                    if exclude_features is not None:
+                        if protocol_name in exclude_features:
+                            if feature["feature"] in exclude_features[protocol_name]:
+                                add_feature = False
+                    if add_feature:
+                        efeatures_def[feature['feature']] = feature['val']
+                        if std_from_mean is not None:
+                            efeatures_def[feature['feature']][1] = std_from_mean * efeatures_def[feature['feature']][0]
+                        if efeatures_def[feature['feature']][1] == 0:
+                            efeatures_def[feature['feature']][1] = epsilon
+                    else:
+                        print(f"Excluding efeature {feature['feature']} from protocol {protocol_name}")
                 out_efeatures[feature_set][protocol_name] = {loc_name: efeatures_def}
 
     s = json.dumps(out_protocols, indent=2)
