@@ -379,7 +379,7 @@ def create(model_name, release=False, v_init=None):
         v_init=v_init,
         morph=define_morphology(model_name, morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(model_name),
-        params=define_parameters(model_name, release),
+        params=define_parameters(model_name, parameter_file=None, release=release),
         seclist_names=seclist_names,
         secarray_names=secarray_names
     )

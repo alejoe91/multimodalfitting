@@ -76,7 +76,7 @@
         "mech_param": "gamma",
         "type": "range",
         "sectionlist": "somatic",
-        "bounds": [0.0005, 0.005]
+        "bounds": [0.0005, 0.05]
     },
     {
         "param_name": "gCa_LVAstbar_Ca_LVAst",

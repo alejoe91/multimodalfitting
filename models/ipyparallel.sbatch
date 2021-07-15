@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --constraint=cpu
-#SBATCH --ntasks=30
+#SBATCH --ntasks=20
 #SBATCH --partition=prod
 #SBATCH --job-name=LFPy
 #SBATCH --time=0-24:00:00
@@ -28,5 +28,4 @@ sleep 20
 /gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/python3 run_optimizations.py --ipyparallel                    \
                                                                          --seed=${OPT_SEED}               \
                                                                          --feature_set=${OPT_FEATURE_SET} \
-                                                                         --sample_id=${OPT_SAMPLE_ID}     \
                                                                          --model=${OPT_MODEL}
