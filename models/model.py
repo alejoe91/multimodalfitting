@@ -426,9 +426,6 @@ def create_experimental_model(morphology_file, parameters_file=None, release=Fal
 
     if v_init is None:
         v_init = -70
-        ljp = -14
-        # add LJP
-        v_init += ljp
 
     morphology = ephys.morphologies.NrnFileMorphology(
         str(morphology_file),

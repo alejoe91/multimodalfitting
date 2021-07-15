@@ -369,6 +369,32 @@ def plot_feature_map(feature, probe, cmap='viridis', log=False,
     return ax
 
 
+def plot_feature_map_w_colorbar(feature, probe, label=None, feature_name=None, height_ratio=[10, 1]):
+    import matplotlib as mpl
+
+    fig, axs = plt.subplots(
+        nrows=2, ncols=1,
+        gridspec_kw={'height_ratios': height_ratio}
+    )
+
+    plot_feature_map(feature, probe, bg=False, ax=axs[0])
+
+    cmap = plt.get_cmap("viridis")
+    norm = mpl.colors.Normalize(vmin=np.min(feature),
+                                vmax=np.max(feature))
+
+    cb1 = mpl.colorbar.ColorbarBase(axs[1], cmap=cmap,
+                                    norm=norm,
+                                    orientation='horizontal')
+    if label is not None:
+        cb1.set_label(label)
+
+    if feature_name is not None:
+        fig.suptitle(feature_name, fontsize=15)
+
+    return fig
+
+
 def _plot_map(temp_map, locations, pitch, cmap, bg, ax, label_color):
     x = locations[:, 0]
     y = locations[:, 1]
