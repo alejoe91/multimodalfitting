@@ -33,6 +33,7 @@ def get_protocol_definitions(model_name, protocols_file=None):
     protocols_dict: dict
         Dictionary with protocol definitions
     """
+    print(protocols_file)
     if protocols_file is None:
         path_protocols = pathlib.Path(f"{model_name}_model") / "protocols.json"
     else:
@@ -451,6 +452,7 @@ def create_evaluator(
         probe_type=None,
         protocols_with_lfp=None,
         extra_recordings=None,
+        timeout=900.,
         **extra_kwargs
 ):
     """
@@ -488,29 +490,26 @@ def create_evaluator(
     -------
     CellEvaluator
     """
+
+    cell = model.create(model_name, release=False)
+
     probe = None
     if feature_set == "extra":
         assert probe_type is not None
         probe = model.define_electrode(probe_type=probe_type)
-    
+
+    param_names = [param.name for param in cell.params.values() if not param.frozen]
+
     fitness_protocols = define_protocols(
-        model_name, feature_set, feature_file, protocols_file=protocol_file,
-        electrode=probe, protocols_with_lfp=protocols_with_lfp, extra_recordings=extra_recordings
+        model_name,
+        feature_set=feature_set,
+        feature_file=feature_file,
+        protocols_file=protocol_file,
+        electrode=probe,
+        protocols_with_lfp=protocols_with_lfp,
+        extra_recordings=extra_recordings
     )
 
-    cell = model.create(model_name, release=False)
-
-    if model_name == "hallermann":
-        sim = ephys.simulators.LFPySimulator(
-            LFPyCellModel=cell, cvode_active=False, electrode=probe
-        )
-    elif model_name == "hay":
-        sim = ephys.simulators.LFPySimulator(
-            LFPyCellModel=cell, cvode_active=True, electrode=probe
-        )
-    else:
-        sim = ephys.simulators.NrnSimulator()
-        
     fitness_calculator, _ = define_fitness_calculator(
         protocols=fitness_protocols,
         feature_file=feature_file,
@@ -519,9 +518,10 @@ def create_evaluator(
         **extra_kwargs
     )
 
-    param_names = [
-        param.name for param in cell.params.values() if not param.frozen
-    ]
+    if model_name == 'hallermann':
+        sim = ephys.simulators.LFPySimulator(cell, cvode_active=False, electrode=probe)
+    else:
+        sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe)
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,
@@ -529,5 +529,6 @@ def create_evaluator(
         fitness_protocols=fitness_protocols,
         fitness_calculator=fitness_calculator,
         sim=sim,
-        timeout=150
+        timeout=timeout
     )
+

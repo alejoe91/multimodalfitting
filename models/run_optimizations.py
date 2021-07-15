@@ -73,8 +73,6 @@ def main():
     probe_type = None
     protocols_with_lfp = None
     timeout = 300.
-    extra_kwargs = {}
-
     if args.feature_set == "extra":
         probe_type = "planar"
         protocols_with_lfp = ['firepattern_200']
