@@ -126,7 +126,7 @@ def define_electrode(
     return probe
 
 
-def define_parameters(model_name, parameter_file=None, release=False):
+def define_parameters(model_name, parameter_file=None, release=False, v_init=None):
     """
     Defines parameters
 
@@ -173,6 +173,9 @@ def define_parameters(model_name, parameter_file=None, release=False):
             )
 
         if param_config["type"] == "global":
+            if param_config["param_name"] == "v_init" and v_init is not None:
+                print(f"Setting v_init to {v_init}")
+                value = v_init
             parameters.append(
                 ephys.parameters.NrnGlobalParameter(
                     name=param_config["param_name"],
@@ -438,7 +441,7 @@ def create_experimental_model(morphology_file, parameters_file=None, release=Fal
         v_init=v_init,
         morph=morphology,
         mechs=define_mechanisms(model_name),
-        params=define_parameters(model_name, parameters_file, release),
+        params=define_parameters(model_name, parameters_file, release, v_init),
         seclist_names=seclist_names,
         secarray_names=secarray_names
     )
