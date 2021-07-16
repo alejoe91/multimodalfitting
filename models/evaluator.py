@@ -490,13 +490,21 @@ def create_evaluator(
     -------
     CellEvaluator
     """
+    
+    # probe = None
+    # if feature_set == "extra":
+    #     assert probe_type is not None
+    #     probe = model.define_electrode(probe_type=probe_type)
 
-    cell = model.create(model_name, release=False)
+    if model_name=='experimental':
+        cell = model.create_experimental_model(morphology_file="./experimental_model/morphology_corrected.swc",
+                                       parameters_file="./experimental_model/parameters.json")
 
-    probe = None
-    if feature_set == "extra":
-        assert probe_type is not None
-        probe = model.define_electrode(probe_type=probe_type)
+        probe = model.define_electrode(probe_file="./experimental_model/probe_BPO.json")
+
+    else:
+        cell = model.create(model_name, release=False)
+
 
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 
