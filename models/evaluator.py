@@ -504,6 +504,10 @@ def create_evaluator(
 
     else:
         cell = model.create(model_name, release=False)
+        probe = None
+        if feature_set == "extra":
+            assert probe_type is not None
+            probe = model.define_electrode(probe_type=probe_type)
 
 
     param_names = [param.name for param in cell.params.values() if not param.frozen]
