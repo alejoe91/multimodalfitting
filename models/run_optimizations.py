@@ -8,7 +8,6 @@ import pathlib
 from datetime import datetime
 
 import bluepyopt
-
 import evaluator
 
 logger = logging.getLogger()
@@ -23,7 +22,9 @@ def get_parser():
     parser.add_argument("--feature_set", type=str, default="extra")
     parser.add_argument("--model", type=str, default="hay")
     parser.add_argument("--ipyparallel", action="store_true", default=False)
-    parser.add_argument("--offspring_size", type=int, default=20)
+    parser.add_argument("--folder", type=str, default=None)
+    parser.add_argument("--offspring", type=int, default=20)
+    parser.add_argument("--maxgen", type=int, default=2000)
 
     return parser
 
@@ -70,23 +71,50 @@ def main():
 
     map_function = get_mapper(args)
 
-    probe_type = None
+    probe_file = None
     protocols_with_lfp = None
     timeout = 300.
     if args.feature_set == "extra":
-        probe_type = "planar"
-        protocols_with_lfp = ['firepattern_200']
+        protocols_with_lfp = ['IDrest_300']
         timeout = 900.
 
-    feature_file = f"../data/{args.model}_ecode_probe_planar/efeatures/features_BPO_test.json"
-    protocol_file = f"../data/{args.model}_ecode_probe_planar/efeatures/protocols_BPO_test.json"
+    if args.folder is not None:
+        # Load features / protocols / and probe
+        folder = pathlib.Path(args.folder)
+
+        feature_files = [p for p in folder.iterdir() if "features" in p.name and "BPO" not in p.name]
+        feature_bpo_files = [p for p in folder.iterdir() if "features" in p.name and "BPO" in p.name]
+        if len(feature_bpo_files) == 1:
+            feature_file = feature_bpo_files[0]
+        elif len(feature_files) == 1:
+            feature_file = feature_files[0]
+        else:
+            raise Exception("Couldn't find a feature json file in the provided folder.")
+
+        protocol_files = [p for p in folder.iterdir() if "protocols" in p.name and "BPO" not in p.name]
+        protocol_bpo_files = [p for p in folder.iterdir() if "protocols" in p.name and "BPO" in p.name]
+        if len(protocol_bpo_files) == 1:
+            protocol_file = protocol_bpo_files[0]
+        elif len(protocol_files) == 1:
+            protocol_file = protocol_files[0]
+        else:
+            raise Exception("Couldn't find a protocol json file in the provided folder.")
+
+        probe_files = [p for p in folder.iterdir() if "probe" in p.name and "BPO" not in p.name]
+        probe_bpo_files = [p for p in folder.iterdir() if "probe" in p.name and "BPO" in p.name]
+        if len(probe_files) == 1:
+            probe_file = probe_files[0]
+        elif len(probe_bpo_files) == 1:
+            probe_file = probe_bpo_files[0]
+        elif args.feature_set == "extra":
+            raise Exception("Couldn't find a probe json file in the provided folder.")
 
     eva = evaluator.create_evaluator(
         model_name=args.model,
         feature_set=args.feature_set,
         feature_file=feature_file,
         protocol_file=protocol_file,
-        probe_type=probe_type,
+        probe_file=probe_file,
         protocols_with_lfp=protocols_with_lfp,
         extra_recordings=None,
         timeout=timeout,
@@ -98,7 +126,7 @@ def main():
     
     opt = bluepyopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
         evaluator=eva,
-        offspring_size=args.offspring_size,
+        offspring_size=args.offspring,
         seed=args.seed,
         map_function=map_function,
         weight_hv=0.4,
@@ -114,7 +142,7 @@ def main():
         logger.info(f"Saving checkpoint in: {cp_filename}")
         continue_cp = False
 
-    opt.run(max_ngen=2000, cp_filename=cp_filename, continue_cp=continue_cp)
+    opt.run(max_ngen=args.maxgen, cp_filename=cp_filename, continue_cp=continue_cp)
 
 
 if __name__ == '__main__':
