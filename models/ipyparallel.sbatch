@@ -26,6 +26,7 @@ srun --output="${LOGS}/engine.out" /gpfs/bbp.cscs.ch/home/mandge/lfpenv/bin/ipen
 sleep 20
 
 /gpfs/bbp.cscs.ch/home/mandge/lfpenv/bin/python3 run_optimizations.py --ipyparallel                    \
-                                                                         --seed=${OPT_SEED}               \
-                                                                         --feature_set=${OPT_FEATURE_SET} \
-                                                                         --model=${OPT_MODEL}
+                                                                      --seed=${OPT_SEED}               \
+                                                                      --feature_set=${OPT_FEATURE_SET} \
+                                                                      --model=${OPT_MODEL}             \
+                                                                      --folder=${OPT_FOLDER}

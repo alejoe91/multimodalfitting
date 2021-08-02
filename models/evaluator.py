@@ -498,7 +498,7 @@ def create_evaluator(
     
     probe = None
     if feature_set == "extra":
-        assert probe_type is not None or probe_file is not None, "Probe muste be provided for 'extra' feature set with" \
+        assert probe_type is not None or probe_file is not None, "Probe must be provided for 'extra' feature set with" \
                                                                  "'probe_type' or 'probe_file' arguments"
         if probe_file is not None:
             probe = model.define_electrode(probe_file=probe_file)
