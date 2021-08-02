@@ -75,12 +75,12 @@ def main():
     timeout = 300.
     if args.feature_set == "extra":
         probe_type = "planar"
-        protocols_with_lfp = ['IDrest_300']#['firepattern_200']
+        protocols_with_lfp = ['IDrest_300']
         timeout = 900.
 
-    if args.model=='experimental':
-        feature_file = f"./{args.model}_model/features_BPO.json"
-        protocol_file = f"./{args.model}_model/protocols_BPO.json"
+    if args.model == 'experimental':
+        feature_file = f"../data/{args.model}_model/features_BPO.json"
+        protocol_file = f"../data/{args.model}_model/protocols_BPO.json"
     else:
         feature_file = f"../data/{args.model}_ecode_probe_planar/efeatures/features_BPO.json"
         protocol_file = f"../data/{args.model}_ecode_probe_planar/efeatures/protocols_BPO.json"

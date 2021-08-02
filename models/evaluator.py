@@ -449,6 +449,7 @@ def create_evaluator(
         feature_set,
         feature_file,
         protocol_file,
+        probe_file=None,
         probe_type=None,
         protocols_with_lfp=None,
         extra_recordings=None,
@@ -468,6 +469,8 @@ def create_evaluator(
         Path to feature json file
     protocol_file: str or Path
         Path to feature json file
+    probe_file: Path or None
+        If given, the probe is loaded from the provided file (.json)
     probe_type: str or MEAutility.MEA
         If string, it can be "linear" or "planar", otherwise any MEAutility.MEA objects can be used
     protocols_with_lfp: list or None
@@ -484,6 +487,8 @@ def create_evaluator(
                 "sec_index": 0
                 },
         ]}
+    timeout: float
+        Timeout in seconds
     extra_kwargs: keyword arguments for computing extracellular signals.
 
     Returns
@@ -491,24 +496,24 @@ def create_evaluator(
     CellEvaluator
     """
     
-    # probe = None
-    # if feature_set == "extra":
-    #     assert probe_type is not None
-    #     probe = model.define_electrode(probe_type=probe_type)
+    probe = None
+    if feature_set == "extra":
+        assert probe_type is not None or probe_file is not None, "Probe muste be provided for 'extra' feature set with" \
+                                                                 "'probe_type' or 'probe_file' arguments"
+        if probe_file is not None:
+            probe = model.define_electrode(probe_file=probe_file)
+        else:
+            probe = model.define_electrode(probe_type=probe_type)
 
-    if model_name=='experimental':
+    if model_name == 'experimental':
         cell = model.create_experimental_model(morphology_file="./experimental_model/morphology_corrected.swc",
-                                       parameters_file="./experimental_model/parameters.json")
-
-        probe = model.define_electrode(probe_file="./experimental_model/probe_BPO.json")
-
+                                               parameters_file="./experimental_model/parameters.json")
     else:
         cell = model.create(model_name, release=False)
         probe = None
         if feature_set == "extra":
             assert probe_type is not None
             probe = model.define_electrode(probe_type=probe_type)
-
 
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 
