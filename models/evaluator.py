@@ -60,10 +60,11 @@ def get_feature_definitions(feature_file, feature_set=None):
     fetaures_dict: dict
         Dictionary with features definitions
     """
+    feature_file = Path(feature_file)
 
-    if ".pkl" in feature_file:
+    if ".pkl" in feature_file.name:
         feature_definitions = pickle.load(open(feature_file, 'rb'))
-    elif ".json" in feature_file:
+    elif ".json" in feature_file.name:
         feature_definitions = json.load(open(feature_file))
     else:
         raise Exception("feature_file is neither or pickle nor a json file.")
@@ -280,8 +281,9 @@ def get_release_params(model_name):
         data = json.load(f)
 
         for prm in data:
-            all_release_params[f"{prm['param_name']}.{prm['sectionlist']}"] = \
-                prm["value"]
+            if prm["type"] != "global":
+                all_release_params[f"{prm['param_name']}_{prm['sectionlist']}"] = \
+                    prm["value"]
 
     params_bounds = {}
     with open(params_file, 'r') as f:
@@ -290,7 +292,7 @@ def get_release_params(model_name):
 
         for prm in data:
             if "bounds" in prm:
-                params_bounds[f"{prm['param_name']}.{prm['sectionlist']}"] = \
+                params_bounds[f"{prm['param_name']}_{prm['sectionlist']}"] = \
                     prm["bounds"]
 
     release_params = {}

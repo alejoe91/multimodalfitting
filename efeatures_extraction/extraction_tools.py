@@ -95,8 +95,9 @@ def build_model_metadata(cell_id, ephys_dir):
 
     for protocol_folder in ephys_dir.iterdir():
         ecode = protocol_folder.name
-        files_metadata[cell_id][ecode] = []
-        if "extracellular" not in protocol_folder.name:
+        if "extracellular" not in protocol_folder.name and not protocol_folder.name.startswith(".")\
+                and "efeatures" not in protocol_folder.name and "results" not in protocol_folder.name:
+            files_metadata[cell_id][ecode] = []
             for sweep in protocol_folder.iterdir():
                 metadata = {
                     "filepath": str(sweep),
@@ -543,7 +544,8 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
                     if add_feature:
                         efeatures_def[feature['feature']] = feature['val']
                         if std_from_mean is not None:
-                            efeatures_def[feature['feature']][1] = std_from_mean * efeatures_def[feature['feature']][0]
+                            efeatures_def[feature['feature']][1] = np.abs(std_from_mean *
+                                                                          efeatures_def[feature['feature']][0])
                         if efeatures_def[feature['feature']][1] == 0:
                             efeatures_def[feature['feature']][1] = epsilon
                     else:
