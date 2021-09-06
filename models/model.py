@@ -370,11 +370,11 @@ def create(model_name, release=False, v_init=None):
         do_replace_axon = True
 
     if v_init is None:
-        if model_name =="hallermann":
+        if model_name == "hallermann":
             v_init = -85.
-        elif model_name =="hay":
+        elif model_name == "hay":
             v_init = -65.
-        elif model_name =="hay_ais":
+        elif model_name == "hay_ais":
             v_init = -80.
 
     cell = ephys.models.LFPyCellModel(

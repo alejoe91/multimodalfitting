@@ -455,6 +455,7 @@ def create_evaluator(
         probe_type=None,
         protocols_with_lfp=None,
         extra_recordings=None,
+        release=False,
         timeout=900.,
         **extra_kwargs
 ):
@@ -511,7 +512,7 @@ def create_evaluator(
         cell = model.create_experimental_model(morphology_file="./experimental_model/morphology_corrected.swc",
                                                parameters_file="./experimental_model/parameters.json")
     else:
-        cell = model.create(model_name, release=False)
+        cell = model.create(model_name, release=release)
         probe = None
         if feature_set == "extra":
             assert probe_type is not None
