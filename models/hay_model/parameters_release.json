@@ -1,5 +1,15 @@
 [
     {
+        "param_name": "v_init",
+        "type": "global",
+        "value": -65
+    },
+    {
+        "param_name": "celsius",
+        "type": "global",
+        "value": 34
+    },
+    {
         "param_name": "e_pas",
         "sectionlist": "all",
         "type": "section",
@@ -260,6 +270,13 @@
         "value": 0.0002,
         "type": "range",
         "sectionlist": "basal"
+    },
+    {
+        "param_name": "cm",
+        "sectionlist": "basal",
+        "type": "section",
+        "dist_type": "uniform",
+        "value": 2
     },
     {
         "param_name": "g_pas",
