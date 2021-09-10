@@ -1,7 +1,12 @@
 # Hay model optimization
 
 This folder contains python scripts and notebooks to investigate different optimization strategies for the 
-[Hay model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002107) of a L5PC cell.  
+[Hay model](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002107) of a L5PC cell and 
+modifications of this model that contain an axon initial segment (HAY_AIS) or an axon initial segment + an aoxn hillock 
+(HAY_AIS_HILLOCK).
+In addition, it also supports optimization of experimental data.
+
+## Usage
 
 The notebooks / scripts need to be run in the following order:
 

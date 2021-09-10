@@ -74,8 +74,18 @@ _ais_recordings = [
 ]
 
 
-def get_ais_extra_recordings():
+def get_ais_hillock_extra_recordings():
     return deepcopy(_ais_recordings)
+
+
+def get_ais_extra_recordings():
+    recs_all = deepcopy(_ais_recordings)
+    recs = []
+    for rec in recs_all:
+        if rec["seclist_name"] != "hillockal":
+            recs.append(rec)
+    return recs
+
 
 # Helper function to turn feature dicitonary into a list
 def vectorize_features(feature_list):

@@ -7,7 +7,8 @@ import LFPy
 
 import numpy as np
 
-from morphology_modifiers import replace_axon_with_hillock, fix_hallerman_morpho, fix_morphology_exp
+from morphology_modifiers import replace_axon_with_hillock_ais, replace_axon_with_ais, fix_hallerman_morpho, \
+    fix_morphology_exp
 
 script_dir = os.path.dirname(__file__)
 config_dir = os.path.join(script_dir, "config")
@@ -311,7 +312,7 @@ def define_morphology(model_name, morph_modifiers, do_replace_axon):
         The morphology object
     """
     
-    if (model_name == "hay") or (model_name == "hay_ais"):
+    if "hay" in model_name:
         path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.asc" #"cell2.asc" #
     else:
         path_morpho = pathlib.Path(f"{model_name}_model") / "morphology.swc"
@@ -352,8 +353,13 @@ def create(model_name, release=False, v_init=None):
         seclist_names = ['all', 'somatic', 'axon_initial_segment', 'collaterals', 'basal', 'apical', 'nodal', 'myelinated']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'my', 'node']
         do_replace_axon = False
+    elif model_name == "hay_ais_hillock":
+        morph_modifiers = [replace_axon_with_hillock_ais]
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
+        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin']
+        do_replace_axon = False
     elif model_name == "hay_ais":
-        morph_modifiers = [replace_axon_with_hillock]
+        morph_modifiers = [replace_axon_with_ais]
         seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
         secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin']
         do_replace_axon = False
@@ -375,6 +381,8 @@ def create(model_name, release=False, v_init=None):
         elif model_name == "hay":
             v_init = -65.
         elif model_name == "hay_ais":
+            v_init = -80.
+        elif model_name == "hay_ais_hillock":
             v_init = -80.
 
     cell = ephys.models.LFPyCellModel(
