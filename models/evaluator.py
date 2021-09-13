@@ -403,7 +403,9 @@ def define_fitness_calculator(
                     kwargs['stim_end'] = stimulus.step_delay + stimulus.step_duration
 
                 if location == 'MEA':
-
+                    
+                    objective_weight = 2.5
+                    
                     recording_names = '%s.%s.LFP' % (protocol_name, location)
                     somatic_recording_name = f'{protocol_name}.soma.v'
 
@@ -420,7 +422,9 @@ def define_fitness_calculator(
                     )
 
                 else:
-
+                    
+                    objective_weight = 1
+                    
                     recording_names = {'': '%s.%s.v' % (protocol_name, location)}
 
                     feature = ephys.efeatures.eFELFeature(
@@ -436,9 +440,10 @@ def define_fitness_calculator(
                 efeatures[protocol_name].append(feature)
 
                 objectives.append(
-                    ephys.objectives.SingletonObjective(
+                    ephys.objectives.SingletonWeightObjective(
                         feature_name,
-                        feature
+                        feature,
+                        weight=objective_weight
                     )
                 )
 
