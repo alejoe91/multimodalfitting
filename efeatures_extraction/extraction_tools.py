@@ -472,7 +472,7 @@ def get_targets(timings):
 ###### CONVERT TO BPO #####
 
 def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
-                          out_protocol_path, out_efeatures_path,
+                          out_protocol_path=None, out_efeatures_path=None,
                           epsilon=1e-3, protocols_of_interest=None,
                           exclude_features=None,
                           std_from_mean=None):
@@ -552,18 +552,29 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
                         print(f"Excluding efeature {feature['feature']} from protocol {protocol_name}")
                 out_efeatures[feature_set][protocol_name] = {loc_name: efeatures_def}
 
-    s = json.dumps(out_protocols, indent=2)
-    with open(out_protocol_path, "w") as fp:
-        fp.write(s)
+    if out_protocol_path is not None:
+        s = json.dumps(out_protocols, indent=2)
+        with open(out_protocol_path, "w") as fp:
+            fp.write(s)
 
-    s = json.dumps(out_efeatures, indent=2)
-    with open(out_efeatures_path, "w") as fp:
-        fp.write(s)
+    if out_efeatures_path is not None:
+        s = json.dumps(out_efeatures, indent=2)
+        with open(out_efeatures_path, "w") as fp:
+            fp.write(s)
 
     return out_protocols, out_efeatures
 
 
-def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_path):
+def select_single_channels():
+    pass
+
+
+def select_mea_sections():
+    pass
+
+
+def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, efeatures_path=None, channel_ids=None,
+                                 single_channel_features=False, std_from_mean=None):
     """
     Appends extracellualar features to existing efeatures json file in BPO format
 
@@ -574,8 +585,22 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_path):
     protocol_name: str
         Protocol name to compute extracellular features in optimization. It should be a protocol that elicits
         a large enough number of spikes
-    efeatures_path: str or Path
-        Path to input efeature json file in BPO format to modify in place
+    efeatures_dict: dict
+        Dictionary with intracellular efeatures
+    efeatures_path: str or Path or None
+        Path to input efeature json file in BPO format to modify in place. If None, the output is not saved
+    channel_ids: list, lists, or None
+        - If None, features from all channels are saved in the json file. Std is set to None.
+        - If list and 'single_channel_features' is True, features from different channels are saved as separate
+        features and the channel id is appended to the feature name. If std_from_mean is given, the second element
+        of each feature list (the standard deviation) is computed from the mean
+        - If list of lists, several features for each extra feature are saved, corresponding to different sections
+        of the MEA (each element is a list of channels that makes a section). In this case, the channel_ids for each
+        section are also saved in the second element of the feature
+    single_channel_features: bool
+        If True and 'channel_ids' is a list, features from different channels are saved as separate features
+    std_from_mean: float or None
+        If 'single_channel_features' is True,
 
 
     Returns
@@ -584,15 +609,12 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_path):
        Modified dictionary with efeatures dict, including MEA features, saved to json
 
     """
-    efeatures_dict = json.load(open(efeatures_path))
-
     feature_set = "extra"
     new_efeatures_dict = efeatures_dict
 
     available_feature_sets = list(efeatures_dict.keys())
     assert len(available_feature_sets) == 1
     new_efeatures_dict[feature_set] = deepcopy(efeatures_dict[available_feature_sets[0]])
-    print(new_efeatures_dict.keys())
 
     if protocol_name not in list(new_efeatures_dict[feature_set].keys()):
         # create protocol if non existing
@@ -603,11 +625,29 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_path):
 
     for extra_feat_name, feature_values in extra_features.items():
         feature_list = feature_values.tolist()
-        new_efeatures_dict[feature_set][protocol_name]["MEA"][extra_feat_name] = [feature_list, None]
+        if channel_ids is None:
+            new_efeatures_dict[feature_set][protocol_name]["MEA"][extra_feat_name] = [feature_list, None]
+        elif isinstance(channel_ids, list) and np.isscalar(channel_ids[0]) and single_channel_features:
+            # save channels separately
+            assert std_from_mean is not None, "When 'single_channel_features' is used, the 'std_from_mean' argument " \
+                                              "should be specified"
+            for chan in channel_ids:
+                new_efeatures_dict[feature_set][protocol_name]["MEA"][f"{extra_feat_name}_{chan}"] = \
+                    [feature_list[chan], np.abs(std_from_mean * feature_list[chan])]
+        else:
+            if np.isscalar(channel_ids[0]):
+                # subset
+                new_efeatures_dict[feature_set][protocol_name]["MEA"][extra_feat_name] = \
+                    [np.array(feature_list)[channel_ids], channel_ids]
+            else:
+                for sec, channels in enumerate(channel_ids):
+                    new_efeatures_dict[feature_set][protocol_name]["MEA"][f"{extra_feat_name}_{sec}"] = \
+                        [np.array(feature_list)[channels], channels]
 
-    s = json.dumps(new_efeatures_dict, indent=2)
-    with open(efeatures_path, "w") as fp:
-        fp.write(s)
+    if efeatures_path is not None:
+        s = json.dumps(new_efeatures_dict, indent=2)
+        with open(efeatures_path, "w") as fp:
+            fp.write(s)
 
     return new_efeatures_dict
 
