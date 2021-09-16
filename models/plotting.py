@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+from matplotlib import path
+from matplotlib.widgets import LassoSelector
+from matplotlib.backend_bases import MouseButton
 import numpy as np
 import utils
 import MEAutility as mu
@@ -6,8 +9,10 @@ from copy import deepcopy
 
 import re
 
+
 def atoi(text):
     return int(text) if text.isdigit() else text
+
 
 def natural_keys(text):
     '''
@@ -441,9 +446,6 @@ def _plot_map(temp_map, locations, pitch, cmap, bg, ax, label_color):
         rect = plt.Rectangle((loc[0] - elec_x / 2, loc[1] - elec_y / 2), elec_x, elec_y,
                              color=color, edgecolor=None, alpha=0.9)
         ax.add_patch(rect)
-        dr = LabeledRectangle(rect, ch, label_color)
-        dr.connect()
-        drs.append(dr)
 
     ax.set_xlim(np.min(x) - elec_x / 2, np.max(x) + elec_x / 2)
     ax.set_ylim(np.min(y) - elec_y / 2, np.max(y) + elec_y / 2)
@@ -453,48 +455,249 @@ def _plot_map(temp_map, locations, pitch, cmap, bg, ax, label_color):
     return ax
 
 
-class LabeledRectangle:
-    lock = None  # only one can be animated at a time
+def get_probe(locations, width=10):
+    """
+    Returns a probeinterface probe with swuare electrodes.
 
-    def __init__(self, rect, channel, color):
-        self.rect = rect
-        self.press = None
-        self.background = None
-        self.channel_str = str(channel)
-        axes = self.rect.axes
-        x0, y0 = self.rect.xy
-        self.text = axes.text(x0, y0, self.channel_str, color=color)
-        self.text.set_visible(False)
+    Parameters
+    ----------
+    locations: np.array
+        Locations of electrodes
+    width: float
+        Width of electrodes (default=10)
 
-    def connect(self):
-        'connect to all the events we need'
-        self.cidpress = self.rect.figure.canvas.mpl_connect('button_press_event', self.on_press)
-        self.cidrelease = self.rect.figure.canvas.mpl_connect('button_release_event', self.on_release)
+    Returns
+    -------
+    print: probeinterface.Probe
+        The probe object
+    """
+    import probeinterface as pi
+    shapes = "square"
+    shape_params = {'width': width}
 
-    def on_press(self, event):
-        'on button press we will see if the mouse is over us and store some data'
-        if event.inaxes != self.rect.axes:
+    probe = pi.Probe(ndim=2, si_units='um')
+    probe.set_contacts(positions=locations,
+                       shapes=shapes, shape_params=shape_params)
+    probe.create_auto_shape(probe_type="rect")
+    return probe
+
+
+def plot_probe(probe, ax=None, electrode_width=10, interactive=True, **kwargs):
+    """
+
+    Parameters
+    ----------
+    probe
+    electrode_width
+    ax
+    interactive
+    kwargs
+
+    Returns
+    -------
+
+    """
+    from probeinterface import plotting
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+    locations = probe.positions[:, :2]
+    probe_pi = get_probe(locations, width=electrode_width)
+    plotting.plot_probe(probe_pi, ax=ax, show_channel_on_click=interactive, **kwargs)
+
+    return ax
+
+
+def plot_cell(cell, sim, ax=None, detailed=False, **kwargs):
+    """
+
+    Parameters
+    ----------
+    cell
+    sim
+    ax
+    detailed
+    kwargs
+
+    Returns
+    -------
+
+    """
+    import neuroplotlib as nplt
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    cell.freeze({})
+    cell.instantiate(sim=sim)
+    if detailed:
+        nplt.plot_detailed_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)
+    else:
+        nplt.plot_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)
+    cell.unfreeze({})
+    cell.destroy(sim=sim)
+    ax.axis("off")
+
+
+def select_single_channels(cell, sim, probe, ax=None, plot_probe_kwargs={},
+                           plot_cell_kwargs={}):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+    else:
+        fig = ax.get_figure()
+
+    plot_probe(probe, ax=ax, interactive=False, **plot_probe_kwargs)
+    plot_cell(cell, sim, ax=ax, **plot_cell_kwargs)
+    ax.set_title("")
+    ax.axis("off")
+
+    es = SelectSingleElectrodes(ax, probe)
+
+    def accept(event):
+        if event.key == "enter":
+            es.disconnect()
+            es.canvas.draw()
+
+    fig.canvas.mpl_connect("key_press_event", accept)
+    ax.set_title("Left click to select, right click to remove.\nPress enter to accept selected points.")
+
+    return es.selection
+
+
+def select_mea_sections(cell, sim, probe, ax=None, plot_probe_kwargs={},
+                        plot_cell_kwargs={}):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+    else:
+        fig = ax.get_figure()
+
+    plot_probe(probe, ax=ax, interactive=False, **plot_probe_kwargs)
+    plot_cell(cell, sim, ax=ax, **plot_cell_kwargs)
+    ax.set_title("")
+    ax.axis("off")
+
+    es = SelectMultipleElectrodes(ax, probe)
+
+    def accept(event):
+        if event.key == "enter":
+            es.disconnect()
+            es.canvas.draw()
+
+    fig.canvas.mpl_connect("key_press_event", accept)
+    ax.set_title("Draw by hilding left click to select, right click to remove region.\n"
+                 "Press enter to accept selected sections.")
+
+    return es.selection
+
+
+class SelectSingleElectrodes:
+    def __init__(self, ax, probe, selection_color="r", max_dist=30):
+        self.ax = ax
+        self.probe = probe
+        self.canvas = ax.figure.canvas
+        self.selection_color = selection_color
+        self.electrode_positions = probe.positions[:, :2]
+        self.selection = []
+        self.lines = []
+        self.max_dist = max_dist
+        self.cid = self.canvas.mpl_connect('button_release_event', self.onclick)
+
+    def onclick(self, event):
+        if not event.inaxes:
             return
-        if LabeledRectangle.lock is not None:
-            return
-        contains, attrd = self.rect.contains(event)
-        if not contains: return
-        x0, y0 = self.rect.xy
-        self.press = x0, y0, event.xdata, event.ydata
-        LabeledRectangle.lock = self
-        self.text.set_visible(True)
-        self.text.draw()
-
-    def on_release(self, event):
-        'on release we reset the press data'
-        if LabeledRectangle.lock is not self:
-            return
-        self.press = None
-        LabeledRectangle.lock = None
-        self.text.set_visible(False)
-        self.text.draw()
+        if event.button is MouseButton.LEFT:
+            x, y = event.xdata, event.ydata
+            dists = [np.linalg.norm(np.array(p) - np.array([x, y])) for p in self.electrode_positions]
+            selected_idx = np.argmin(dists)
+            if dists[selected_idx] < self.max_dist:
+                self.selection.append(selected_idx)
+                l = self.ax.plot(self.electrode_positions[selected_idx][0],
+                                 self.electrode_positions[selected_idx][1],
+                                 color=self.selection_color, marker="o", markersize=5,
+                                 alpha=0.5)
+                self.lines.append(l)
+            self.canvas.draw_idle()
+        elif event.button is MouseButton.RIGHT:
+            x, y = event.xdata, event.ydata
+            dists = [np.linalg.norm(np.array(p) - np.array([x, y])) for p in self.electrode_positions]
+            selected_idx = np.argmin(dists)
+            if selected_idx in self.selection:
+                index = self.selection.index(selected_idx)
+                line = self.lines[index]
+                line.pop(0).remove()
+                _ = self.lines.pop(index)
+                _ = self.selection.pop(index)
+            self.canvas.draw_idle()
 
     def disconnect(self):
-        'disconnect all the stored connection ids'
-        self.rect.figure.canvas.mpl_disconnect(self.cidpress)
-        self.rect.figure.canvas.mpl_disconnect(self.cidrelease)
+        self.canvas.mpl_disconnect(self.cid)
+        self.ax.set_title(f"Selected {len(self.selection)} MEA channels")
+        self.canvas.draw_idle()
+
+
+class SelectMultipleElectrodes:
+    def __init__(self, ax, probe, selection_color="r"):
+        self.ax = ax
+        self.probe = probe
+        self.canvas = ax.figure.canvas
+        self.selection_color = selection_color
+        self.electrode_positions = probe.positions[:, :2]
+        self.electrode_tuple = [(p[0], p[1]) for p in probe.positions[:, :2]]
+        self.selection = []
+        self.lines = []
+        self.points = []
+        self.lasso = LassoSelector(self.ax, onselect=self.onselect)
+        self.cid = self.canvas.mpl_connect('button_release_event', self.onclick)
+
+    def onselect(self, verts):
+        p = path.Path(verts)
+        v = np.array(verts)
+        ind = p.contains_points(self.electrode_tuple)
+        selection = []
+        points = []
+        for i in range(len(self.electrode_positions)):
+            if ind[i]:
+                selection.append(i)
+                p = self.ax.plot(self.electrode_positions[i][0],
+                                 self.electrode_positions[i][1],
+                                 color=self.selection_color, marker="o", markersize=5,
+                                 alpha=0.5)
+                points.append(p)
+        if len(selection) > 0:
+            self.points.append(points)
+            self.selection.append(selection)
+            l = self.ax.plot(v[:, 0], v[:, 1], color=self.selection_color)
+            self.lines.append(l)
+        self.canvas.draw_idle()
+
+    def onclick(self, event):
+        if not event.inaxes:
+            return
+        if event.button is MouseButton.RIGHT:
+            x, y = event.xdata, event.ydata
+            dists = [np.linalg.norm(np.array(p) - np.array([x, y])) for p in self.electrode_positions]
+            selected_idx = np.argmin(dists)
+
+            new_selection = []
+            for i, sel in enumerate(self.selection):
+                if selected_idx in sel:
+                    line = self.lines[i]
+                    line.pop(0).remove()
+                    points = self.points[i]
+                    for p in points:
+                        p.pop(0).remove()
+                    _ = self.points.pop(i)
+                    _ = self.lines.pop(i)
+                else:
+                    new_selection.append(sel)
+            self.selection = new_selection
+
+            self.canvas.draw_idle()
+
+    def disconnect(self):
+        self.lasso.disconnect_events()
+        self.ax.set_title(f"Selected {len(self.selection)} MEA sections")
+        self.canvas.draw_idle()
