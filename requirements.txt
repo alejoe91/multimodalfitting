@@ -1,0 +1,10 @@
+numpy
+scipy
+mpi4py
+matplotlib
+neuron
+LFPy
+efel
+BluePyOpt
+BluePyEfe
+neuroplotlib
