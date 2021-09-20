@@ -565,14 +565,6 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
     return out_protocols, out_efeatures
 
 
-def select_single_channels():
-    pass
-
-
-def select_mea_sections():
-    pass
-
-
 def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, efeatures_path=None, channel_ids=None,
                                  single_channel_features=False, std_from_mean=None):
     """
@@ -638,11 +630,11 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, 
             if np.isscalar(channel_ids[0]):
                 # subset
                 new_efeatures_dict[feature_set][protocol_name]["MEA"][extra_feat_name] = \
-                    [np.array(feature_list)[channel_ids], channel_ids]
+                    [list(np.array(feature_list)[channel_ids]), channel_ids]
             else:
                 for sec, channels in enumerate(channel_ids):
                     new_efeatures_dict[feature_set][protocol_name]["MEA"][f"{extra_feat_name}_{sec}"] = \
-                        [np.array(feature_list)[channels], channels]
+                        [list(np.array(feature_list)[channels]), channels]
 
     if efeatures_path is not None:
         s = json.dumps(new_efeatures_dict, indent=2)

@@ -256,7 +256,7 @@ def define_parameters(model_name, parameter_file=None, release=False, v_init=Non
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
-                        # param_dependancies=param_dependancies
+                        param_dependancies=param_dependancies
                     )
                 )
 
@@ -270,7 +270,7 @@ def define_parameters(model_name, parameter_file=None, release=False, v_init=Non
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
-                        # param_dependancies=param_dependancies
+                        param_dependancies=param_dependancies
                     )
                 )
             elif param_config["type"] == "meta":
