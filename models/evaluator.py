@@ -5,6 +5,7 @@ import pickle
 import pathlib
 from pathlib import Path
 import bluepyopt.ephys as ephys
+import numpy as np
 
 import logging
 
@@ -332,7 +333,8 @@ def get_unfrozen_params_bounds(model_name):
 
 
 def define_fitness_calculator(
-        protocols, feature_file, feature_set, probe=None, **extra_kwargs
+        protocols, feature_file, feature_set, probe=None, objective_weight_mea=2.5,
+        **extra_kwargs
 ):
     """
     Defines objective calculator
@@ -372,8 +374,7 @@ def define_fitness_calculator(
 
             for efel_feature_name, meanstd in features.items():
 
-                feature_name = '%s.%s.%s' % (
-                protocol_name, location, efel_feature_name)
+                feature_name = f'{protocol_name}.{location}.{efel_feature_name}'
                 
                 if protocols[protocol_name].stimuli[0].step_delay > 0.:
                     stimulus = protocols[protocol_name].stimuli[0]
@@ -404,20 +405,31 @@ def define_fitness_calculator(
 
                 if location == 'MEA':
                     
-                    objective_weight = 2.5
+                    objective_weight = objective_weight_mea
                     
                     recording_names = '%s.%s.LFP' % (protocol_name, location)
                     somatic_recording_name = f'{protocol_name}.soma.v'
 
                     kwargs.update(extra_kwargs)
 
+                    # depending on "exp_std" value, different strategies can be identified
+                    if kwargs["exp_std"] is None:
+                        # full cosine dist strategy
+                        channel_ids = None
+                    elif np.isscalar(kwargs["exp_std"]):
+                        # single channel strategy
+                        channel_ids = int(feature_name.split("_")[-1])
+                    else:
+                        # sections strategy
+                        channel_ids = kwargs["exp_std"]
+                        kwargs["exp_std"] = None
+
                     feature = ephys.efeatures.extraFELFeature(
                         name=feature_name,
                         extrafel_feature_name=efel_feature_name,
                         recording_names={'': recording_names},
                         somatic_recording_name=somatic_recording_name,
-                        channel_locations=probe.positions,
-                        channel_id=None,
+                        channel_ids=channel_ids,
                         **kwargs
                     )
 

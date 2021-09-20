@@ -279,7 +279,7 @@ def define_parameters(model_name, parameter_file=None, release=False, v_init=Non
                     ephys.parameters.MetaParameter(
                         name=name,
                         obj=scaler,
-                        attr_name=name, #.split("_")[0], #name.split("_")[0],
+                        attr_name=name,
                         frozen=frozen,
                         bounds=bounds,
                         value=value
