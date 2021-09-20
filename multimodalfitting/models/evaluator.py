@@ -35,7 +35,7 @@ def get_protocol_definitions(model_name, protocols_file=None):
     protocols_dict: dict
         Dictionary with protocol definitions
     """
-    print(protocols_file)
+
     if protocols_file is None:
         path_protocols = pathlib.Path(f"{model_name}_model") / "protocols.json"
     else:
@@ -550,23 +550,25 @@ def create_evaluator(
     """
     
     probe = None
-    if feature_set == "extra":
-        assert probe_type is not None or probe_file is not None, "Probe must be provided for 'extra' feature set with" \
-                                                                 "'probe_type' or 'probe_file' arguments"
-        if probe_file is not None:
-            probe = define_electrode(probe_file=probe_file)
-        else:
-            probe = define_electrode(probe_type=probe_type)
 
     if model_name == 'experimental':
-        cell = create_experimental_model(morphology_file="./experimental_model/morphology_corrected.swc",
-                                               parameters_file="./experimental_model/parameters.json")
+        cell = create_experimental_model(
+            morphology_file="./experimental_model/morphology_corrected.swc",
+            parameters_file="./experimental_model/parameters.json"
+        )
+
     else:
         cell = create_ground_truth_model(model_name, release=release)
-        probe = None
         if feature_set == "extra":
-            assert probe_type is not None
-            probe = define_electrode(probe_type=probe_type)
+            if probe_file is not None:
+                probe = define_electrode(probe_file=probe_file)
+            elif probe_type is not None:
+                probe = define_electrode(probe_type=probe_type)
+            else:
+                raise Exception(
+                        "Probe must be provided for 'extra' feature set with"
+                        "'probe_type' or 'probe_file' arguments"
+                    )
 
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 
@@ -588,10 +590,7 @@ def create_evaluator(
         **extra_kwargs
     )
 
-    if model_name == 'hallermann':
-        sim = ephys.simulators.LFPySimulator(cell, cvode_active=False, electrode=probe)
-    else:
-        sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe)
+    sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe)
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,
