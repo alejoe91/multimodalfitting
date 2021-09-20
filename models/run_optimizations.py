@@ -21,6 +21,7 @@ def get_parser():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--feature_set", type=str, default="extra")
     parser.add_argument("--model", type=str, default="hay")
+    parser.add_argument("--extra_strategy", type=str, default=None)
     parser.add_argument("--ipyparallel", action="store_true", default=False)
     parser.add_argument("--folder", type=str, default=None)
     parser.add_argument("--offspring", type=int, default=20)
@@ -62,6 +63,7 @@ def get_cp_filename(model, feature_set, seed):
 
 
 def main():
+
     args = get_parser().parse_args()
 
     logging.basicConfig(
@@ -77,38 +79,30 @@ def main():
     if args.feature_set == "extra":
         protocols_with_lfp = ['IDrest_300']
         timeout = 900.
+    
+    probe_file = None
 
     if args.folder is not None:
         # Load features / protocols / and probe
         folder = pathlib.Path(args.folder)
-
-        feature_files = [p for p in folder.iterdir() if "features" in p.name and "BPO" not in p.name]
-        feature_bpo_files = [p for p in folder.iterdir() if "features" in p.name and "BPO" in p.name]
-        if len(feature_bpo_files) == 1:
-            feature_file = feature_bpo_files[0]
-        elif len(feature_files) == 1:
-            feature_file = feature_files[0]
+        
+        if args.extra_strategy:
+            feature_file = folder / f"features_BPO_{args.extra_strategy}.json"
+            protocol_file = folder / f"protocols_BPO_{args.extra_strategy}.json"
         else:
+            feature_file = folder / "features.json"
+            protocol_file = folder / "protocols.json"
+
+        if not os.path.isfile(feature_file):
             raise Exception("Couldn't find a feature json file in the provided folder.")
-
-        protocol_files = [p for p in folder.iterdir() if "protocols" in p.name and "BPO" not in p.name]
-        protocol_bpo_files = [p for p in folder.iterdir() if "protocols" in p.name and "BPO" in p.name]
-        if len(protocol_bpo_files) == 1:
-            protocol_file = protocol_bpo_files[0]
-        elif len(protocol_files) == 1:
-            protocol_file = protocol_files[0]
-        else:
+        if not os.path.isfile(protocol_file):
             raise Exception("Couldn't find a protocol json file in the provided folder.")
 
-        probe_files = [p for p in folder.iterdir() if "probe" in p.name and "BPO" not in p.name]
-        probe_bpo_files = [p for p in folder.iterdir() if "probe" in p.name and "BPO" in p.name]
-        if len(probe_files) == 1:
-            probe_file = probe_files[0]
-        elif len(probe_bpo_files) == 1:
-            probe_file = probe_bpo_files[0]
-        elif args.feature_set == "extra":
-            raise Exception("Couldn't find a probe json file in the provided folder.")
-
+        if args.feature_set == "extra":
+            probe_file = folder / f"probe_BPO.json"
+            if not os.path.isfile(probe_file):
+                raise Exception("Couldn't find a probe json file in the provided folder.")
+    
     eva = evaluator.create_evaluator(
         model_name=args.model,
         feature_set=args.feature_set,

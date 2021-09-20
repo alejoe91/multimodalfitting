@@ -34,7 +34,7 @@ def get_protocol_definitions(model_name, protocols_file=None):
     protocols_dict: dict
         Dictionary with protocol definitions
     """
-    print(protocols_file)
+
     if protocols_file is None:
         path_protocols = pathlib.Path(f"{model_name}_model") / "protocols.json"
     else:
@@ -61,6 +61,7 @@ def get_feature_definitions(feature_file, feature_set=None):
     fetaures_dict: dict
         Dictionary with features definitions
     """
+
     feature_file = Path(feature_file)
 
     if ".pkl" in feature_file.name:
@@ -182,7 +183,8 @@ def define_stimuli(protocol_definition):
 
     """
     stimuli = []
-
+    
+    print(protocol_definition)
     for stimulus_definition in protocol_definition["stimuli"]:
         stimuli.append(ephys.stimuli.LFPySquarePulse(
             step_amplitude=stimulus_definition['amp'],
@@ -517,23 +519,25 @@ def create_evaluator(
     """
     
     probe = None
-    if feature_set == "extra":
-        assert probe_type is not None or probe_file is not None, "Probe must be provided for 'extra' feature set with" \
-                                                                 "'probe_type' or 'probe_file' arguments"
-        if probe_file is not None:
-            probe = model.define_electrode(probe_file=probe_file)
-        else:
-            probe = model.define_electrode(probe_type=probe_type)
-
+    
     if model_name == 'experimental':
-        cell = model.create_experimental_model(morphology_file="./experimental_model/morphology_corrected.swc",
-                                               parameters_file="./experimental_model/parameters.json")
+        cell = model.create_experimental_model(
+            morphology_file="./experimental_model/morphology_corrected.swc",
+            parameters_file="./experimental_model/parameters.json"
+        )
+
     else:
         cell = model.create(model_name, release=release)
-        probe = None
         if feature_set == "extra":
-            assert probe_type is not None
-            probe = model.define_electrode(probe_type=probe_type)
+            if probe_file is not None:
+                probe = model.define_electrode(probe_file=probe_file)
+            elif probe_type is not None:
+                probe = model.define_electrode(probe_type=probe_type)
+            else:
+                raise Exception(
+                        "Probe must be provided for 'extra' feature set with"
+                        "'probe_type' or 'probe_file' arguments"
+                    )
 
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 
