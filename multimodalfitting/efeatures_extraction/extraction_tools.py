@@ -365,7 +365,7 @@ def _get_poscheops_targets(timings):
     return poscheops_targets
 
 
-def get_targets(timings):
+def get_ecode_targets(timings):
     targets = {
         "IDthres": {
             "amplitudes": [],  # Not used to extract actual e-features, just to compute the rheobase

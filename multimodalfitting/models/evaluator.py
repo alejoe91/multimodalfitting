@@ -498,6 +498,7 @@ def define_fitness_calculator(
 
 def create_evaluator(
         model_name,
+        cell_model_folder,
         feature_set,
         feature_file,
         protocol_file,
@@ -558,7 +559,7 @@ def create_evaluator(
         )
 
     else:
-        cell = create_ground_truth_model(model_name, release=release)
+        cell = create_ground_truth_model(model_name, cell_model_folder, release=release)
         if feature_set == "extra":
             if probe_file is not None:
                 probe = define_electrode(probe_file=probe_file)
@@ -590,7 +591,8 @@ def create_evaluator(
         **extra_kwargs
     )
 
-    sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe)
+    sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
+                                         mechs_folders=cell_model_folder)
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,

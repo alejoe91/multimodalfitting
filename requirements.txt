@@ -8,3 +8,6 @@ efel
 BluePyOpt
 BluePyEfe
 neuroplotlib
+probeinterface
+pandas
+seaborn

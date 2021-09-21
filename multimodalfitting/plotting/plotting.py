@@ -51,7 +51,7 @@ def plot_responses(responses, protocol_names=None,
     """
     resp_no_mea = {}
     for (resp_name, response) in sorted(responses.items()):
-        if 'MEA' not in resp_name:
+        if 'MEA' not in resp_name and ".v" in resp_name:
             resp_no_mea[resp_name] = response
 
     if protocol_names is not None:

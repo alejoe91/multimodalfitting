@@ -1,11 +1,16 @@
 export OPT_MODEL='hay'  # hay | hay_ais | experimental
-export OPT_EXTRA_STRATEGY='all'
+export OPT_EXTRA_STRATEGY='all'  # all | single | sections
 
 # Define model and experimental folders here. They should contain:
 # features_BPO.json, protocols_BPO.json, probe_BPO.json,
 exp_folder='../data/experimental/cell1_210301/efeatures'
 hay_folder='../data/hay_ecode_probe_planar/efeatures'
 hayais_folder='../data/hay_ais_ecode_probe_planar/efeatures'
+hayaishillock_folder='../data/hay_ais_hillock_ecode_probe_planar/efeatures'
+
+CELL_FOLDER="../cell_models"
+OPT_FOLDER="../optimization_results"
+
 
 # set correct folder for optimization
 if [ $OPT_MODEL == "experimental" ];
@@ -17,6 +22,9 @@ then
 elif [ $OPT_MODEL == "hay_ais" ];
 then
   export OPT_FOLDER=$hayais_folder
+elif [ $OPT_MODEL == "hay_ais_hillock" ];
+then
+  export OPT_FOLDER=$hayaishillock_folder
 fi
 
 for feature_set in 'soma' 'extra'; do

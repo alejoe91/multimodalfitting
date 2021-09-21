@@ -2,8 +2,12 @@ import numpy as np
 import json
 import os
 from copy import deepcopy
-import bluepyopt.ephys as ephys
 import time
+import pickle
+from pathlib import Path
+
+import bluepyopt.ephys as ephys
+
 
 
 _ais_recordings = [
@@ -382,6 +386,65 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
     mean_wf = np.mean(ewf, axis=0)
 
     return mean_wf
+
+
+def read_checkpoint(checkpoint_path):
+    """Reads a BluePyOpt checkpoint file"""
+
+    p = Path(checkpoint_path)
+    p_tmp = p.with_suffix(p.suffix + ".tmp")
+
+    try:
+        run = pickle.load(open(str(p), "rb"))
+    except EOFError:
+        try:
+            run = pickle.load(open(str(p_tmp), "rb"))
+        except EOFError:
+            raise FileNotFoundError(f"Cannot store model. Checkpoint file {checkpoint_path.name} does not exist or is "
+                                    f"corrupted.")
+
+    return run
+
+
+def load_checkpoint(checkpoint_path):
+    run = read_checkpoint(checkpoint_path)
+
+    chkp_name = Path(checkpoint_path).stem
+
+    chkp_name_split = chkp_name.split('_')
+
+    if "hay_ais_hillock" in chkp_name:
+        model = "hay_ais_hillock"
+    elif "hay_ais" in chkp_name:
+        model = "hay_ais"
+    elif "hay" in chkp_name:
+        model = "hay"
+    elif "experimental" in chkp_name:
+        model = "experimental"
+    else:
+        raise Exception("Unknown model!!!")
+
+    feature_set = [e.replace('featureset=', '') for e in chkp_name_split if "featureset=" in e][0]
+    seed = int([e.replace('seed=', '') for e in chkp_name_split if "seed=" in e][0])
+    if "extra_startegy" in chkp_name:
+        extra_strategy = [e.replace('strategy=', '') for e in chkp_name_split if "extra_strategy=" in e][0]
+    else:
+        extra_strategy = None
+
+    run = {"nevals": np.cumsum(run['logbook'].select("nevals")),
+           "population": run['population'],
+           "hof": run['halloffame'],
+           "logbook": run['logbook'],
+           "model": model,
+           "seed": seed,
+           "extra_strategy": extra_strategy,
+           "feature_set": feature_set,
+           "best_fitness": np.sum(run['halloffame'][0].fitness.values),
+           "best_scores": list(run['halloffame'][0].fitness.values),
+           "best_params": list(run['halloffame'][0]),
+           "path": checkpoint_path}
+
+    return run
 
 
 ## HELPER FUNCTIONS FOR EAP##

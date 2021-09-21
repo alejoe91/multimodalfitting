@@ -6,9 +6,16 @@ exec(open("multimodalfitting/version.py").read(), None, d)
 version = d['version']
 long_description = open("README.md").read()
 
-entry_points = None
 
-install_requires = []
+def open_requirements(fname):
+    with open(fname, mode='r') as f:
+        requires = f.read().split('\n')
+    requires = [e for e in requires if len(e) > 0 and not e.startswith('#')]
+    return requires
+
+
+install_requires = open_requirements('requirements.txt')
+entry_points = None
 
 setup(
     name="multimodalfitting",
@@ -19,11 +26,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/alejoe91/multimodalfitting",
-    install_requires=[
-        'numpy',
-        'pyyaml',
-        'matplotlib'
-    ],
+    install_requires=install_requires,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
