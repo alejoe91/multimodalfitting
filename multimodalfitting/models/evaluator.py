@@ -508,6 +508,8 @@ def create_evaluator(
         extra_recordings=None,
         release=False,
         timeout=900.,
+        morphology_file=None,
+        v_init=None,
         **extra_kwargs
 ):
     """
@@ -553,23 +555,21 @@ def create_evaluator(
     probe = None
 
     if model_name == 'experimental':
-        cell = create_experimental_model(
-            morphology_file="./experimental_model/morphology_corrected.swc",
-            parameters_file="./experimental_model/parameters.json"
-        )
-
+        assert morphology_file is not None, "Experimental model requires morphology file to be specified."
+        cell = create_experimental_model(morphology_file, cell_model_folder, v_init=v_init)
     else:
-        cell = create_ground_truth_model(model_name, cell_model_folder, release=release)
-        if feature_set == "extra":
-            if probe_file is not None:
-                probe = define_electrode(probe_file=probe_file)
-            elif probe_type is not None:
-                probe = define_electrode(probe_type=probe_type)
-            else:
-                raise Exception(
-                        "Probe must be provided for 'extra' feature set with"
-                        "'probe_type' or 'probe_file' arguments"
-                    )
+        cell = create_ground_truth_model(model_name, cell_model_folder, release=release, v_init=v_init)
+
+    if feature_set == "extra":
+        if probe_file is not None:
+            probe = define_electrode(probe_file=probe_file)
+        elif probe_type is not None:
+            probe = define_electrode(probe_type=probe_type)
+        else:
+            raise Exception(
+                    "Probe must be provided for 'extra' feature set with"
+                    "'probe_type' or 'probe_file' arguments"
+                )
 
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 

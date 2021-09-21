@@ -123,7 +123,7 @@ def define_electrode(
     return probe
 
 
-def define_parameters(cell_models_folder, parameter_file, release=False, v_init=None):
+def define_parameters(cell_model_folder, parameter_file=None, release=False, v_init=None):
     """
     Defines parameters
 
@@ -141,7 +141,7 @@ def define_parameters(cell_models_folder, parameter_file, release=False, v_init=
         List of BPO parameters
     """
 
-    path_params = cell_models_folder
+    path_params = cell_model_folder
 
     if parameter_file is None:
         if release:
@@ -187,7 +187,7 @@ def define_parameters(cell_models_folder, parameter_file, release=False, v_init=
 
             if param_config["dist_type"] == "uniform":
                 scaler = ephys.parameterscalers.NrnSegmentLinearScaler()
-                
+
             elif param_config["dist_type"] in ["exp", "step_funct", "user_defined", "sig_increase", "sig_decrease",
                                                "decay"]:
 
@@ -226,7 +226,7 @@ def define_parameters(cell_models_folder, parameter_file, release=False, v_init=
 
             if not isinstance(param_config["sectionlist"], list):
                 param_config["sectionlist"] = [param_config["sectionlist"]]
-            
+
             seclist_loc = []
             for loc in param_config["sectionlist"]:
                 seclist_loc.append(ephys.locations.NrnSeclistLocation(
@@ -286,7 +286,7 @@ def define_parameters(cell_models_folder, parameter_file, release=False, v_init=
                 "Param config type has to be global, section, range, or meta: %s"
                 % param_config
             )
-        
+
     return parameters
 
 
@@ -381,7 +381,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
         v_init=v_init,
         morph=define_morphology(cell_model_folder, morph_modifiers, do_replace_axon),
         mechs=define_mechanisms(cell_model_folder),
-        params=define_parameters(cell_model_folder, parameter_file=None, release=release),
+        params=define_parameters(cell_model_folder, release=release),
         seclist_names=seclist_names,
         secarray_names=secarray_names
     )
@@ -389,7 +389,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
     return cell
 
 
-def create_experimental_model(morphology_file, parameters_file=None, release=False, v_init=None):
+def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None):
     """
     Create Hay cell model
 
@@ -439,8 +439,8 @@ def create_experimental_model(morphology_file, parameters_file=None, release=Fal
         model_name,
         v_init=v_init,
         morph=morphology,
-        mechs=define_mechanisms(model_name),
-        params=define_parameters(model_name, parameters_file, release, v_init),
+        mechs=define_mechanisms(cell_model_folder),
+        params=define_parameters(cell_model_folder, release=release, v_init=v_init),
         seclist_names=seclist_names,
         secarray_names=secarray_names
     )
