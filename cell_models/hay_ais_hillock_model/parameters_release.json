@@ -402,7 +402,7 @@
         "param_name": "gNa12bar_Na12Hu2009",
         "mech": "Na12Hu2009",
         "dist": "(1/(1+math.exp(({distance}-25)/3)))*{value}",
-        "soma_ref_point":1.0,
+        "soma_ref_point": 1.0,
         "dist_type": "sig_decrease",
         "mech_param": "gNa12bar",
         "value": 6.158074988321586,
