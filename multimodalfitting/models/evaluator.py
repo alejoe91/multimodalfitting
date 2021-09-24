@@ -452,9 +452,11 @@ def define_fitness_calculator(
                     elif np.isscalar(kwargs["exp_std"]):
                         # single channel strategy
                         channel_ids = int(feature_name.split("_")[-1])
+                        feature_name = "_".join(feature_name.split("_")[:-1])
                     else:
                         # sections strategy
                         channel_ids = kwargs["exp_std"]
+                        feature_name = "_".join(feature_name.split("_")[:-1])
                         kwargs["exp_std"] = None
 
                     feature = ephys.efeatures.extraFELFeature(
