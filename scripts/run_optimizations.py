@@ -116,6 +116,9 @@ def main():
             feature_file = data_folder / "features_BPO.json"
             protocol_file = data_folder / "protocols_BPO.json"
 
+        print(f"Feature_file: {str(feature_file)}")
+        print(f"Protocol_file: {str(protocol_file)}")
+
         if not Path(feature_file).is_file():
             raise Exception("Couldn't find a feature json file in the provided folder.")
         if not Path(protocol_file).is_file():

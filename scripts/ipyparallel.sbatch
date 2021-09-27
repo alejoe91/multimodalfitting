@@ -30,6 +30,6 @@ sleep 20
                                                                 --seed=${OPT_SEED}                        \
                                                                 --feature_set=${OPT_FEATURE_SET}          \
                                                                 --model=${OPT_MODEL}                      \
-                                                                --data-folder=${OPT_FOLDER}               \
+                                                                --data-folder=${DATA_FOLDER}               \
                                                                 --opt-folder=${OPT_FOLDER}                \
                                                                 --extra_strategy=${OPT_EXTRA_STRATEGY}

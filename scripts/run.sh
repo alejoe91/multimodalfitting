@@ -8,23 +8,22 @@ hay_folder='../data/hay_ecode_probe_planar/efeatures'
 hayais_folder='../data/hay_ais_ecode_probe_planar/efeatures'
 hayaishillock_folder='../data/hay_ais_hillock_ecode_probe_planar/efeatures'
 
-CELL_FOLDER="../cell_models"
-OPT_FOLDER="../optimization_results"
-
+export CELL_FOLDER="../cell_models"
+export OPT_FOLDER="../optimization_results"
 
 # set correct folder for optimization
 if [ $OPT_MODEL == "experimental" ];
 then
-  export OPT_FOLDER=$exp_folder
+  export DATA_FOLDER=$exp_folder
 elif [ $OPT_MODEL == "hay" ];
 then
-  export OPT_FOLDER=$hay_folder
+  export DATA_FOLDER=$hay_folder
 elif [ $OPT_MODEL == "hay_ais" ];
 then
-  export OPT_FOLDER=$hayais_folder
+  export DATA_FOLDER=$hayais_folder
 elif [ $OPT_MODEL == "hay_ais_hillock" ];
 then
-  export OPT_FOLDER=$hayaishillock_folder
+  export DATA_FOLDER=$hayaishillock_folder
 fi
 
 for feature_set in 'soma' 'extra'; do

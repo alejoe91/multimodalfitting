@@ -408,7 +408,7 @@ def define_fitness_calculator(
             for efel_feature_name, meanstd in features.items():
 
                 feature_name = f'{protocol_name}.{location}.{efel_feature_name}'
-                
+
                 if protocols[protocol_name].stimuli[0].step_delay > 0.:
                     stimulus = protocols[protocol_name].stimuli[0]
                 else:
@@ -451,12 +451,12 @@ def define_fitness_calculator(
                         channel_ids = None
                     elif np.isscalar(kwargs["exp_std"]):
                         # single channel strategy
-                        channel_ids = int(feature_name.split("_")[-1])
-                        feature_name = "_".join(feature_name.split("_")[:-1])
+                        channel_ids = int(efel_feature_name.split("_")[-1])
+                        efel_feature_name = "_".join(efel_feature_name.split("_")[:-1])
                     else:
                         # sections strategy
                         channel_ids = kwargs["exp_std"]
-                        feature_name = "_".join(feature_name.split("_")[:-1])
+                        efel_feature_name = "_".join(efel_feature_name.split("_")[:-1])
                         kwargs["exp_std"] = None
 
                     feature = ephys.efeatures.extraFELFeature(
