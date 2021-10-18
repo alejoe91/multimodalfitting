@@ -389,7 +389,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
     return cell
 
 
-def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None):
+def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None, **morph_kwargs):
     """
     Create Hay cell model
 
@@ -422,6 +422,9 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
 
     secarray_names = ["soma", "dend", "apic", "axon", "ais"]
 
+    if "abd" in morph_kwargs:
+        seclist_names.append("axon_bearing_dendrite")
+        secarray_names.append("abd")
 
     do_replace_axon = False
     model_name = "experimental"
@@ -432,7 +435,8 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
     morphology = ephys.morphologies.NrnFileMorphology(
         str(morphology_file),
         morph_modifiers=morph_modifiers,
-        do_replace_axon=do_replace_axon
+        do_replace_axon=do_replace_axon,
+        morph_modifiers_kwargs=morph_kwargs
     )
 
     cell = ephys.models.LFPyCellModel(

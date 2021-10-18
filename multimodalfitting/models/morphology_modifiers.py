@@ -4,8 +4,21 @@ import math
 logger = logging.getLogger(__name__)
 
 
-def fix_morphology_exp(sim=None, icell=None, nseg_ais=50):
-    """Fix exp morphology by renaming 'apic' -> 'ais' and by setting the number of ais segments."""
+def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=True):
+    '''
+    Fix exp morphology by renaming 'apic' -> 'ais' and by setting the number of ais segments.
+    In addition, if 'abd=True' an axon-bearing-dendrite section is created between the soma and the ais.
+
+    Parameters
+    ----------
+    sim: BlueyuOpt.Simulator
+    icell: BlueyuOpt.CellModel
+    nseg_ais: int
+        Number of segment for AIS
+    abd: bool
+        If True, the axon-bearing-dendrite section is created for the dendrite
+        connecting the soma to the AIS
+    '''
 
     # 1) rename apic to ais
     sim.neuron.h.execute("create ais[1]", icell)
@@ -15,23 +28,69 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50):
         n3d = sec.n3d()
         for i in range(n3d):
             sim.neuron.h.pt3dadd(sec.x3d(i), sec.y3d(i), sec.z3d(i), sec.diam3d(i), sec=sec_ais)
-        parentseg_ais = sec.parentseg()
+        parent_ais = sec.parentseg().sec
         children_ais = sec.children()
         sim.neuron.h.pt3dclear(sec=sec)
         sim.neuron.h.delete_section(sec=sec)
 
-        sec_ais.connect(parentseg_ais.sec, 1.0, 0.0)
+        sec_ais.connect(parent_ais, 1, 0)
         for child in children_ais:
-            child.connect(sec_ais, 1.0, 0.0)
-            
+            child.connect(sec_ais, 1, 0)
+        sim.neuron.h.disconnect(sec=sec)
+        
         icell.axon_initial_segment.append(sec=sec_ais)
         icell.all.append(sec=sec_ais)
         
         for index, section in enumerate(icell.axon_initial_segment):
             section.nseg = nseg_ais
 
-    for section in icell.apical:
-        sim.neuron.h.delete_section(sec=section)
+
+    # TODO: fix shift in position
+    # find all dendritic sections connecting between AIS and soma
+    if abd:
+        ais_sec = icell.ais[0]
+        abd_sections = []
+        sec = ais_sec
+
+        while "soma" not in sec.name():
+            parent_sec = sec.parentseg().sec
+            if "soma" not in parent_sec.name():
+                abd_sections.append(parent_sec)
+            sec = parent_sec
+
+        sim.neuron.h.execute(f"create abd[{len(abd_sections)}]", icell)
+
+        for sec in abd_sections:
+            print(sec.name())
+
+        print("Adding")
+        for i, sec in enumerate(abd_sections):
+            sec_abd = icell.abd[i]
+            print(i, f"{sec.name()} is now {sec_abd.name()}")
+
+            # add points
+            n3d = sec.n3d()
+            for i in range(n3d):
+                sim.neuron.h.pt3dadd(sec.x3d(i), sec.y3d(i), sec.z3d(i), sec.diam3d(i), sec=sec_abd)
+
+            parent_abd = sec.parentseg().sec
+            children_abd = sec.children()
+
+            print(f"Parent: Connecting {sec_abd.name()} to {parent_abd.name()}")
+            sec_abd.connect(parent_abd, 0, 0)
+            print("Children")
+            for child in children_abd:
+                # parent_segment = child.psection()["morphology"]["parent"]
+                print(f"Connecting {sec_abd.name()} to {child.name()}")
+                sim.neuron.h.disconnect(sec=child)
+                child.connect(sec_abd, 1, 0)
+
+            icell.axon_bearing_dendrite.append(sec=sec_abd)
+            icell.all.append(sec=sec_abd)
+
+            sim.neuron.h.disconnect(sec=sec)
+            sim.neuron.h.pt3dclear(sec=sec)
+            sim.neuron.h.delete_section(sec=sec)
 
 
 def replace_axon_with_hillock_ais(sim=None, icell=None, l_hillock=10, l_ais=40,
