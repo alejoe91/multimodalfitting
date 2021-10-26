@@ -353,12 +353,12 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
     elif model_name == "hay_ais_hillock":
         morph_modifiers = [replace_axon_with_hillock_ais]
         seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
-        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin']
+        secarray_names = ['soma', 'dend', 'apic', 'ais', 'hillock', 'myelin', 'axon']
         do_replace_axon = False
     elif model_name == "hay_ais":
         morph_modifiers = [replace_axon_with_ais]
-        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
-        secarray_names = ['soma', 'dend', 'apic', 'axon', 'ais', 'hillock', 'myelin']
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'myelinated', 'axonal']
+        secarray_names = ['soma', 'dend', 'apic', 'ais', 'myelin', 'axon']
         do_replace_axon = False
     else:
         morph_modifiers = None
