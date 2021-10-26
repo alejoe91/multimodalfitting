@@ -43,7 +43,7 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=True):
         
         for index, section in enumerate(icell.axon_initial_segment):
             section.nseg = nseg_ais
-
+    # sim.neuron.h.define_shape()
 
     # TODO: fix shift in position
     # find all dendritic sections connecting between AIS and soma
@@ -75,15 +75,19 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=True):
 
             parent_abd = sec.parentseg().sec
             children_abd = sec.children()
+            parent_x = sim.neuron.h.parent_connection(sec=sec)
+            child_y = sim.neuron.h.section_orientation(sec=sec)
 
-            print(f"Parent: Connecting {sec_abd.name()} to {parent_abd.name()}")
-            sec_abd.connect(parent_abd, 0, 0)
+            print(f"Parent: Connecting {sec_abd.name()} {child_y} to {parent_abd.name()}{parent_x}")
+            sec_abd.connect(parent_abd, parent_x, child_y)
             print("Children")
             for child in children_abd:
+                parent_x = sim.neuron.h.parent_connection(sec=child)
+                child_y = sim.neuron.h.section_orientation(sec=child)
                 # parent_segment = child.psection()["morphology"]["parent"]
-                print(f"Connecting {sec_abd.name()} to {child.name()}")
+                print(f"Connecting {sec_abd.name()}{parent_x} to {child.name()}{child_y}")
                 sim.neuron.h.disconnect(sec=child)
-                child.connect(sec_abd, 1, 0)
+                child.connect(sec_abd, parent_x, child_y)
 
             icell.axon_bearing_dendrite.append(sec=sec_abd)
             icell.all.append(sec=sec_abd)
