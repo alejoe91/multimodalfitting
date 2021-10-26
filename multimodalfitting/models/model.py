@@ -389,7 +389,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
     return cell
 
 
-def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None, **morph_kwargs):
+def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None, model_type ="LFPy", **morph_kwargs):
     """
     Create Hay cell model
 
@@ -438,8 +438,12 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         do_replace_axon=do_replace_axon,
         morph_modifiers_kwargs=morph_kwargs
     )
-
-    cell = ephys.models.LFPyCellModel(
+    if model_type == "LFPy":
+        model_class = ephys.models.LFPyCellModel
+    else:
+        model_class = ephys.models.CellModel
+        
+    cell = model_class(
         model_name,
         v_init=v_init,
         morph=morphology,
@@ -450,3 +454,4 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
     )
 
     return cell
+
