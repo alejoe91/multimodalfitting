@@ -4,8 +4,7 @@ import numpy as np
 
 import bluepyopt.ephys as ephys
 
-from .morphology_modifiers import replace_axon_with_hillock_ais, replace_axon_with_ais, fix_hallerman_morpho, \
-    fix_morphology_exp
+from .morphology_modifiers import replace_axon_with_hillock_ais, replace_axon_with_ais, fix_morphology_exp
 
 
 def define_mechanisms(cell_model_folder):
@@ -130,7 +129,7 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
     Parameters
     ----------
     model_name: str
-            "hay", "hay_ais", or "hallermann"
+            "hay", "hay_ais", or "hay_ais_hillock"
     release: bool
         If True, the frozen release parameters are returned. Otherwise, the unfrozen parameters with bounds are
         returned (use False - default - for optimizations)
@@ -290,17 +289,20 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
     return parameters
 
 
-def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon):
+def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **morph_kwargs):
     """
     Defines neuron morphology for the Hay model
 
     Parameters
     ----------
     model_name: str
-            "hay", "hay_ais" or "hallermann"
+            "hay", "hay_ais" or "hay_ais_hillock"
     morph_modifiers: list of python functions
         The modifier functions to apply to the axon
     do_replace_axon: bool
+        If True axon is replaced by axon stub
+    **morph_kwargs: kwargs for morphology modifiers
+    
 
     Returns
     -------
@@ -322,27 +324,32 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon):
     return ephys.morphologies.NrnFileMorphology(
         str(path_morpho),
         morph_modifiers=morph_modifiers,
-        do_replace_axon=do_replace_axon
+        do_replace_axon=do_replace_axon,
+        morph_modifiers_kwargs=morph_kwargs
     )
 
 
-def create_ground_truth_model(model_name, cell_model_folder, release=False, v_init=None):
-    """
-    Create Hay cell model
+def create_ground_truth_model(model_name, cell_model_folder, release=False, v_init=None, model_type="LFPy", 
+                              **morph_kwargs):
+    """Create ground-truth model
 
     Parameters
     ----------
-    model_name: str
-            "hay" or "hallermann"
-    release: bool
-        If True, the frozen release parameters are returned. Otherwise, the
-        unfrozen parameters with bounds are returned (use False for
-        optimizations).
+    model_name : str
+        'hay' | 'hay_ais' | 'hay_ais_hillock'
+    cell_model_folder : str or Path
+        Path to the cell model folder 
+    release : bool, optional
+        If True, release parameters are loaded (for experimental models some dummy parameters are available),
+        by default False
+    v_init : float, optional
+        Initial membrane potential value, by default None
+    **morph_kwargs: kwargs for morphology modifiers
 
     Returns
     -------
-    cell: bluepyopt.ephys.models.LFPyCellModel
-        The LFPyCellModel object
+    bluepyopt.ephys.models.LFPyCellModel or bluepyopt.ephys.models.CellModel
+        The BluePyOpt model object
     """
 
     if model_name == "hay":
@@ -352,7 +359,8 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
         do_replace_axon = True
     elif model_name == "hay_ais_hillock":
         morph_modifiers = [replace_axon_with_hillock_ais]
-        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 'axonal']
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 
+                         'axonal']
         secarray_names = ['soma', 'dend', 'apic', 'ais', 'hillock', 'myelin', 'axon']
         do_replace_axon = False
     elif model_name == "hay_ais":
@@ -373,43 +381,56 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
             v_init = -80.
         elif model_name == "hay_ais_hillock":
             v_init = -80.
-            
-    cell_model_folder = Path(cell_model_folder)
 
-    cell = ephys.models.LFPyCellModel(
+    cell_model_folder = Path(cell_model_folder)
+    
+    if model_type == "LFPy":
+        model_class = ephys.models.LFPyCellModel
+        model_kwargs = {'v_init': v_init}
+    else:
+        model_class = ephys.models.CellModel
+        model_kwargs = {}
+
+    cell = model_class(
         model_name,
-        v_init=v_init,
-        morph=define_morphology(cell_model_folder, morph_modifiers, do_replace_axon),
+        morph=define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **morph_kwargs),
         mechs=define_mechanisms(cell_model_folder),
-        params=define_parameters(cell_model_folder, release=release),
+        params=define_parameters(cell_model_folder, release=release, v_init=v_init),
         seclist_names=seclist_names,
-        secarray_names=secarray_names
+        secarray_names=secarray_names,
+        **model_kwargs
     )
 
     return cell
 
 
-def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None, model_type ="LFPy", 
+def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None, model_type="LFPy",
                               **morph_kwargs):
-    """
-    Create Hay cell model
+    """Create experimental cell model
+
 
     Parameters
     ----------
-    model_name: str
-            "hay" or "hallermann"
-    release: bool
-        If True, the frozen release parameters are returned. Otherwise, the
-        unfrozen parameters with bounds are returned (use False for
-        optimizations).
+    morphology_file : str or Path
+        Path to the morphology file
+    cell_model_folder : str or Path
+        Path to the cell model folder
+    release : bool, optional
+        If True, release parameters are loaded (for experimental models some dummy parameters are available),
+        by default False
+    v_init : float, optional
+        Initial membrane potential value, by default None
+    model_type : str, optional
+        * "neuron": instantiate a CellModel
+        * "LFPy": instantiate an LFPyCellModel
+        by default "LFPy"
+    **morph_kwargs: kwargs for morphology modifiers
 
     Returns
     -------
-    cell: bluepyopt.ephys.models.LFPyCellModel
-        The LFPyCellModel object
+    bluepyopt.ephys.models.LFPyCellModel or bluepyopt.ephys.models.CellModel
+        The BluePyOpt model object
     """
-
-
     morph_modifiers = [fix_morphology_exp]
 
     seclist_names = [
@@ -446,7 +467,7 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}
-    
+
     cell = model_class(
         model_name,
         morph=morphology,
@@ -458,4 +479,3 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
     )
 
     return cell
-
