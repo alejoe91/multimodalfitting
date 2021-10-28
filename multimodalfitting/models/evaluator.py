@@ -438,8 +438,6 @@ def define_fitness_calculator(
 
                 if location == 'MEA':
                     
-                    objective_weight = objective_weight_mea
-                    
                     recording_names = '%s.%s.LFP' % (protocol_name, location)
                     somatic_recording_name = f'{protocol_name}.soma.v'
 
@@ -448,13 +446,16 @@ def define_fitness_calculator(
                     # depending on "exp_std" value, different strategies can be identified
                     if kwargs["exp_std"] is None:
                         # full cosine dist strategy
+                        objective_weight = objective_weight_mea
                         channel_ids = None
                     elif np.isscalar(kwargs["exp_std"]):
                         # single channel strategy
+                        objective_weight = 1  # in this case weight is the same as other intra-features
                         channel_ids = int(efel_feature_name.split("_")[-1])
                         efel_feature_name = "_".join(efel_feature_name.split("_")[:-1])
                     else:
                         # sections strategy
+                        objective_weight = objective_weight_mea
                         channel_ids = kwargs["exp_std"]
                         efel_feature_name = "_".join(efel_feature_name.split("_")[:-1])
                         kwargs["exp_std"] = None
@@ -469,9 +470,9 @@ def define_fitness_calculator(
                     )
 
                 else:
-                    
+
                     objective_weight = 1
-                    
+
                     recording_names = {'': '%s.%s.v' % (protocol_name, location)}
 
                     feature = ephys.efeatures.eFELFeature(
