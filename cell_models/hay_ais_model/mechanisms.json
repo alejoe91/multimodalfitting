@@ -28,18 +28,6 @@
         "Ca_LVAst",
         "Ca_HVA2"
     ],
-    "hillockal": [
-        "Ih",
-        "CaDynamics_DC0",
-        "Ca_LVAst",
-        "Ca_HVA2",
-        "SKv3_1",
-        "SK_E2",
-        "K_Tst",
-        "K_Pst",
-        "NaTg",
-        "extracellular"
-    ],
     "axon_initial_segment": [
         "Ca_LVAst",
         "Ca_HVA2",

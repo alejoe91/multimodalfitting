@@ -13,7 +13,7 @@
     },
     {
         "param_name": "g_pas",
-        "sectionlist": ["somatic", "hillockal"],
+        "sectionlist": "somatic",
         "type": "section",
         "dist_type": "uniform",
         "bounds": [2e-5, 5e-5]
@@ -55,14 +55,14 @@
     },
     {
         "param_name": "ek",
-        "sectionlist": ["somatic", "hillockal"],
+        "sectionlist": "somatic",
         "type": "section",
         "dist_type": "uniform",
         "value": -90
     },
     {
         "param_name": "ena",
-        "sectionlist": ["somatic", "hillockal"],
+        "sectionlist": "somatic",
         "type": "section",
         "dist_type": "uniform",
         "value": 50
@@ -76,7 +76,7 @@
         "mech_param": "gIhbar",
         "value": 1.3210130547656326e-05,
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "decay_CaDynamics_DC0",
@@ -85,7 +85,7 @@
         "dist_type": "uniform",
         "mech_param": "decay",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "gamma_CaDynamics_DC0",
@@ -94,7 +94,7 @@
         "dist_type": "uniform",
         "mech_param": "gamma",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "gCa_LVAstbar_Ca_LVAst",
@@ -103,7 +103,7 @@
         "dist_type": "uniform",
         "mech_param": "gCa_LVAstbar",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "gCa_HVAbar_Ca_HVA2",
@@ -112,7 +112,7 @@
         "dist_type": "uniform",
         "mech_param": "gCa_HVAbar",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "gSKv3_1bar_SKv3_1",
@@ -121,7 +121,7 @@
         "dist_type": "uniform",
         "mech_param": "gSKv3_1bar",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "gSK_E2bar_SK_E2",
@@ -130,7 +130,7 @@
         "dist_type": "uniform",
         "mech_param": "gSK_E2bar",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "gK_Tstbar_K_Tst",
@@ -139,7 +139,7 @@
         "dist_type": "uniform",
         "mech_param": "gK_Tstbar",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "gK_Pstbar_K_Pst",
@@ -148,7 +148,7 @@
         "dist_type": "uniform",
         "mech_param": "gK_Pstbar",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "vshiftm_NaTg",
@@ -157,7 +157,7 @@
         "dist_type": "uniform",
         "mech_param": "vshiftm",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "vshifth_NaTg",
@@ -166,7 +166,7 @@
         "dist_type": "uniform",
         "mech_param": "vshifth",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "slopem_NaTg",
@@ -175,7 +175,7 @@
         "dist_type": "uniform",
         "mech_param": "slopem",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "gNaTgbar_NaTg",
@@ -184,7 +184,7 @@
         "dist_type": "uniform",
         "mech_param": "gNaTgbar",
         "type": "range",
-        "sectionlist": ["somatic", "hillockal"]
+        "sectionlist": "somatic"
     },
     {
         "param_name": "cm",
