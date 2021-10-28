@@ -4,7 +4,7 @@ import math
 logger = logging.getLogger(__name__)
 
 
-def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=True):
+def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
     '''
     Fix exp morphology by renaming 'apic' -> 'ais' and by setting the number of ais segments.
     In addition, if 'abd=True' an axon-bearing-dendrite section is created between the soma and the ais.
