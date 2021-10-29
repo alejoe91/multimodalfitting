@@ -80,12 +80,9 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
 
         sim.neuron.h.execute(f"create abd[{len(abd_sections)}]", icell)
 
-        for sec in abd_sections:
-            print(sec.name())
-
         for i, sec in enumerate(abd_sections[::-1]):
             sec_abd = icell.abd[i]
-            # print(i, f"{sec.name()} is now {sec_abd.name()}")
+            print(i, f"{sec.name()} is now {sec_abd.name()}")
 
             # add 3d points
             n3d = sec.n3d()
@@ -123,7 +120,7 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
         logger.debug(
             f"Replace {len(abd_sections)} sections with ABD sections"
         )
-           
+
 
 def replace_axon_with_hillock_ais(sim=None, icell=None, l_hillock=10, l_ais=40,
                                   l_myelin=1000, d_myelin=0.2, seg_len=5, myelin_nseg=5):

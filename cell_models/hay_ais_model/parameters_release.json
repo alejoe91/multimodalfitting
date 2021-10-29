@@ -5,6 +5,11 @@
         "value": 34
     },
     {
+        "param_name": "v_init",
+        "type": "global",
+        "value": -72
+    },
+    {
         "param_name": "e_pas",
         "sectionlist": "all",
         "type": "section",
@@ -228,7 +233,7 @@
     {
         "param_name": "vshiftm_NaTg",
         "mech": "NaTg",
-        "value":6,
+        "value": 6,
         "dist_type": "uniform",
         "mech_param": "vshiftm",
         "type": "range",
@@ -299,7 +304,7 @@
         "soma_ref_point":0.5,
         "dist_type": "exp",
         "mech_param": "gIhbar",
-        "value": 0.0002,
+        "value": 1.3210130547656326e-05,
         "type": "range",
         "sectionlist": "basal"
     },

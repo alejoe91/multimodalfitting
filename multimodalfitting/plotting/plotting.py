@@ -529,6 +529,7 @@ def plot_cell(cell, sim, ax=None, detailed=False, **kwargs):
         ax = fig.add_subplot(111)
 
     cell.freeze({})
+    print("Instantiate")
     cell.instantiate(sim=sim)
     if detailed:
         nplt.plot_detailed_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)

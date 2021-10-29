@@ -367,6 +367,7 @@ def get_unfrozen_params_bounds(model_name):
 
 def define_fitness_calculator(
         protocols, feature_file, feature_set, probe=None, objective_weight_mea=2.5,
+        inter_step=0.1,
         **extra_kwargs
 ):
     """
@@ -466,6 +467,7 @@ def define_fitness_calculator(
                         recording_names={'': recording_names},
                         somatic_recording_name=somatic_recording_name,
                         channel_ids=channel_ids,
+                        inter_step=inter_step,
                         **kwargs
                     )
 
@@ -482,6 +484,7 @@ def define_fitness_calculator(
                         max_score=250,
                         force_max_score=True,
                         int_settings={'strict_stiminterval': True},
+                        inter_step=inter_step,
                         **kwargs
                     )
 
@@ -513,6 +516,7 @@ def create_evaluator(
         timeout=900.,
         morphology_file=None,
         v_init=None,
+        abd=False,
         **extra_kwargs
 ):
     """
@@ -548,18 +552,19 @@ def create_evaluator(
         ]}
     timeout: float
         Timeout in seconds
+    abd: bool
+        If True and model is 'experimental', the ABD section is used
     extra_kwargs: keyword arguments for computing extracellular signals.
 
     Returns
     -------
     CellEvaluator
-    """
-    
+    """  
     probe = None
 
     if model_name == 'experimental':
         assert morphology_file is not None, "Experimental model requires morphology file to be specified."
-        cell = create_experimental_model(morphology_file, cell_model_folder, v_init=v_init)
+        cell = create_experimental_model(morphology_file, cell_model_folder, v_init=v_init, abd=abd)
     else:
         cell = create_ground_truth_model(model_name, cell_model_folder, release=release, v_init=v_init)
 

@@ -7,10 +7,14 @@ import bluepyopt.ephys as ephys
 from .morphology_modifiers import replace_axon_with_hillock_ais, replace_axon_with_ais, fix_morphology_exp
 
 
-def define_mechanisms(cell_model_folder):
+def define_mechanisms(cell_model_folder, abd=False):
     """Defines mechanisms"""
-    
-    path_mechs = cell_model_folder / "mechanisms.json"
+
+    mechanism_file_name = "mechanisms"
+    if abd:
+        mechanism_file_name += "_abd"
+
+    path_mechs = cell_model_folder / f"{mechanism_file_name}.json"
 
     assert path_mechs.is_file(), "Couldn't find the 'mechanisms.json' file in the folder!"
 
@@ -122,7 +126,7 @@ def define_electrode(
     return probe
 
 
-def define_parameters(cell_model_folder, parameter_file=None, release=False, v_init=None):
+def define_parameters(cell_model_folder, parameter_file=None, release=False, v_init=None, abd=False):
     """
     Defines parameters
 
@@ -144,9 +148,14 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
 
     if parameter_file is None:
         if release:
-            param_configs = json.load(open(path_params / "parameters_release.json"))
+            param_file_name = "parameters_release"
         else:
-            param_configs = json.load(open(path_params / "parameters.json"))
+            param_file_name = "parameters"
+        if abd:
+            param_file_name += "_abd"
+
+        param_configs = json.load(
+            open(path_params / f"{param_file_name}.json"))
     else:
         parameter_file = Path(parameter_file)
         assert parameter_file.is_file(), "Parameter file doesn't exist"
@@ -376,14 +385,14 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
 
     if v_init is None:
         if model_name == "hay":
-            v_init = -65.
+            v_init = -80.
         elif model_name == "hay_ais":
-            v_init = -80.
+            v_init = -72.
         elif model_name == "hay_ais_hillock":
-            v_init = -80.
+            v_init = -72.
 
     cell_model_folder = Path(cell_model_folder)
-    
+
     if model_type == "LFPy":
         model_class = ephys.models.LFPyCellModel
         model_kwargs = {'v_init': v_init}
@@ -405,7 +414,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
 
 
 def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None, model_type="LFPy",
-                              **morph_kwargs):
+                              abd=False, **morph_kwargs):
     """Create experimental cell model
 
 
@@ -424,6 +433,8 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         * "neuron": instantiate a CellModel
         * "LFPy": instantiate an LFPyCellModel
         by default "LFPy"
+    abd: bool
+        If True, the axon-bearing-dendrite section is used. Default False
     **morph_kwargs: kwargs for morphology modifiers
 
     Returns
@@ -432,6 +443,9 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         The BluePyOpt model object
     """
     morph_modifiers = [fix_morphology_exp]
+
+    if abd:
+        morph_kwargs.update({"abd": True})
 
     seclist_names = [
         "all",
@@ -444,7 +458,7 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
 
     secarray_names = ["soma", "dend", "apic", "axon", "ais"]
 
-    if "abd" in morph_kwargs:
+    if abd:
         seclist_names.append("axon_bearing_dendrite")
         secarray_names.append("abd")
 
@@ -471,8 +485,8 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
     cell = model_class(
         model_name,
         morph=morphology,
-        mechs=define_mechanisms(cell_model_folder),
-        params=define_parameters(cell_model_folder, release=release, v_init=v_init),
+        mechs=define_mechanisms(cell_model_folder, abd=abd),
+        params=define_parameters(cell_model_folder, release=release, v_init=v_init, abd=abd),
         seclist_names=seclist_names,
         secarray_names=secarray_names,
         **model_kwargs
