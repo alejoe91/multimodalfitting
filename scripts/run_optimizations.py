@@ -43,6 +43,8 @@ def get_parser():
     parser.add_argument("--opt-folder", type=str, default=None,
                         help="The folder containing the results of optimization "
                              "(default is parent of data_folder/optimization_results)")
+    parser.add_argument("--abd", action="store_true", default=False,
+                        help="If True and model is 'experimental', the ABD section is used")
     parser.add_argument("--offspring", type=int, default=20,
                         help="The population size (offspring) - default 20")
     parser.add_argument("--maxgen", type=int, default=2000,
@@ -108,7 +110,7 @@ def main():
     if args.data_folder is not None:
         # Load features / protocols / and probe
         data_folder = Path(args.data_folder)
-        
+
         if args.extra_strategy:
             feature_file = data_folder / f"features_BPO_{args.extra_strategy}.json"
             protocol_file = data_folder / f"protocols_BPO_{args.extra_strategy}.json"
@@ -125,17 +127,18 @@ def main():
             raise Exception("Couldn't find a protocol json file in the provided folder.")
 
         if args.feature_set == "extra":
-            probe_file = data_folder / f"probe_BPO.json"
+            probe_file = data_folder / "probe_BPO.json"
             if not os.path.isfile(probe_file):
                 raise Exception("Couldn't find a probe json file in the provided folder.")
     else:
         raise Exception("Provide --folder argument to specify where BPO files are")
 
     model_name = args.model
+    abd = args.abd
 
     assert args.cell_folder is not None, "Provide --cell-folder argument to specify where cell models folders are"
     cell_folder = Path(args.cell_folder) / f"{model_name}_model"
-    
+
     eva = mf.create_evaluator(
         model_name=model_name,
         cell_model_folder=cell_folder,
@@ -146,9 +149,10 @@ def main():
         protocols_with_lfp=protocols_with_lfp,
         extra_recordings=None,
         timeout=timeout,
+        abd=abd,
         **extra_kwargs
     )
-    
+
     opt = bluepyopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
         evaluator=eva,
         offspring_size=args.offspring,

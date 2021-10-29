@@ -25,6 +25,7 @@ sleep 20
 srun --output="${LOGS}/engine.out" /gpfs/bbp.cscs.ch/home/damart//lfpenv/bin/ipengine --profile=${IPYTHON_PROFILE} &
 sleep 20
 
+# TODO add ABD option
 /gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/python3 run_optimizations.py --ipyparallel                    \
                                                                 --cell-folder=${CELL_FOLDER}              \
                                                                 --seed=${OPT_SEED}                        \
