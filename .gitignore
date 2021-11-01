@@ -9,6 +9,7 @@ data/
 .ideas/
 .idea/
 efeatures_extraction/efeatures/
+optimization_results/checkpoints/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -20,17 +20,16 @@ mkdir -p ${IPYTHONDIR}
 
 export IPYTHON_PROFILE=benchmark.${SLURM_JOBID}
 
-/gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/ipcontroller --init --ip='*' --profile=${IPYTHON_PROFILE} &
+/gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy/lfpyenv/bin/ipcontroller --init --ip='*' --profile=${IPYTHON_PROFILE} &
 sleep 20
-srun --output="${LOGS}/engine.out" /gpfs/bbp.cscs.ch/home/damart//lfpenv/bin/ipengine --profile=${IPYTHON_PROFILE} &
+srun --output="${LOGS}/engine.out" /gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy/lfpyenv/bin/ipengine --profile=${IPYTHON_PROFILE} &
 sleep 20
 
-# TODO add ABD option
-/gpfs/bbp.cscs.ch/home/damart/venv_lfpy/bin/python3 run_optimizations.py --ipyparallel                    \
-                                                                --cell-folder=${CELL_FOLDER}              \
-                                                                --seed=${OPT_SEED}                        \
-                                                                --feature_set=${OPT_FEATURE_SET}          \
-                                                                --model=${OPT_MODEL}                      \
-                                                                --data-folder=${DATA_FOLDER}               \
-                                                                --opt-folder=${OPT_FOLDER}                \
-                                                                --extra_strategy=${OPT_EXTRA_STRATEGY}
+/gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy/lfpyenv/bin/python3 run_optimizations.py --ipyparallel \
+                                                                --cell-folder=${CELL_FOLDER}             \
+                                                                --seed=${OPT_SEED}                       \
+                                                                --feature-set=${OPT_FEATURE_SET}         \
+                                                                --model=${OPT_MODEL}                     \
+                                                                --data-folder=${DATA_FOLDER}             \
+                                                                --opt-folder=${OPT_FOLDER}               \
+                                                                --extra-strategy=${OPT_EXTRA_STRATEGY}
