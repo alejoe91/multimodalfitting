@@ -138,6 +138,11 @@ def main():
 
     assert args.cell_folder is not None, "Provide --cell-folder argument to specify where cell models folders are"
     cell_folder = Path(args.cell_folder) / f"{model_name}_model"
+    
+    if model_name == 'experimental':
+        morphology_file = "../data/experimental/210301_3113_cell1/morphology/morphology_corrected.swc"
+    else:
+        morphology_file= None
 
     eva = mf.create_evaluator(
         model_name=model_name,
@@ -147,6 +152,7 @@ def main():
         protocol_file=protocol_file,
         probe_file=probe_file,
         protocols_with_lfp=protocols_with_lfp,
+        morphology_file=morphology_file,
         extra_recordings=None,
         timeout=timeout,
         abd=abd,

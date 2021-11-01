@@ -367,7 +367,7 @@ def get_unfrozen_params_bounds(model_name):
 
 def define_fitness_calculator(
         protocols, feature_file, feature_set, probe=None, objective_weight_mea=2.5,
-        inter_step=0.1,
+        interp_step=0.1,
         **extra_kwargs
 ):
     """
@@ -467,7 +467,7 @@ def define_fitness_calculator(
                         recording_names={'': recording_names},
                         somatic_recording_name=somatic_recording_name,
                         channel_ids=channel_ids,
-                        inter_step=inter_step,
+                        interp_step=interp_step,
                         **kwargs
                     )
 
@@ -484,7 +484,7 @@ def define_fitness_calculator(
                         max_score=250,
                         force_max_score=True,
                         int_settings={'strict_stiminterval': True},
-                        inter_step=inter_step,
+                        interp_step=interp_step,
                         **kwargs
                     )
 
