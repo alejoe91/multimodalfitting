@@ -426,8 +426,8 @@ def load_checkpoint(checkpoint_path):
 
     feature_set = [e.replace('featureset=', '') for e in chkp_name_split if "featureset=" in e][0]
     seed = int([e.replace('seed=', '') for e in chkp_name_split if "seed=" in e][0])
-    if "extra_startegy" in chkp_name:
-        extra_strategy = [e.replace('strategy=', '') for e in chkp_name_split if "extra_strategy=" in e][0]
+    if "strategy" in chkp_name:
+        extra_strategy = [e.replace('strategy=', '') for e in chkp_name_split if "strategy=" in e][0]
     else:
         extra_strategy = None
 
