@@ -22,7 +22,7 @@ export IPYTHON_PROFILE=benchmark.${SLURM_JOBID}
 
 /gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy/lfpyenv/bin/ipcontroller --init --ip='*' --profile=${IPYTHON_PROFILE} &
 sleep 20
-srun --output="${LOGS}/engine.out" /gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy/lfpyenv/bin/ipengine --profile=${IPYTHON_PROFILE} &
+srun --output="${LOGS}/engine.out" --mpi=none /gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy/lfpyenv/bin/ipengine --profile=${IPYTHON_PROFILE} &
 sleep 20
 
 /gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy/lfpyenv/bin/python3 run_optimizations.py --ipyparallel \
