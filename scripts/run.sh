@@ -1,5 +1,6 @@
 export OPT_MODEL='hay'  # hay | hay_ais | experimental
 
+export SIM='lfpy' # lfpy | neuron
 # Define model and experimental folders here. They should contain:
 # features_BPO.json, protocols_BPO.json, probe_BPO.json,
 exp_folder='../data/experimental/210301_3113_cell1/efeatures'

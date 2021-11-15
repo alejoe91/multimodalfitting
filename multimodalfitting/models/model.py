@@ -295,6 +295,22 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
                 % param_config
             )
 
+        # add v_init if specified as an argument, but not in the parameters
+        has_v_init = False
+        for param in parameters:
+            if param.name == "v_init":
+                has_v_init = True
+        if not has_v_init and v_init is not None:
+            parameters.append(
+                ephys.parameters.NrnGlobalParameter(
+                    name="v_init",
+                    param_name="v_init",
+                    frozen=True,
+                    bounds=None,
+                    value=v_init,
+                )
+            )
+
     return parameters
 
 
@@ -353,6 +369,10 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
         by default False
     v_init : float, optional
         Initial membrane potential value, by default None
+    model_type : str, optional
+        * "neuron": instantiate a CellModel
+        * "LFPy": instantiate an LFPyCellModel
+        by default "LFPy"
     **morph_kwargs: kwargs for morphology modifiers
 
     Returns
@@ -360,6 +380,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
     bluepyopt.ephys.models.LFPyCellModel or bluepyopt.ephys.models.CellModel
         The BluePyOpt model object
     """
+    assert model_type.lower() in ["lfpy", "neuron"]
 
     if model_name == "hay":
         morph_modifiers = None
@@ -393,7 +414,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
 
     cell_model_folder = Path(cell_model_folder)
 
-    if model_type == "LFPy":
+    if model_type.lower() == "LFPy":
         model_class = ephys.models.LFPyCellModel
         model_kwargs = {'v_init': v_init}
     else:
@@ -443,6 +464,8 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         The BluePyOpt model object
     """
     morph_modifiers = [fix_morphology_exp]
+    
+    assert model_type.lower() in ["lfpy", "neuron"]
 
     if abd:
         morph_kwargs.update({"abd": True})
@@ -475,7 +498,7 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         morph_modifiers_kwargs=morph_kwargs
     )
 
-    if model_type == "LFPy":
+    if model_type.lower == "lfpy":
         model_class = ephys.models.LFPyCellModel
         model_kwargs = {'v_init': v_init}
     else:
