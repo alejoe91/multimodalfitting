@@ -167,7 +167,7 @@ def define_recordings(protocol_name, protocol_definition, electrode=None, extra_
     return recordings
 
 
-def define_stimuli(protocol_definition):
+def define_stimuli(protocol_definition, simulator="lfpy"):
     """
     Defines stimuli associated with a specified protocol
 
@@ -184,8 +184,13 @@ def define_stimuli(protocol_definition):
     """
     stimuli = []
 
+    if simulator == "lfpy":
+        stimulus_class = ephys.stimuli.LFPySquarePulse
+    else:
+        stimulus_class = ephys.stimuli.NrnSquarePulse
+
     for stimulus_definition in protocol_definition["stimuli"]:
-        stimuli.append(ephys.stimuli.LFPySquarePulse(
+        stimuli.append(stimulus_class(
             step_amplitude=stimulus_definition['amp'],
             step_delay=stimulus_definition['delay'],
             step_duration=stimulus_definition['duration'],
@@ -202,7 +207,8 @@ def define_protocols(
         protocols_file=None,
         electrode=None,
         protocols_with_lfp=None,
-        extra_recordings=None
+        extra_recordings=None,
+        simulator="lfpy"
 ):
     """
     Defines protocols for a specified feature_Set (or file)
@@ -222,6 +228,8 @@ def define_protocols(
     protocols_with_lfp: list or None
         List of protocols for which LFP should be computed. If None, LFP are
         added to all protocols.
+    simulator : str, optional
+        The simulator to use. "lfpy" | "neuron"
 
     Returns
     -------
@@ -230,6 +238,8 @@ def define_protocols(
     """
     protocol_definitions = get_protocol_definitions(model_name, protocols_file)
     feature_definitions = get_feature_definitions(feature_file, feature_set)
+
+    assert simulator.lower() in ["lfpy", "neuron"]
 
     protocols = {}
 
@@ -247,7 +257,7 @@ def define_protocols(
                 protocol_name, protocol_definitions[protocol_name], None, extra_recordings
             )
 
-        stimuli = define_stimuli(protocol_definitions[protocol_name])
+        stimuli = define_stimuli(protocol_definitions[protocol_name], simulator=simulator)
 
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
@@ -257,7 +267,32 @@ def define_protocols(
 
 
 def define_test_step_protocol(step_amplitude=0.5, tot_duration=500, delay=50,
-                              step_duration=400, probe=None, protocol_name="TestStep"):
+                              step_duration=400, probe=None, protocol_name="TestStep",
+                              simulator="lfpy"):
+    """Generates test protocol with a current pulse.
+
+    Parameters
+    ----------
+    step_amplitude : float, optional
+        Amplitude of the current pulse, by default 0.5
+    tot_duration : int, optional
+        Total duration of the protocol in ms, by default 500
+    delay : int, optional
+        Delay from the stimulus onset in ms, by default 50
+    step_duration : int, optional
+        Duration of the step in ms, by default 400
+    probe : MEAutility.MEA, optional
+        The extracellular probe, by default None
+    protocol_name : str, optional
+        The protocol name, by default "TestStep"
+    simulator : str, optional
+        The simulator to use. "lfpy" | "neuron"
+
+    Returns
+    -------
+    protocols: dict
+        Dictionary of BluePyOpt protocols
+    """
 
     protocol_definition = {
         "stimuli": [
@@ -517,6 +552,7 @@ def create_evaluator(
         morphology_file=None,
         v_init=None,
         abd=False,
+        simulator="lfpy",
         **extra_kwargs
 ):
     """
@@ -554,19 +590,23 @@ def create_evaluator(
         Timeout in seconds
     abd: bool
         If True and model is 'experimental', the ABD section is used
+    simulator: str
+        The simulator and cell models to use. "lfpy" | "neuron"
     extra_kwargs: keyword arguments for computing extracellular signals.
 
     Returns
     -------
     CellEvaluator
-    """  
+    """
     probe = None
 
     if model_name == 'experimental':
         assert morphology_file is not None, "Experimental model requires morphology file to be specified."
-        cell = create_experimental_model(morphology_file, cell_model_folder, v_init=v_init, abd=abd)
+        cell = create_experimental_model(morphology_file, cell_model_folder, v_init=v_init, abd=abd,
+                                         model_type=simulator)
     else:
-        cell = create_ground_truth_model(model_name, cell_model_folder, release=release, v_init=v_init)
+        cell = create_ground_truth_model(model_name, cell_model_folder, release=release, v_init=v_init,
+                                         model_type=simulator)
 
     if feature_set == "extra":
         if probe_file is not None:
@@ -588,7 +628,8 @@ def create_evaluator(
         protocols_file=protocol_file,
         electrode=probe,
         protocols_with_lfp=protocols_with_lfp,
-        extra_recordings=extra_recordings
+        extra_recordings=extra_recordings,
+        simulator=simulator
     )
 
     fitness_calculator, _ = define_fitness_calculator(
@@ -599,8 +640,12 @@ def create_evaluator(
         **extra_kwargs
     )
 
-    sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
-                                         mechs_folders=cell_model_folder)
+    if simulator == "lfpy":
+        sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
+                                             mechs_folders=cell_model_folder)
+    else:
+        sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,
+                                            mechs_folders=cell_model_folder)
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,
@@ -610,4 +655,3 @@ def create_evaluator(
         sim=sim,
         timeout=timeout
     )
-

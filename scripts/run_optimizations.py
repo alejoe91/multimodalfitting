@@ -34,6 +34,8 @@ def get_parser():
                         help="The feature set to be used ('soma' - 'extra')")
     parser.add_argument("--model", type=str, default="hay",
                         help="the model to be optimized ('hay' - 'hay_ais' - 'hay_ais_hillock')")
+    parser.add_argument("--sim", type=str, default="lfpy",
+                        help="the simulator to be used ('lfpy' - 'neuron')")
     parser.add_argument("--extra-strategy", type=str, default="all",
                         help="The strategy for using extracellular features ('all' - 'single' - 'sections')")
     parser.add_argument("--ipyparallel", action="store_true", default=False,
@@ -99,9 +101,16 @@ def main():
 
     map_function = get_mapper(args)
 
+    sim = args.sim
+    feature_set = args.feature_set
+
+    if feature_set == "extra" and sim == "neuron":
+        print("For 'extra' features use the lfpy simulator. Setting feature_set to 'soma'")
+        feature_set = "soma"
+
     protocols_with_lfp = None
     timeout = 300.
-    if args.feature_set == "extra":
+    if feature_set == "extra":
         protocols_with_lfp = ['IDrest_300']
         timeout = 900.
 
@@ -111,7 +120,7 @@ def main():
         # Load features / protocols / and probe
         data_folder = Path(args.data_folder)
 
-        if args.extra_strategy:
+        if args.extra_strategy and feature_set == "extra":
             feature_file = data_folder / f"features_BPO_{args.extra_strategy}.json"
             protocol_file = data_folder / f"protocols_BPO_{args.extra_strategy}.json"
         else:
@@ -126,7 +135,7 @@ def main():
         if not Path(protocol_file).is_file():
             raise Exception("Couldn't find a protocol json file in the provided folder.")
 
-        if args.feature_set == "extra":
+        if feature_set == "extra":
             probe_file = data_folder / "probe_BPO.json"
             if not os.path.isfile(probe_file):
                 raise Exception("Couldn't find a probe json file in the provided folder.")
@@ -138,16 +147,16 @@ def main():
 
     assert args.cell_folder is not None, "Provide --cell-folder argument to specify where cell models folders are"
     cell_folder = Path(args.cell_folder) / f"{model_name}_model"
-    
+
     if model_name == 'experimental':
         morphology_file = "../data/experimental/210301_3113_cell1/morphology/morphology_corrected.swc"
     else:
-        morphology_file= None
+        morphology_file = None
 
     eva = mf.create_evaluator(
         model_name=model_name,
         cell_model_folder=cell_folder,
-        feature_set=args.feature_set,
+        feature_set=feature_set,
         feature_file=feature_file,
         protocol_file=protocol_file,
         probe_file=probe_file,
@@ -156,6 +165,7 @@ def main():
         extra_recordings=None,
         timeout=timeout,
         abd=abd,
+        simulator=sim,
         **extra_kwargs
     )
 
