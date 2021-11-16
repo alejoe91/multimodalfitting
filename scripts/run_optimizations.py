@@ -1,11 +1,9 @@
 import argparse
-
 import logging
 import os
 import sys
 from pathlib import Path
 import json
-
 from datetime import datetime
 
 import bluepyopt
@@ -14,11 +12,18 @@ import multimodalfitting as mf
 
 logger = logging.getLogger()
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    stream=sys.stdout,
+)
+
 # kwargs for extracellular computation
-extra_kwargs = dict(fs=20,
-                    fcut=[300, 6000],
-                    filt_type="filtfilt",
-                    ms_cut=[3, 10])
+EXTRA_EVALUATOR_KWARGS = dict(
+    fs=20,
+    fcut=[300, 6000],
+    filt_type="filtfilt",
+    ms_cut=[3, 10]
+)
 
 
 def get_parser():
@@ -28,7 +33,7 @@ def get_parser():
     )
     parser.add_argument("--seed", type=int, default=42,
                         help="The seed used for the optimization")
-    parser.add_argument("--cell-folder", type=str, default="../cell_models",
+    parser.add_argument("--cell-folder", type=str, default="../cell_models", required=True,
                         help="The folder where the cell models are (default '../cell_models/')")
     parser.add_argument("--feature-set", type=str, default="extra",
                         help="The feature set to be used ('soma' - 'extra')")
@@ -42,7 +47,7 @@ def get_parser():
                         help="If True ipyparallel is used to parallelize computations (default False)")
     parser.add_argument("--data-folder", type=str, default=None,
                         help="The folder containing the features and protocol json files")
-    parser.add_argument("--opt-folder", type=str, default=None,
+    parser.add_argument("--opt-folder", type=str, default=None, required=True,
                         help="The folder containing the results of optimization "
                              "(default is parent of data_folder/optimization_results)")
     parser.add_argument("--abd", action="store_true", default=False,
@@ -90,14 +95,72 @@ def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed):
     return cp_filename
 
 
+def get_protocols_and_features_paths(data_folder, extra_strategy, feature_set):
+
+    feature_file = data_folder / f"features_BPO_{extra_strategy}.json"
+    protocol_file = data_folder / f"protocols_BPO_{extra_strategy}.json"
+
+    logger.info(f"Feature_file: {str(feature_file)}")
+    logger.info(f"Protocol_file: {str(protocol_file)}")
+
+    if not Path(feature_file).is_file():
+        raise Exception("Couldn't find a feature json file in the provided folder.")
+    if not Path(protocol_file).is_file():
+        raise Exception("Couldn't find a protocol json file in the provided folder.")
+
+    probe_file = None
+    if feature_set == "extra":
+        probe_file = data_folder / "probe_BPO.json"
+        if not os.path.isfile(probe_file):
+            raise Exception("Couldn't find a probe json file in the provided folder.")
+
+    return feature_file, protocol_file, probe_file
+
+
+def save_evaluator_configuration(
+    model_name,
+    cell_folder,
+    feature_set,
+    feature_file,
+    protocol_file,
+    probe_file,
+    protocols_with_lfp,
+    timeout,
+    cp_filename,
+    simulator,
+    abd
+):
+
+    eva_args = dict(model_name=model_name,
+                    cell_model_folder=str(cell_folder),
+                    feature_set=feature_set,
+                    feature_file=str(feature_file),
+                    protocol_file=str(protocol_file),
+                    probe_file=str(probe_file),
+                    protocols_with_lfp=protocols_with_lfp,
+                    extra_recordings=None,
+                    timeout=timeout,
+                    simulator=simulator,
+                    abd=abd)
+
+    eva_args.update(EXTRA_EVALUATOR_KWARGS)
+
+    eva_file = cp_filename.parent / f"{cp_filename.stem}.json"
+    print(eva_file)
+    with eva_file.open("w") as f:
+        json.dump(eva_args, f, indent=4)
+
+
 def main():
 
     args = get_parser().parse_args()
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        stream=sys.stdout,
-    )
+    cell_folder = Path(args.cell_folder) / f"{args.model}_model"
+    data_folder = Path(args.data_folder)
+    if args.opt_folder is None:
+        opt_folder = data_folder.parent / "optimization_results"
+    else:
+        opt_folder = Path(args.opt_folder)
 
     map_function = get_mapper(args)
 
@@ -114,47 +177,17 @@ def main():
         protocols_with_lfp = ['IDrest_300']
         timeout = 900.
 
-    probe_file = None
+    feature_file, protocol_file, probe_file = get_protocols_and_features_paths(
+        data_folder, args.extra_strategy, args.feature_set
+    )
 
-    if args.data_folder is not None:
-        # Load features / protocols / and probe
-        data_folder = Path(args.data_folder)
-
-        if args.extra_strategy and feature_set == "extra":
-            feature_file = data_folder / f"features_BPO_{args.extra_strategy}.json"
-            protocol_file = data_folder / f"protocols_BPO_{args.extra_strategy}.json"
-        else:
-            feature_file = data_folder / "features_BPO.json"
-            protocol_file = data_folder / "protocols_BPO.json"
-
-        print(f"Feature_file: {str(feature_file)}")
-        print(f"Protocol_file: {str(protocol_file)}")
-
-        if not Path(feature_file).is_file():
-            raise Exception("Couldn't find a feature json file in the provided folder.")
-        if not Path(protocol_file).is_file():
-            raise Exception("Couldn't find a protocol json file in the provided folder.")
-
-        if feature_set == "extra":
-            probe_file = data_folder / "probe_BPO.json"
-            if not os.path.isfile(probe_file):
-                raise Exception("Couldn't find a probe json file in the provided folder.")
-    else:
-        raise Exception("Provide --folder argument to specify where BPO files are")
-
-    model_name = args.model
-    abd = args.abd
-
-    assert args.cell_folder is not None, "Provide --cell-folder argument to specify where cell models folders are"
-    cell_folder = Path(args.cell_folder) / f"{model_name}_model"
-
-    if model_name == 'experimental':
+    if args.model == 'experimental':
         morphology_file = "../data/experimental/210301_3113_cell1/morphology/morphology_corrected.swc"
     else:
         morphology_file = None
 
     eva = mf.create_evaluator(
-        model_name=model_name,
+        model_name=args.model,
         cell_model_folder=cell_folder,
         feature_set=feature_set,
         feature_file=feature_file,
@@ -164,9 +197,9 @@ def main():
         morphology_file=morphology_file,
         extra_recordings=None,
         timeout=timeout,
-        abd=abd,
         simulator=sim,
-        **extra_kwargs
+        abd=args.abd,
+        **EXTRA_EVALUATOR_KWARGS
     )
 
     opt = bluepyopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
@@ -178,12 +211,9 @@ def main():
         selector_name="multi_objective"
     )
 
-    if args.opt_folder is None:
-        opt_folder = data_folder.parent / "optimization_results"
-    else:
-        opt_folder = Path(args.opt_folder)
-
-    cp_filename = get_cp_filename(opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed)
+    cp_filename = get_cp_filename(
+        opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed
+    )
 
     if cp_filename.is_file():
         logger.info(f"Continuing from checkpoint: {cp_filename}")
@@ -192,24 +222,21 @@ def main():
         logger.info(f"Saving checkpoint in: {cp_filename}")
         continue_cp = False
 
-    # save evaluator args
-    eva_args = dict(model_name=model_name,
-                    cell_model_folder=str(cell_folder),
-                    feature_set=args.feature_set,
-                    feature_file=str(feature_file),
-                    protocol_file=str(protocol_file),
-                    probe_file=str(probe_file),
-                    protocols_with_lfp=protocols_with_lfp,
-                    extra_recordings=None,
-                    timeout=timeout)
-    eva_args.update(extra_kwargs)
+    save_evaluator_configuration(
+        args.model,
+        cell_folder,
+        args.feature_set,
+        feature_file,
+        protocol_file,
+        probe_file,
+        protocols_with_lfp,
+        timeout,
+        cp_filename,
+        simulator=sim,
+        abd=args.abd,
+    )
 
-    eva_file = cp_filename.parent / f"{cp_filename.stem}.json"
-    print(eva_file)
-    with eva_file.open("w") as f:
-        json.dump(eva_args, f, indent=4)
-
-    opt.run(max_ngen=args.maxgen, cp_filename=cp_filename, continue_cp=continue_cp)
+    opt.run(max_ngen=args.maxgen, cp_filename=str(cp_filename), continue_cp=continue_cp)
 
 
 if __name__ == '__main__':
