@@ -39,6 +39,8 @@ def get_parser():
                         help="The feature set to be used ('soma' - 'extra')")
     parser.add_argument("--model", type=str, default="hay",
                         help="the model to be optimized ('hay' - 'hay_ais' - 'hay_ais_hillock')")
+    parser.add_argument("--sim", type=str, default="lfpy",
+                        help="the simulator to be used ('lfpy' - 'neuron')")
     parser.add_argument("--extra-strategy", type=str, default="all",
                         help="The strategy for using extracellular features ('all' - 'single' - 'sections')")
     parser.add_argument("--ipyparallel", action="store_true", default=False,
@@ -124,7 +126,9 @@ def save_evaluator_configuration(
     probe_file,
     protocols_with_lfp,
     timeout,
-    cp_filename
+    cp_filename,
+    simulator,
+    abd
 ):
 
     eva_args = dict(model_name=model_name,
@@ -135,7 +139,9 @@ def save_evaluator_configuration(
                     probe_file=str(probe_file),
                     protocols_with_lfp=protocols_with_lfp,
                     extra_recordings=None,
-                    timeout=timeout)
+                    timeout=timeout,
+                    simulator=simulator,
+                    abd=abd)
 
     eva_args.update(EXTRA_EVALUATOR_KWARGS)
 
@@ -158,9 +164,16 @@ def main():
 
     map_function = get_mapper(args)
 
+    sim = args.sim
+    feature_set = args.feature_set
+
+    if feature_set == "extra" and sim == "neuron":
+        print("For 'extra' features use the lfpy simulator. Setting feature_set to 'soma'")
+        feature_set = "soma"
+
     protocols_with_lfp = None
     timeout = 300.
-    if args.feature_set == "extra":
+    if feature_set == "extra":
         protocols_with_lfp = ['IDrest_300']
         timeout = 900.
 
@@ -176,7 +189,7 @@ def main():
     eva = mf.create_evaluator(
         model_name=args.model,
         cell_model_folder=cell_folder,
-        feature_set=args.feature_set,
+        feature_set=feature_set,
         feature_file=feature_file,
         protocol_file=protocol_file,
         probe_file=probe_file,
@@ -184,6 +197,7 @@ def main():
         morphology_file=morphology_file,
         extra_recordings=None,
         timeout=timeout,
+        simulator=sim,
         abd=args.abd,
         **EXTRA_EVALUATOR_KWARGS
     )
@@ -217,7 +231,9 @@ def main():
         probe_file,
         protocols_with_lfp,
         timeout,
-        cp_filename
+        cp_filename,
+        simulator=sim,
+        abd=args.abd,
     )
 
     opt.run(max_ngen=args.maxgen, cp_filename=str(cp_filename), continue_cp=continue_cp)

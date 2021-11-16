@@ -32,4 +32,5 @@ python3 run_optimizations.py --ipyparallel                            \
                              --model=${OPT_MODEL}                     \
                              --data-folder=${DATA_FOLDER}             \
                              --opt-folder=${OPT_FOLDER}               \
-                             --extra-strategy=${OPT_EXTRA_STRATEGY}
+                             --extra-strategy=${OPT_EXTRA_STRATEGY}   \
+                             --sim=${SIM}
