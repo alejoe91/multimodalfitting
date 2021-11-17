@@ -184,7 +184,7 @@ def define_stimuli(protocol_definition, simulator="lfpy"):
     """
     stimuli = []
 
-    if simulator == "lfpy":
+    if simulator.lower() == "lfpy":
         stimulus_class = ephys.stimuli.LFPySquarePulse
     else:
         stimulus_class = ephys.stimuli.NrnSquarePulse
@@ -312,7 +312,7 @@ def define_test_step_protocol(step_amplitude=0.5, tot_duration=500, delay=50,
     }
     recordings = define_recordings(protocol_name, protocol_definition, probe)
 
-    stimuli = define_stimuli(protocol_definition)
+    stimuli = define_stimuli(protocol_definition, simulator=simulator)
 
     protocol = ephys.protocols.SweepProtocol(
         protocol_name, stimuli, recordings, cvode_active=True
@@ -618,7 +618,6 @@ def create_evaluator(
                     "Probe must be provided for 'extra' feature set with"
                     "'probe_type' or 'probe_file' arguments"
                 )
-
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 
     fitness_protocols = define_protocols(
@@ -640,7 +639,7 @@ def create_evaluator(
         **extra_kwargs
     )
 
-    if simulator == "lfpy":
+    if simulator.lower() == "lfpy":
         sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
                                              mechs_folders=cell_model_folder)
     else:
