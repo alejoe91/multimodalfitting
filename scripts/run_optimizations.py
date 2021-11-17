@@ -201,7 +201,9 @@ def main():
                     probe_file=str(probe_file),
                     protocols_with_lfp=protocols_with_lfp,
                     extra_recordings=None,
-                    timeout=timeout)
+                    timeout=timeout,
+                    simulator=sim,
+                    abd=abd)
     eva_args.update(extra_kwargs)
 
     eva_file = cp_filename.parent / f"{cp_filename.stem}.json"
