@@ -414,7 +414,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
 
     cell_model_folder = Path(cell_model_folder)
 
-    if model_type.lower() == "LFPy":
+    if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
         model_kwargs = {'v_init': v_init}
     else:
