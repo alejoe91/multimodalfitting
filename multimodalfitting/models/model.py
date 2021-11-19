@@ -126,7 +126,8 @@ def define_electrode(
     return probe
 
 
-def define_parameters(cell_model_folder, parameter_file=None, release=False, v_init=None, abd=False):
+def define_parameters(cell_model_folder, parameter_file=None, release=False, v_init=None, abd=False,
+                      ra_fixed=True):
     """
     Defines parameters
 
@@ -153,6 +154,8 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
             param_file_name = "parameters"
         if abd:
             param_file_name += "_abd"
+        if not ra_fixed:
+            param_file_name += "_ra"
 
         param_configs = json.load(
             open(path_params / f"{param_file_name}.json"))
@@ -251,18 +254,22 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
                 param_dependancies = param_config.get("dependencies", None)
 
             if param_config["type"] == "section":
-                parameters.append(
-                    ephys.parameters.NrnSectionParameter(
-                        name=name,
-                        param_name=param_config["param_name"],
-                        value_scaler=scaler,
-                        value=value,
-                        frozen=frozen,
-                        bounds=bounds,
-                        locations=seclist_loc,
-                        param_dependancies=param_dependancies
+                for sec in seclist_loc:
+                    name = f"{param_config['param_name']}_{sec}"
+                    param_dependancies = param_config.get("dependencies", None)
+                    
+                    parameters.append(
+                        ephys.parameters.NrnSectionParameter(
+                            name=name,
+                            param_name=param_config["param_name"],
+                            value_scaler=scaler,
+                            value=value,
+                            frozen=frozen,
+                            bounds=bounds,
+                            locations=seclist_loc,
+                            param_dependancies=param_dependancies
+                        )
                     )
-                )
 
             elif param_config["type"] == "range":
                 parameters.append(
@@ -435,7 +442,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
 
 
 def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None, model_type="LFPy",
-                              abd=False, **morph_kwargs):
+                              abd=False, ra_fixed=True, **morph_kwargs):
     """Create experimental cell model
 
 
@@ -456,6 +463,9 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         by default "LFPy"
     abd: bool
         If True, the axon-bearing-dendrite section is used. Default False
+    ra_fixed: bool
+        If True, the Ra for axon_bering_dendrite and axon_initial_segment is fixed. 
+        If False, it is a free parameter to optimize. Default True
     **morph_kwargs: kwargs for morphology modifiers
 
     Returns
@@ -464,7 +474,7 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         The BluePyOpt model object
     """
     morph_modifiers = [fix_morphology_exp]
-    
+
     assert model_type.lower() in ["lfpy", "neuron"]
 
     if abd:
@@ -498,7 +508,7 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         morph_modifiers_kwargs=morph_kwargs
     )
 
-    if model_type.lower == "lfpy":
+    if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
         model_kwargs = {'v_init': v_init}
     else:
@@ -509,7 +519,8 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         model_name,
         morph=morphology,
         mechs=define_mechanisms(cell_model_folder, abd=abd),
-        params=define_parameters(cell_model_folder, release=release, v_init=v_init, abd=abd),
+        params=define_parameters(cell_model_folder, release=release, v_init=v_init, abd=abd,
+                                 ra_fixed=ra_fixed),
         seclist_names=seclist_names,
         secarray_names=secarray_names,
         **model_kwargs
