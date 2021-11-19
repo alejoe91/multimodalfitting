@@ -52,6 +52,8 @@ def get_parser():
                              "(default is parent of data_folder/optimization_results)")
     parser.add_argument("--abd", action="store_true", default=False,
                         help="If True and model is 'experimental', the ABD section is used")
+    parser.add_argument("--ra", action="store_true", default=True,
+                        help="If True and model is 'experimental' and abd is used, Ra in ABD and AIS is also optimized")
     parser.add_argument("--offspring", type=int, default=20,
                         help="The population size (offspring) - default 20")
     parser.add_argument("--maxgen", type=int, default=2000,
@@ -128,7 +130,8 @@ def save_evaluator_configuration(
     timeout,
     cp_filename,
     simulator,
-    abd
+    abd,
+    optimize_ra
 ):
 
     eva_args = dict(model_name=model_name,
@@ -141,7 +144,8 @@ def save_evaluator_configuration(
                     extra_recordings=None,
                     timeout=timeout,
                     simulator=simulator,
-                    abd=abd)
+                    abd=abd,
+                    optimize_ra=optimize_ra)
 
     eva_args.update(EXTRA_EVALUATOR_KWARGS)
 
@@ -199,6 +203,7 @@ def main():
         timeout=timeout,
         simulator=sim,
         abd=args.abd,
+        optimize_ra=args.ra,
         **EXTRA_EVALUATOR_KWARGS
     )
 
