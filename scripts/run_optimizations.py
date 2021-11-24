@@ -254,7 +254,7 @@ def main():
         cp_filename,
         simulator=sim,
         abd=args.abd,
-        ra=args.ra
+        optimize_ra=args.ra
     )
 
     opt.run(max_ngen=args.maxgen, cp_filename=str(cp_filename), continue_cp=continue_cp)
