@@ -39,6 +39,8 @@ def get_parser():
                         help="The feature set to be used ('soma' - 'extra')")
     parser.add_argument("--model", type=str, default="hay",
                         help="the model to be optimized ('hay' - 'hay_ais' - 'hay_ais_hillock')")
+    parser.add_argument("--morphology", type=str, default="",
+                        help="the path to the morphology file (required for experimental models)")
     parser.add_argument("--sim", type=str, default="lfpy",
                         help="the simulator to be used ('lfpy' - 'neuron')")
     parser.add_argument("--extra-strategy", type=str, default="all",
@@ -197,7 +199,8 @@ def main():
     )
 
     if args.model == 'experimental':
-        morphology_file = "../data/experimental/210301_3113_cell1/morphology/morphology_corrected.swc"
+        assert Path(args.morphology).is_file(), f"The morphology {args.morphology} doesn't exist!"
+        morphology_file = args.morphology
     else:
         morphology_file = None
 
@@ -229,7 +232,7 @@ def main():
 
     # add abd and ra
     cp_filename = get_cp_filename(
-        opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed, args.ra, args.abd
+        opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed, args.abd, args.ra
     )
 
     if cp_filename.is_file():
@@ -251,6 +254,7 @@ def main():
         cp_filename,
         simulator=sim,
         abd=args.abd,
+        ra=args.ra
     )
 
     opt.run(max_ngen=args.maxgen, cp_filename=str(cp_filename), continue_cp=continue_cp)
