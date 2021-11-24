@@ -552,6 +552,7 @@ def create_evaluator(
         morphology_file=None,
         v_init=None,
         abd=False,
+        optimize_ra=False,
         simulator="lfpy",
         **extra_kwargs
 ):
@@ -590,6 +591,8 @@ def create_evaluator(
         Timeout in seconds
     abd: bool
         If True and model is 'experimental', the ABD section is used
+    optimize_ra: bool
+        If True and abd is True, Ra is also oprimized for AIS and ABD
     simulator: str
         The simulator and cell models to use. "lfpy" | "neuron"
     extra_kwargs: keyword arguments for computing extracellular signals.
@@ -603,7 +606,7 @@ def create_evaluator(
     if model_name == 'experimental':
         assert morphology_file is not None, "Experimental model requires morphology file to be specified."
         cell = create_experimental_model(morphology_file, cell_model_folder, v_init=v_init, abd=abd,
-                                         model_type=simulator)
+                                         optimize_ra=optimize_ra, model_type=simulator)
     else:
         cell = create_ground_truth_model(model_name, cell_model_folder, release=release, v_init=v_init,
                                          model_type=simulator)

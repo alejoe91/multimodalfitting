@@ -43,7 +43,7 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
             child_y = sim.neuron.h.section_orientation(sec=child)
             sim.neuron.h.disconnect(sec=child)
             child.connect(sec_ais, parent_x, child_y)
-        
+
         # delete original apical section
         sim.neuron.h.pt3dclear(sec=sec)
         sim.neuron.h.delete_section(sec=sec)
@@ -51,22 +51,19 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
 
         # this should fix the morphology issue
         sim.neuron.h.pt3dconst(1, sec=sec_ais)
-       
+
         # add ais to section lists
         icell.axon_initial_segment.append(sec=sec_ais)
         icell.all.append(sec=sec_ais)
-    
+
     # set number of segments
     for index, section in enumerate(icell.axon_initial_segment):
         section.nseg = nseg_ais
-        
-    logger.debug(
-        f"Replace apic sections with AIS section with {nseg_ais} segments"
-        )
+
+    logger.debug(f"Replace apic sections with AIS section with {nseg_ais} segments")
 
     # add ABD
     if abd:
-        print("Adding ABD sections")
         ais_sec = icell.ais[0]
         abd_sections = []
         sec = ais_sec
@@ -80,9 +77,11 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
 
         sim.neuron.h.execute(f"create abd[{len(abd_sections)}]", icell)
 
+        logger.debug(f"Adding {len(abd_sections)} ABD sections")
+
         for i, sec in enumerate(abd_sections[::-1]):
             sec_abd = icell.abd[i]
-            print(i, f"{sec.name()} is now {sec_abd.name()}")
+            logger.debug(f"{sec.name()} is now {sec_abd.name()}")
 
             # add 3d points
             n3d = sec.n3d()
@@ -95,13 +94,10 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
             parent_x = sim.neuron.h.parent_connection(sec=sec)
             child_y = sim.neuron.h.section_orientation(sec=sec)
 
-            # print(f"Parent: Connecting {sec_abd.name()} {child_y} to {parent_abd.name()}{parent_x}")
             sec_abd.connect(parent_abd, parent_x, child_y)
-            # print("Children")
             for child in children_abd:
                 parent_x = sim.neuron.h.parent_connection(sec=child)
                 child_y = sim.neuron.h.section_orientation(sec=child)
-                # print(f"Connecting {sec_abd.name()}{parent_x} to {child.name()}{child_y}")
                 sim.neuron.h.disconnect(sec=child)
                 child.connect(sec_abd, parent_x, child_y)
 

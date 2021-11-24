@@ -212,8 +212,7 @@ ecodes_model_timings = {
 
 
 ###### READERS ########
-
-def wcp_reader(in_data):
+def wcp_reader(in_data, voltage_channel=0, current_channel=0):
     """Reader for .wcp
 
     Args:
@@ -239,10 +238,24 @@ def wcp_reader(in_data):
     data = []
     for segment in block.segments:
 
+        voltage_array = segment.analogsignals[0].as_array()
+        current_array = segment.analogsignals[1].as_array()
+        sr = segment.analogsignals[0].sampling_rate
+        dt = 1.0 / sr.magnitude
+
+        if voltage_array.shape[1] > 1:
+            voltage_trace = voltage_array[:, voltage_channel]
+        else:
+            voltage_trace = np.squeeze(voltage_array)
+        if current_array.shape[1] > 1:
+            current_trace = current_array[:, current_channel]
+        else:
+            current_trace = np.squeeze(current_array)
+
         trace_data = {
-            "voltage": np.array(segment.analogsignals[0]).flatten(),
-            "current": np.array(segment.analogsignals[1]).flatten(),
-            "dt": 1.0 / int(segment.analogsignals[0].sampling_rate)
+            "voltage": voltage_trace,
+            "current": current_trace,
+            "dt": dt
         }
 
         data.append(trace_data)

@@ -7,8 +7,16 @@ exp_folder='../data/experimental/210301_3113_cell1/efeatures'
 hay_folder='../data/models/hay_ecode_probe_planar/efeatures'
 hayais_folder='../data/models/hay_ais_ecode_probe_planar/efeatures'
 
+# this is required for experimental models
+export MORPHOLOGY_FILE="../data/experimental/210301_3113_cell1/morphology/morphology_corrected.swc"
+
 export CELL_FOLDER="../cell_models"
 export OPT_FOLDER="../optimization_results"
+
+# if ABD is true, the axon_bearing_dendrite is added to the sections
+export ABD=false
+# if RA is true, the Ra for AIS and ABD are optimized separately
+export RA=false
 
 # set correct folder for optimization
 if [ $OPT_MODEL == "experimental" ];

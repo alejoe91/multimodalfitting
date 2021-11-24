@@ -39,6 +39,8 @@ def get_parser():
                         help="The feature set to be used ('soma' - 'extra')")
     parser.add_argument("--model", type=str, default="hay",
                         help="the model to be optimized ('hay' - 'hay_ais' - 'hay_ais_hillock')")
+    parser.add_argument("--morphology", type=str, default="",
+                        help="the path to the morphology file (required for experimental models)")
     parser.add_argument("--sim", type=str, default="lfpy",
                         help="the simulator to be used ('lfpy' - 'neuron')")
     parser.add_argument("--extra-strategy", type=str, default="all",
@@ -52,6 +54,8 @@ def get_parser():
                              "(default is parent of data_folder/optimization_results)")
     parser.add_argument("--abd", action="store_true", default=False,
                         help="If True and model is 'experimental', the ABD section is used")
+    parser.add_argument("--ra", action="store_true", default=True,
+                        help="If True and model is 'experimental' and abd is used, Ra in ABD and AIS is also optimized")
     parser.add_argument("--offspring", type=int, default=20,
                         help="The population size (offspring) - default 20")
     parser.add_argument("--maxgen", type=int, default=2000,
@@ -81,13 +85,24 @@ def get_mapper(args):
         return None
 
 
-def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed):
+def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed, abd, ra):
 
+    cp_folder = opt_folder / 'checkpoints'
     if extra_strategy is not None:
-        cp_filename = opt_folder / 'checkpoints' / \
-                      f'model={model}_featureset={feature_set}_strategy={extra_strategy}_seed={seed}'
+        cp_name = f'model={model}_featureset={feature_set}_strategy={extra_strategy}'
     else:
-        cp_filename = opt_folder / 'checkpoints' / f'model={model}_featureset={feature_set}_seed={seed}'
+        cp_name = f'model={model}_featureset={feature_set}'
+
+    if abd:
+        cp_name = cp_name + "_abd"
+
+    if ra:
+        cp_name = cp_name + "_ra"
+
+    # add seed
+    cp_name = cp_name + f"_seed={seed}"
+
+    cp_filename = cp_folder / cp_name
 
     if not cp_filename.parent.is_dir():
         os.makedirs(cp_filename.parent)
@@ -128,7 +143,8 @@ def save_evaluator_configuration(
     timeout,
     cp_filename,
     simulator,
-    abd
+    abd,
+    optimize_ra
 ):
 
     eva_args = dict(model_name=model_name,
@@ -141,7 +157,8 @@ def save_evaluator_configuration(
                     extra_recordings=None,
                     timeout=timeout,
                     simulator=simulator,
-                    abd=abd)
+                    abd=abd,
+                    optimize_ra=optimize_ra)
 
     eva_args.update(EXTRA_EVALUATOR_KWARGS)
 
@@ -182,7 +199,8 @@ def main():
     )
 
     if args.model == 'experimental':
-        morphology_file = "../data/experimental/210301_3113_cell1/morphology/morphology_corrected.swc"
+        assert Path(args.morphology).is_file(), f"The morphology {args.morphology} doesn't exist!"
+        morphology_file = args.morphology
     else:
         morphology_file = None
 
@@ -199,6 +217,7 @@ def main():
         timeout=timeout,
         simulator=sim,
         abd=args.abd,
+        optimize_ra=args.ra,
         **EXTRA_EVALUATOR_KWARGS
     )
 
@@ -211,8 +230,9 @@ def main():
         selector_name="multi_objective"
     )
 
+    # add abd and ra
     cp_filename = get_cp_filename(
-        opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed
+        opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed, args.abd, args.ra
     )
 
     if cp_filename.is_file():
@@ -234,6 +254,7 @@ def main():
         cp_filename,
         simulator=sim,
         abd=args.abd,
+        optimize_ra=args.ra
     )
 
     opt.run(max_ngen=args.maxgen, cp_filename=str(cp_filename), continue_cp=continue_cp)
