@@ -83,13 +83,24 @@ def get_mapper(args):
         return None
 
 
-def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed):
+def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed, abd, ra):
 
+    cp_folder = opt_folder / 'checkpoints'
     if extra_strategy is not None:
-        cp_filename = opt_folder / 'checkpoints' / \
-                      f'model={model}_featureset={feature_set}_strategy={extra_strategy}_seed={seed}'
+        cp_name = f'model={model}_featureset={feature_set}_strategy={extra_strategy}'
     else:
-        cp_filename = opt_folder / 'checkpoints' / f'model={model}_featureset={feature_set}_seed={seed}'
+        cp_name = f'model={model}_featureset={feature_set}'
+
+    if abd:
+        cp_name = cp_name + "_abd"
+
+    if ra:
+        cp_name = cp_name + "_ra"
+
+    # add seed
+    cp_name = cp_name + f"_seed={seed}"
+
+    cp_filename = cp_folder / cp_name
 
     if not cp_filename.parent.is_dir():
         os.makedirs(cp_filename.parent)
@@ -216,8 +227,9 @@ def main():
         selector_name="multi_objective"
     )
 
+    # add abd and ra
     cp_filename = get_cp_filename(
-        opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed
+        opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed, args.ra, args.abd
     )
 
     if cp_filename.is_file():
