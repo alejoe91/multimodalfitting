@@ -8,7 +8,7 @@ hay_folder='../data/models/hay_ecode_probe_planar/efeatures'
 hayais_folder='../data/models/hay_ais_ecode_probe_planar/efeatures'
 
 # this is required for experimental models
-export MORPHOLOGY_FILE="../data/experimental/210301_3113_cell1/morphology/morphology_corrected.swc"
+export MORPHOLOGY_FILE="../experimental_data/210301_3113_cell1/morphology/morphology_corrected.swc"
 
 export CELL_FOLDER="../cell_models"
 export OPT_FOLDER="../optimization_results"
