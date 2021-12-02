@@ -507,7 +507,10 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
     model_name = "experimental"
 
     if v_init is None:
-        v_init = -70
+        if "3113" in morphology_file.name:
+            v_init = -70
+        else:
+            v_init = -84
 
     morphology = ephys.morphologies.NrnFileMorphology(
         str(morphology_file),

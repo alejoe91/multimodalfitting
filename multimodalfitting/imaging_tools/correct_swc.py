@@ -7,7 +7,7 @@ swc_dtype = np.dtype([('id', "int32"), ('type', "int16"),
 
 
 def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
-                min_diam_value=0.11, interp=True, smooth=True,
+                min_radius_value=0.11, interp=True, smooth=True,
                 soma_radius=None, reset_tags=[[4, 3], [7, 4]], save=True):
     """
     Correct an SWC morphology by interpolating missing diameters (below min_diam_value) and smoothing the
@@ -21,7 +21,7 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
         The output swc file
     smooth_samples: int
         Number of points for smoothing
-    min_diam_value: float
+    min_radius_value: float
         Minimum diameter in um to consider it "missing" and to interpolate
     interp: bool
         If True (default), missing diameters are interpolated
@@ -46,8 +46,11 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
     corrected_idxs = np.array([], dtype="int")
     n_missing_values = 0
 
-    for i_br, init in enumerate(initial_branches):
+    if not interp:
+        min_radius_idxs = np.where(old_radii < min_radius_value)[0]
+        new_radii[min_radius_idxs] = min_radius_value
 
+    for i_br, init in enumerate(initial_branches):
         if i_br < len(initial_branches) - 1:
             idxs = range(init, initial_branches[i_br + 1])
         else:
@@ -57,7 +60,7 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
 
         if interp:
             # interpolate min values
-            min_radius_idxs = np.where(old_radii[idxs] < min_diam_value)
+            min_radius_idxs = np.where(old_radii[idxs] < min_radius_value)
             if len(min_radius_idxs[0]) > 0:
                 min_radius_idxs = min_radius_idxs[0]
                 n_missing_values += len(min_radius_idxs)
@@ -104,11 +107,17 @@ def correct_swc(input_swc_file, output_swc_file, smooth_samples=10,
 
         if smooth:
             # smooth
-            new_radii[idxs] = np.convolve(new_radii[idxs], np.ones(smooth_samples) / \
-                                          smooth_samples, mode='same')
+            if len(idxs) > smooth_samples:
+                new_radii[idxs] = np.convolve(new_radii[idxs], np.ones(smooth_samples) / 
+                                              smooth_samples, mode='same')
+            else:
+                print(f"Skipped path {i_br} because it has {len(idxs)} points")
 
     if interp:
         print(f"Interpolated diameters of {n_missing_values} out of {len(swc_data)} points")
+
+    min_radius_idxs = np.where(new_radii < min_radius_value)[0]
+    new_radii[min_radius_idxs] = min_radius_value
 
     swc_corrected = deepcopy(swc_data)
     swc_corrected["radius"] = new_radii
