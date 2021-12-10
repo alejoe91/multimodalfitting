@@ -18,6 +18,9 @@ soma_loc = ephys.locations.NrnSeclistCompLocation(
     name="soma", seclist_name="somatic", sec_index=0, comp_x=0.5
 )
 
+this_file = Path(__file__)
+cell_models_folder = this_file.parent.parent.parent / "cell_models"
+
 
 def get_protocol_definitions(model_name, protocols_file=None):
     """
@@ -129,7 +132,6 @@ def define_recordings(protocol_name, protocol_definition, electrode=None, extra_
                     variable=recording_definition["var"],
                 )
             )
-
     if extra_recordings is not None:
         # check for substring
         if protocol_name in extra_recordings:
@@ -268,7 +270,7 @@ def define_protocols(
 
 def define_test_step_protocol(step_amplitude=0.5, tot_duration=500, delay=50,
                               step_duration=400, probe=None, protocol_name="TestStep",
-                              simulator="lfpy"):
+                              simulator="lfpy", extra_recordings=None):
     """Generates test protocol with a current pulse.
 
     Parameters
@@ -310,7 +312,7 @@ def define_test_step_protocol(step_amplitude=0.5, tot_duration=500, delay=50,
           }
         ]
     }
-    recordings = define_recordings(protocol_name, protocol_definition, probe)
+    recordings = define_recordings(protocol_name, protocol_definition, probe, extra_recordings=extra_recordings)
 
     stimuli = define_stimuli(protocol_definition, simulator=simulator)
 
@@ -539,25 +541,31 @@ def define_fitness_calculator(
 
 def create_evaluator(
         model_name,
-        cell_model_folder,
         feature_set,
-        feature_file,
-        protocol_file,
-        probe_file=None,
-        probe_type=None,
+        extra_strategy=None,
         protocols_with_lfp=None,
         extra_recordings=None,
+        cell_folder=None,
         release=False,
         timeout=900.,
-        morphology_file=None,
-        v_init=None,
         abd=False,
         optimize_ra=False,
         simulator="lfpy",
+        sim=None,
         **extra_kwargs
 ):
     """
     Prepares objects for optimization of the model.
+    The cell model folder ("multimodal_fitting/cell_models/{model_name}") needs to have the following files:
+    * a morphology file (swc or asc with "morphology" in the file name)
+    * mechanisms.json
+    * parameters.json and parameters_release.json (for experimental models also abd and abd_ra versions)
+    * a mechanism folder with the mod files
+    * a fitting folder with:
+        * probe_BPO.json (description of the probe)
+        * protocols_BPO_{}.json (protocol files for 'all', 'sections', and 'single' extra strategies)
+        * features_BPO_{}.json (feature files for 'all', 'sections', and 'single' extra strategies)
+        * holding_threshold_currents.json (information about hilding current)
 
     Parameters
     ----------
@@ -565,16 +573,12 @@ def create_evaluator(
         "hay", "hay_ais", or "hallermann"
     feature_set: str
         "soma", "extra"
-    feature_file: str or Path
-        Path to feature json file
-    protocol_file: str or Path
-        Path to feature json file
-    probe_file: Path or None
-        If given, the probe is loaded from the provided file (.json)
-    probe_type: str or MEAutility.MEA
-        If string, it can be "linear" or "planar", otherwise any MEAutility.MEA objects can be used
+    extra_strategy: str or None
+        "all", "sections", "single" (only needed if feature_set is "extra")
     protocols_with_lfp: list or None
         If given, the list of protocols to compute LFP from
+    cell_folder: path or None
+        If given, the cell_folder where the model_name folder is. Default is "multimodal/cell_folders"
     extra_recordings: dict or None
         If given, it specifies a set of extra recordings to add to a specific protocol. It needs to be in the form of:
         extra_recordings = {"protocol_name": [
@@ -602,32 +606,43 @@ def create_evaluator(
     CellEvaluator
     """
     probe = None
-
-    if model_name == 'experimental':
-        assert morphology_file is not None, "Experimental model requires morphology file to be specified."
-        cell = create_experimental_model(morphology_file, cell_model_folder, v_init=v_init, abd=abd,
-                                         optimize_ra=optimize_ra, model_type=simulator)
+    if extra_strategy:
+        assert extra_strategy in ["all", "sections", "single"]
+    if model_name not in ['hay', 'hay_ais', 'hay_ais_hillock']:
+        cell = create_experimental_model(model_name=model_name, abd=abd, optimize_ra=optimize_ra, model_type=simulator)
     else:
-        cell = create_ground_truth_model(model_name, cell_model_folder, release=release, v_init=v_init,
-                                         model_type=simulator)
+        cell = create_ground_truth_model(model_name=model_name, release=release, model_type=simulator)
+
+    if cell_folder is None:
+        cell_folder = cell_models_folder
+    cell_model_folder = cell_folder / model_name
+    fitting_folder = cell_model_folder / "fitting"
+    efeatures_folder = fitting_folder / "efeatures"
+
+    assert efeatures_folder.is_dir(), f"Couldn't find fitting folder {efeatures_folder}"
 
     if feature_set == "extra":
-        if probe_file is not None:
-            probe = define_electrode(probe_file=probe_file)
-        elif probe_type is not None:
-            probe = define_electrode(probe_type=probe_type)
-        else:
-            raise Exception(
-                    "Probe must be provided for 'extra' feature set with"
-                    "'probe_type' or 'probe_file' arguments"
-                )
+        probe_file = efeatures_folder / "probe_BPO.json"
+        assert probe_file.is_file() is not None, f"Couldn't find probe file {probe_file}"
+        probe = define_electrode(probe_file=probe_file)
+
+        assert extra_strategy is not None, "'extra_strategy' must be specified for 'extra' feature_set"
+    else:
+        extra_strategy = "all"
+
+    features_file = efeatures_folder / f"features_BPO_{extra_strategy}.json"
+    protocols_file = efeatures_folder / f"protocols_BPO_{extra_strategy}.json"
+
+    assert features_file.is_file() is not None, f"Couldn't find features file {features_file}"
+    assert protocols_file.is_file() is not None, f"Couldn't find protocols file {protocols_file}"
+
     param_names = [param.name for param in cell.params.values() if not param.frozen]
 
     fitness_protocols = define_protocols(
         model_name,
         feature_set=feature_set,
-        feature_file=feature_file,
-        protocols_file=protocol_file,
+        feature_file=features_file,
+        protocols_file=protocols_file,
         electrode=probe,
         protocols_with_lfp=protocols_with_lfp,
         extra_recordings=extra_recordings,
@@ -636,18 +651,19 @@ def create_evaluator(
 
     fitness_calculator, _ = define_fitness_calculator(
         protocols=fitness_protocols,
-        feature_file=feature_file,
+        feature_file=features_file,
         feature_set=feature_set,
         probe=probe,
         **extra_kwargs
     )
 
-    if simulator.lower() == "lfpy":
-        sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
-                                             mechs_folders=cell_model_folder)
-    else:
-        sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,
-                                            mechs_folders=cell_model_folder)
+    if sim is None:
+        if simulator.lower() == "lfpy":
+            sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
+                                                 mechs_folders=cell_model_folder)
+        else:
+            sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,
+                                                mechs_folders=cell_model_folder)
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,

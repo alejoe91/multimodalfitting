@@ -396,10 +396,10 @@ def save_extracellular_template(responses, protocols, protocol_name,
     locations = probe.positions
 
     output_folder = Path(output_folder)
-    (output_folder / "extracellular").mkdir(exist_ok=True, parents=True)
-    np.save(output_folder / "extracellular" / "template.npy", eap)
-    np.save(output_folder / "extracellular" / "locations.npy", locations)
-    np.save(output_folder / "extracellular" / "fs.npy", resample_rate_khz * 1000)
+    output_folder.mkdir(exist_ok=True, parents=True)
+    np.save(output_folder / "template.npy", eap)
+    np.save(output_folder / "locations.npy", locations)
+    np.save(output_folder / "fs.npy", resample_rate_khz * 1000)
 
     return eap, locations
 
@@ -432,4 +432,3 @@ def _interpolate_response(response, fs=20.0):
         response_new[other] = ynew
 
     return response_new
-

@@ -25,8 +25,8 @@ sleep 20
 srun --mpi=none ipengine --profile=${IPYTHON_PROFILE} &
 sleep 20
 
-cmd="python3 run_optimizations.py --ipyparallel --cell-folder=${CELL_FOLDER} --seed=${OPT_SEED} 
---feature-set=${OPT_FEATURE_SET} --model=${OPT_MODEL} --data-folder=${DATA_FOLDER} --opt-folder=${OPT_FOLDER} 
+cmd="python3 run_optimizations.py --ipyparallel --seed=${OPT_SEED} 
+--feature-set=${OPT_FEATURE_SET} --model=${OPT_MODEL} --opt-folder=${OPT_FOLDER} 
 --extra-strategy=${OPT_EXTRA_STRATEGY} --sim=${SIM}"
 
 if [ ${ABD} = true] ; then
