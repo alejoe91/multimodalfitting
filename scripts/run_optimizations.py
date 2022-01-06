@@ -48,13 +48,13 @@ def get_parser():
     parser.add_argument("--opt-folder", type=str, default=None, required=True,
                         help="The folder containing the results of optimization "
                              "(default is parent of ./optimization_results)")
-    parser.add_argument("--abd", action="store_true", default=False,
+    parser.add_argument("--abd", type=int, default=0,
                         help="If True and model is 'experimental', the ABD section is used")
-    parser.add_argument("--ra", action="store_true", default=False,
+    parser.add_argument("--ra", type=int, default=0,
                         help="If True and model is 'experimental' and abd is used, Ra in ABD and AIS is also optimized")
     parser.add_argument("--offspring", type=int, default=20,
                         help="The population size (offspring) - default 20")
-    parser.add_argument("--maxgen", type=int, default=2000,
+    parser.add_argument("--maxgen", type=int, default=600,
                         help="The maximum number of generations - default 2000")
 
     return parser
@@ -167,7 +167,7 @@ def main():
         feature_set=feature_set,
         extra_strategy=args.extra_strategy,
         protocols_with_lfp=protocols_with_lfp,
-        cell_folder=args.cell_folder,
+        cell_folder=Path(args.cell_folder),
         extra_recordings=None,
         timeout=timeout,
         simulator=sim,
@@ -202,7 +202,7 @@ def main():
         feature_set=args.feature_set,
         extra_strategy=args.extra_strategy,
         protocols_with_lfp=protocols_with_lfp,
-        cell_folder=args.cell_folder,
+        cell_folder=Path(args.cell_folder),
         timeout=timeout,
         cp_filename=cp_filename,
         simulator=sim,

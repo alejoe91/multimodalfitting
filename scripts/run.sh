@@ -3,11 +3,12 @@ export OPT_MODEL='hay'  # hay | hay_ais | experimental | cell1_210301_3113 | cel
 export SIM='lfpy' # lfpy | neuron
 
 export OPT_FOLDER="../optimization_results"
+export CELL_FOLDER="../cell_models"
 
 # if ABD is true, the axon_bearing_dendrite is added to the sections
-export ABD=false
+export OPT_ABD=0
 # if RA is true, the Ra for AIS and ABD are optimized separately
-export RA=false
+export OPT_RA=0
 
 for seed in {1..10}; do
   export OPT_SEED=${seed}
