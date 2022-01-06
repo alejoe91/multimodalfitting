@@ -1,6 +1,6 @@
-export OPT_MODEL='cell1_211006_3148'
+export OPT_MODEL='hay'
 export OPT_FEATURE_SET='extra'
-export OPT_EXTRA_STRATEGY='single'
+export OPT_EXTRA_STRATEGY='all'
 export OPT_SEED=1
 
 export CELL_FOLDER="../cell_models"

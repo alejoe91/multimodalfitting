@@ -10,15 +10,10 @@ export OPT_ABD=0
 # if RA is true, the Ra for AIS and ABD are optimized separately
 export OPT_RA=0
 
-for seed in {1..10}; do
-  export OPT_SEED=${seed}
-  sbatch ipyparallel.sbatch
-done
-
 export OPT_FEATURE_SET='extra'
 for strategy in 'all' 'single' 'sections'; do
       export OPT_EXTRA_STRATEGY=${strategy}
-      for seed in {1..10}; do
+      for seed in {1..2}; do
           export OPT_SEED=${seed}
           sbatch ipyparallel.sbatch
       done

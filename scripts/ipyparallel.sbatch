@@ -25,7 +25,8 @@ sleep 30
 srun --mpi=none /gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/ipengine --timeout=300 --profile=${IPYTHON_PROFILE} &
 sleep 30
 
-/gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/python3 run_optimizations.py --ipyparallel                            \
+/gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/python3 run_optimizations.py \
+                             --ipyparallel                            \
                              --cell-folder=${CELL_FOLDER}             \
                              --seed=${OPT_SEED}                       \
                              --feature-set=${OPT_FEATURE_SET}         \
@@ -35,3 +36,4 @@ sleep 30
                              --sim=${SIM}                             \
                              --abd=${OPT_ABD}                         \
                              --ra=${OPT_RA}
+
