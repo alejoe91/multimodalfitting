@@ -475,7 +475,6 @@ def define_fitness_calculator(
                     kwargs['stim_end'] = stimulus.step_delay + stimulus.step_duration
 
                 if location == 'MEA':
-                    
                     recording_names = '%s.%s.LFP' % (protocol_name, location)
                     somatic_recording_name = f'{protocol_name}.soma.v'
 
@@ -551,7 +550,7 @@ def create_evaluator(
         abd=False,
         optimize_ra=False,
         simulator="lfpy",
-        sim=None,
+        interp_step=0.1,
         **extra_kwargs
 ):
     """
@@ -654,16 +653,16 @@ def create_evaluator(
         feature_file=features_file,
         feature_set=feature_set,
         probe=probe,
+        interp_step=interp_step,
         **extra_kwargs
     )
 
-    if sim is None:
-        if simulator.lower() == "lfpy":
-            sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
-                                                 mechs_folders=cell_model_folder)
-        else:
-            sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,
-                                                mechs_folders=cell_model_folder)
+    if simulator.lower() == "lfpy":
+        sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
+                                             mechs_folders=cell_model_folder)
+    else:
+        sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,
+                                            mechs_folders=cell_model_folder)
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,

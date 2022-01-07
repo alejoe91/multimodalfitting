@@ -11,6 +11,12 @@ import LFPy
 import efel
 
 
+_extra_kwargs = dict(fs=20,
+                     fcut=[300, 6000],
+                     filt_type="filtfilt",
+                     ms_cut=[3, 5],
+                     upsample=10)
+
 
 _ais_recordings = [
     {
@@ -91,6 +97,10 @@ def get_ais_extra_recordings():
         if rec["seclist_name"] != "hillockal":
             recs.append(rec)
     return recs
+
+
+def get_extra_kwargs():
+    return deepcopy(_extra_kwargs)
 
 
 def extra_recordings_from_positions(cell, sim, positions, position_names):
@@ -445,7 +455,7 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
 
 def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1,
                   ms_cut=[2, 10], filt_type="filtfilt", skip_first_spike=True, skip_last_spike=True,
-                  raise_warnings=False, verbose=False, **efel_kwargs):
+                  upsample=None, raise_warnings=False, verbose=False, **efel_kwargs):
     """
     Calculate extracellular action potential (EAP) by combining intracellular spike times and extracellular signals
 
@@ -521,8 +531,10 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
     else:
         return None
 
-    if np.std(np.diff(response['time'])) > 0.001 * np.mean(np.diff(response['time'])):
-        assert fs is not None
+    if fs is not None:
+        response_interp = _interpolate_response(response, fs=fs)
+    elif np.std(np.diff(response['time'])) > 0.001 * np.mean(np.diff(response['time'])):
+        assert fs is not None, "Irregular sampling! Please pass the 'fs' argument"
         if verbose:
             print('interpolate')
         response_interp = _interpolate_response(response, fs=fs)
@@ -788,9 +800,7 @@ def _get_waveforms(response, peak_times, snippet_len_ms):
             if snippet_range[1] >= num_frames:
                 snippet_buffer[1] -= snippet_range[1] - num_frames
                 snippet_range[1] -= snippet_range[1] - num_frames
-            snippet_chunk[:, snippet_buffer[0] : snippet_buffer[1]] = traces[
-                :, snippet_range[0] : snippet_range[1]
-            ]
+            snippet_chunk[:, snippet_buffer[0]:snippet_buffer[1]] = traces[:, snippet_range[0]:snippet_range[1]]
         waveforms[i] = snippet_chunk
 
     return waveforms
