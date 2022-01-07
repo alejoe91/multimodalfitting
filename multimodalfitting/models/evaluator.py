@@ -238,9 +238,10 @@ def define_protocols(
     protocols: dict
         Dictionary with defined protocols
     """
+
     protocol_definitions = get_protocol_definitions(model_name, protocols_file)
     feature_definitions = get_feature_definitions(feature_file, feature_set)
-
+    
     assert simulator.lower() in ["lfpy", "neuron"]
 
     protocols = {}
@@ -264,7 +265,7 @@ def define_protocols(
         protocols[protocol_name] = ephys.protocols.SweepProtocol(
             protocol_name, stimuli, recordings, cvode_active=True
         )
-
+    
     return protocols
 
 
