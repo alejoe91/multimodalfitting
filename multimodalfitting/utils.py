@@ -7,7 +7,15 @@ import pickle
 from pathlib import Path
 
 import bluepyopt.ephys as ephys
+import LFPy
+import efel
 
+
+_extra_kwargs = dict(fs=20,
+                     fcut=[300, 6000],
+                     filt_type="filtfilt",
+                     ms_cut=[3, 5],
+                     upsample=10)
 
 
 _ais_recordings = [
@@ -89,6 +97,164 @@ def get_ais_extra_recordings():
         if rec["seclist_name"] != "hillockal":
             recs.append(rec)
     return recs
+
+
+def get_extra_kwargs():
+    return deepcopy(_extra_kwargs)
+
+
+def extra_recordings_from_positions(cell, sim, positions, position_names):
+    extra_recordings = []
+    # instantiate lfpycell
+    cell.freeze({})
+    cell.instantiate(sim)
+    lfpycell = cell.LFPyCell
+
+    positions = np.array(positions)
+
+    if len(positions[0]) == 2:
+        positions_full = np.zeros((len(positions), 3))
+        positions_full[:, :2] = positions
+    else:
+        positions_full = positions
+
+    for (position, pos_name) in zip(positions_full, position_names):
+        idx = lfpycell.get_closest_idx(*position)
+        sec_name = lfpycell.get_idx_name(idx)[1]
+
+        if "." in sec_name:
+            sec_name = sec_name.split(".")[1]
+        secarray_name = sec_name[:sec_name.find("[")]
+        secarray_idx = int(sec_name[sec_name.find("[")+1:sec_name.find("]")])
+
+        # find seclist
+        selected_seclist = None
+        for seclist in cell.seclist_names:
+            if seclist != "all":
+                for sec in eval(f"cell.icell.{seclist}"):
+                    if "." in sec.name():
+                        sec_name_cmp = sec.name().split(".")[1]
+                    else:
+                        sec_name_cmp = sec.name()
+                    if sec_name in sec_name_cmp:
+                        selected_seclist = seclist
+                        break
+            if selected_seclist is not None:
+                break
+        print(f"Found position: {position} in seclist {selected_seclist}")
+
+        extra_rec_v = {'var': 'v',
+                       'comp_x': 0.5,
+                       'type': 'nrnseclistcomp',
+                       'name': pos_name,
+                       'seclist_name': selected_seclist,
+                       'sec_index': secarray_idx}
+        extra_rec_i = {'var': 'i_membrane_',
+                       'comp_x': 0,
+                       'type': 'nrnseclistcomp',
+                       'name': pos_name,
+                       'seclist_name': selected_seclist,
+                       'sec_index': secarray_idx}
+
+        extra_recordings.append(extra_rec_v)
+        extra_recordings.append(extra_rec_i)
+    cell.unfreeze({})
+    cell.destroy(sim)
+
+    return extra_recordings
+
+
+def construct_efel_trace(response, stim_start=250, stim_end=1600):
+    trace = {}
+    trace["T"] = response["time"]
+    trace["V"] = response["voltage"]
+    trace["stim_start"] = [stim_start]
+    trace["stim_end"] = [stim_end]
+
+    return trace
+
+
+def get_peak_cutout(responses, peak_idx=5, ms_before=1, ms_after=5):
+    soma_resp_name = [resp for resp in responses if "soma.v" in resp][0]
+    soma_response = responses[soma_resp_name]
+    soma_trace = construct_efel_trace(soma_response)
+    peak_times = efel.getFeatureValues([soma_trace], featureNames=[
+                                       "peak_time"])[0]["peak_time"]
+
+    peak_target = peak_times[peak_idx]
+    cutout_ms = np.array([peak_target - ms_before, peak_target + ms_after])
+
+    cutout_idxs = np.searchsorted(soma_response["time"], cutout_ms)
+
+    resp_cut = {}
+    for resp_name in responses:
+        response = responses[resp_name]
+        if not isinstance(response, ephys.responses.TimeLFPResponse):
+            resp_cut[resp_name] = {}
+            for k in response.response.keys():
+                if k == "time":
+                    resp_time = response[k].values.copy(
+                    )[cutout_idxs[0]:cutout_idxs[1]]
+                    resp_cut[resp_name][k] = resp_time - resp_time[0]
+                else:
+                    resp_cut[resp_name][k] = response[k].values.copy()[
+                        cutout_idxs[0]:cutout_idxs[1]]
+
+    return resp_cut
+
+
+def simulate_BAC_responses(cell, params, sim, pulse_delay=15, pulse_amp=1, pulse_dur=5,
+                           syn_tau=2, syn_weight=5, syn_delay=10, dend_y_stim=620,
+                           dend_y_rec=[400, 620]):
+    # instantiate
+    cell.freeze(param_dict=params)
+    cell.instantiate(sim=sim)
+    lfpy_cell = cell.LFPyCell
+
+    # define args for stimuli
+    soma_args = {
+        'idx': 0,
+        'record_current': True,
+        'pptype': 'IClamp',
+        'amp': pulse_amp,
+        'dur': pulse_dur,
+        'delay': pulse_delay
+    }
+    stim = LFPy.StimIntElectrode(cell=lfpy_cell, **soma_args)
+
+    synapseParameters = {
+        'idx': lfpy_cell.get_closest_idx(x=0, y=dend_y_stim, z=0),
+        'e': 0,                               # reversal potential
+        'syntype': 'ExpSyn',                  # synapse type
+        'tau': syn_tau,                             # syn. time constant
+        'weight': syn_weight,                          # syn. weight
+        'record_current': True                # syn. current record
+    }
+
+    synapse = LFPy.Synapse(lfpy_cell, **synapseParameters)
+    synapse.set_spike_times(np.array([syn_delay]))
+
+    # simulate
+    lfpy_cell.simulate(rec_vmem=True)
+
+    # gather responses
+    responses = {}
+    responses["soma"] = {}
+    responses["soma"]["time"] = lfpy_cell.tvec
+    responses["soma"]["voltage"] = lfpy_cell.vmem[0]
+
+    for d in dend_y_rec:
+        responses[str(d)] = {}
+        d_idx = lfpy_cell.get_closest_idx(x=0, y=d, z=0)
+        resp = lfpy_cell.vmem[d_idx]
+        responses[str(d)]["voltage"] = resp
+        responses[str(d)]["time"] = lfpy_cell.tvec
+
+    # destroy/unfreeze
+    cell.destroy(sim=sim)
+    cell.unfreeze(list(params.keys()))
+
+    return responses
 
 
 # Helper function to turn feature dicitonary into a list
@@ -289,7 +455,7 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
 
 def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1,
                   ms_cut=[2, 10], filt_type="filtfilt", skip_first_spike=True, skip_last_spike=True,
-                  raise_warnings=False, verbose=False, **efel_kwargs):
+                  upsample=None, raise_warnings=False, verbose=False, **efel_kwargs):
     """
     Calculate extracellular action potential (EAP) by combining intracellular spike times and extracellular signals
 
@@ -365,8 +531,10 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
     else:
         return None
 
-    if np.std(np.diff(response['time'])) > 0.001 * np.mean(np.diff(response['time'])):
-        assert fs is not None
+    if fs is not None:
+        response_interp = _interpolate_response(response, fs=fs)
+    elif np.std(np.diff(response['time'])) > 0.001 * np.mean(np.diff(response['time'])):
+        assert fs is not None, "Irregular sampling! Please pass the 'fs' argument"
         if verbose:
             print('interpolate')
         response_interp = _interpolate_response(response, fs=fs)
@@ -632,9 +800,7 @@ def _get_waveforms(response, peak_times, snippet_len_ms):
             if snippet_range[1] >= num_frames:
                 snippet_buffer[1] -= snippet_range[1] - num_frames
                 snippet_range[1] -= snippet_range[1] - num_frames
-            snippet_chunk[:, snippet_buffer[0] : snippet_buffer[1]] = traces[
-                :, snippet_range[0] : snippet_range[1]
-            ]
+            snippet_chunk[:, snippet_buffer[0]:snippet_buffer[1]] = traces[:, snippet_range[0]:snippet_range[1]]
         waveforms[i] = snippet_chunk
 
     return waveforms

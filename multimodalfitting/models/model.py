@@ -7,6 +7,10 @@ import bluepyopt.ephys as ephys
 from .morphology_modifiers import replace_axon_with_hillock_ais, replace_axon_with_ais, fix_morphology_exp
 
 
+this_file = Path(__file__)
+cell_models_folder = this_file.parent.parent.parent / "cell_models"
+
+
 def define_mechanisms(cell_model_folder, abd=False):
     """Defines mechanisms"""
 
@@ -126,8 +130,8 @@ def define_electrode(
     return probe
 
 
-def define_parameters(cell_model_folder, parameter_file=None, release=False, v_init=None, abd=False,
-                      optimize_ra=False):
+def define_parameters(cell_model_folder, parameter_file=None, release=False, 
+                      abd=False, optimize_ra=False):
     """
     Defines parameters
 
@@ -189,9 +193,6 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
             )
 
         if param_config["type"] == "global":
-            if param_config["param_name"] == "v_init" and v_init is not None:
-                print(f"Setting v_init to {v_init}")
-                value = v_init
             parameters.append(
                 ephys.parameters.NrnGlobalParameter(
                     name=param_config["param_name"],
@@ -265,7 +266,7 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
                 for sec in seclist_loc:
                     name = f"{param_config['param_name']}_{sec}"
                     param_dependancies = param_config.get("dependencies", None)
-                    
+
                     parameters.append(
                         ephys.parameters.NrnSectionParameter(
                             name=name,
@@ -310,22 +311,6 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False, v_i
                 % param_config
             )
 
-        # add v_init if specified as an argument, but not in the parameters
-        has_v_init = False
-        for param in parameters:
-            if param.name == "v_init":
-                has_v_init = True
-        if not has_v_init and v_init is not None:
-            parameters.append(
-                ephys.parameters.NrnGlobalParameter(
-                    name="v_init",
-                    param_name="v_init",
-                    frozen=True,
-                    bounds=None,
-                    value=v_init,
-                )
-            )
-
     return parameters
 
 
@@ -336,7 +321,7 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
     Parameters
     ----------
     model_name: str
-            "hay", "hay_ais" or "hay_ais_hillock"
+            "hay" | "hay_ais" 
     morph_modifiers: list of python functions
         The modifier functions to apply to the axon
     do_replace_axon: bool
@@ -369,7 +354,7 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
     )
 
 
-def create_ground_truth_model(model_name, cell_model_folder, release=False, v_init=None, model_type="LFPy", 
+def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
                               **morph_kwargs):
     """Create ground-truth model
 
@@ -377,8 +362,8 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
     ----------
     model_name : str
         'hay' | 'hay_ais' | 'hay_ais_hillock'
-    cell_model_folder : str or Path
-        Path to the cell model folder 
+    cell_folder: path or None
+        If given, the cell_folder where the model_name folder is. Default is "multimodal/cell_folders"
     release : bool, optional
         If True, release parameters are loaded (for experimental models some dummy parameters are available),
         by default False
@@ -396,6 +381,7 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
         The BluePyOpt model object
     """
     assert model_type.lower() in ["lfpy", "neuron"]
+    assert model_name in ["hay", "hay_ais", "hay_ais_hillock"]
 
     if model_name == "hay":
         morph_modifiers = None
@@ -419,15 +405,19 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
         secarray_names = None
         do_replace_axon = True
 
-    if v_init is None:
-        if model_name == "hay":
-            v_init = -80.
-        elif model_name == "hay_ais":
-            v_init = -72.
-        elif model_name == "hay_ais_hillock":
-            v_init = -72.
+    if cell_folder is None:
+        cell_folder = cell_models_folder
+    cell_model_folder = cell_folder / model_name
 
-    cell_model_folder = Path(cell_model_folder)
+    morph = define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **morph_kwargs)
+    mechs = define_mechanisms(cell_model_folder)
+    params = define_parameters(cell_model_folder, release=release)
+
+    assert "v_init" in [param.name for param in params], ("Couldn't find v_init in the parameters. "
+                                                          "Add it as a global parameter")
+    for param in params:
+        if "v_init" in param.name:
+            v_init = param.value
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
@@ -438,9 +428,9 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
 
     cell = model_class(
         model_name,
-        morph=define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **morph_kwargs),
-        mechs=define_mechanisms(cell_model_folder),
-        params=define_parameters(cell_model_folder, release=release, v_init=v_init),
+        morph=morph,
+        mechs=mechs,
+        params=params,
         seclist_names=seclist_names,
         secarray_names=secarray_names,
         **model_kwargs
@@ -449,17 +439,16 @@ def create_ground_truth_model(model_name, cell_model_folder, release=False, v_in
     return cell
 
 
-def create_experimental_model(morphology_file, cell_model_folder, release=False, v_init=None, model_type="LFPy",
+def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
                               abd=False, optimize_ra=False, **morph_kwargs):
     """Create experimental cell model
 
-
     Parameters
     ----------
-    morphology_file : str or Path
-        Path to the morphology file
-    cell_model_folder : str or Path
-        Path to the cell model folder
+    model_name : str 
+        Name of the model in cell folder
+    cell_folder: path or None
+        If given, the cell_folder where the model_name folder is. Default is "multimodal/cell_folders"
     release : bool, optional
         If True, release parameters are loaded (for experimental models some dummy parameters are available),
         by default False
@@ -504,10 +493,16 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         secarray_names.append("abd")
 
     do_replace_axon = False
-    model_name = "experimental"
 
-    if v_init is None:
-        v_init = -70
+    if cell_folder is None:
+        cell_folder = cell_models_folder
+    cell_model_folder = cell_folder / model_name
+    # get morphology
+    morphology_files = [
+        p for p in cell_model_folder.iterdir() if "morphology" in p.name]
+    assert len(morphology_files) == 1, (f"Make sure you have a single morphology "
+                                        f"file in the model folder {cell_model_folder}")
+    morphology_file = morphology_files[0]
 
     morphology = ephys.morphologies.NrnFileMorphology(
         str(morphology_file),
@@ -515,6 +510,15 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
         do_replace_axon=do_replace_axon,
         morph_modifiers_kwargs=morph_kwargs
     )
+
+    mechs = define_mechanisms(cell_model_folder, abd=abd)
+    params = define_parameters(cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra)
+
+    assert "v_init" in [param.name for param in params], ("Couldn't find v_init in the parameters. "
+                                                          "Add it as a global parameter")
+    for param in params:
+        if "v_init" in param.name:
+            v_init = param.value
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
@@ -526,9 +530,8 @@ def create_experimental_model(morphology_file, cell_model_folder, release=False,
     cell = model_class(
         model_name,
         morph=morphology,
-        mechs=define_mechanisms(cell_model_folder, abd=abd),
-        params=define_parameters(cell_model_folder, release=release, v_init=v_init, abd=abd,
-                                 optimize_ra=optimize_ra),
+        mechs=mechs,
+        params=params,
         seclist_names=seclist_names,
         secarray_names=secarray_names,
         **model_kwargs

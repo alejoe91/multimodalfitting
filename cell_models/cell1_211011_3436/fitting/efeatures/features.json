@@ -1,0 +1,3494 @@
+{
+  "firepattern_120": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          27.19792385463931,
+          5.906663502530183
+        ],
+        "n": 4,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          21.758339083711448,
+          12.094100582769228
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          77.6757261007839,
+          4.450546068669135
+        ],
+        "n": 4,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          24.973223218003366,
+          1.7599008237944316
+        ],
+        "n": 4,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          2.7500000000006253,
+          0.18027756377324047
+        ],
+        "n": 4,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "firepattern_200": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          8.217797662443342,
+          3.230394655724977
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          2.8,
+          0.39999999999999997
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.0547301874535628,
+          0.023367199331006987
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.5438202179095397,
+          0.036605229239771366
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          0.7871954315255024,
+          0.18602803163630732
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          100.08655957580991,
+          3.601468849738372
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          117.00361432979176,
+          24.32967884737756
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          46.78022012386274,
+          10.599982021566483
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          29.09626009365145,
+          6.30198584389909
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          22.817092022693807,
+          5.461316359847104
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          19.370382828615426,
+          5.762358873284663
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          72.49671833513678,
+          2.1711402425728132
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          27.520928099158247,
+          2.0228205125189365
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          6.264465909437176,
+          0.37401775394553155
+        ],
+        "n": 5,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_50": {
+    "soma": [
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_75": {
+    "soma": [
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_100": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          33.40971612147224,
+          8.719461729928966
+        ],
+        "n": 4,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          13.363886448588897,
+          17.271415595140002
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          80.00924898817038,
+          2.9842050081892473
+        ],
+        "n": 4,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          23.789872490149513,
+          1.5960461789445868
+        ],
+        "n": 4,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          2.6750000000006082,
+          0.12990381056769534
+        ],
+        "n": 4,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_125": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          20.521996142017375,
+          15.259595269864823
+        ],
+        "n": 9,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.0,
+          0.001
+        ],
+        "n": 2,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.2516618788916045,
+          0.07736748816110889
+        ],
+        "n": 2,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.626950142649371,
+          0.09543075588595074
+        ],
+        "n": 2,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          1.2480404338574036,
+          0.25404673237036396
+        ],
+        "n": 2,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          42.47363069735633,
+          19.935045079293946
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          20.554272097288067,
+          30.249664564644394
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          3.431933711688471,
+          6.552027920655142
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          1.174421454679487,
+          2.3947548238058145
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          0.8472383500780625,
+          1.7187960138578895
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          0.4762414298648787,
+          0.9527590209254535
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          78.66557391625331,
+          2.9056613175607944
+        ],
+        "n": 9,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          24.432562913124215,
+          1.4774516027219073
+        ],
+        "n": 9,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.0703703703703566,
+          0.5653458341651031
+        ],
+        "n": 9,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_150": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          8.5636932473498,
+          7.96186666539657
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.0,
+          0.001
+        ],
+        "n": 7,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.25347467770224513,
+          0.11762685861777003
+        ],
+        "n": 7,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.6467637321232836,
+          0.08278640456262817
+        ],
+        "n": 7,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          1.3304551758146945,
+          0.387121580827418
+        ],
+        "n": 7,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          67.84488954205256,
+          11.952570540612848
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          56.73787502965123,
+          32.04676961361123
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          15.248965620033692,
+          11.116670968240186
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          6.676377854100336,
+          6.9146438643391
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          4.400230445305956,
+          4.625917014684911
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          3.1574674365673863,
+          3.9371396824882114
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          77.52041292740705,
+          1.985430663404776
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          25.524012993266204,
+          1.3760592720618825
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.949441558441104,
+          0.968476783416486
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_175": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          8.381488400761935,
+          2.4106637960489494
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.1,
+          0.3
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.18522271533344578,
+          0.1213439413734493
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.6058506961992705,
+          0.1160037117817995
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          1.1389834331858106,
+          0.4102245929062869
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          84.87958811375503,
+          9.934186444891028
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          78.040629814247,
+          24.86016231980221
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          28.56601474540359,
+          8.251827650486717
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          15.75893718729383,
+          7.776823687872085
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          10.728843621853489,
+          6.303287587523779
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          8.783529459069081,
+          6.131227674971558
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          75.95945891213057,
+          2.0501349912147737
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          26.478870759897397,
+          1.3443900905629307
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          5.229366861895635,
+          1.1171648577448836
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_200": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          10.935770954057526,
+          2.7476136398393947
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.6,
+          0.48989794855663565
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.09429909901752451,
+          0.048673895114410705
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.5454562569719608,
+          0.1301875103409897
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          0.832357111641518,
+          0.2422279336381583
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          98.6151317188798,
+          8.789021488647663
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          90.77642418148778,
+          24.227956025394754
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          36.89821135925179,
+          6.423382631470643
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          24.156147944122722,
+          5.766601367717257
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          18.134917304841533,
+          5.550000481200283
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          15.194344735130269,
+          5.376237620737079
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          73.46822590995365,
+          1.3992281463467997
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          27.210940553844562,
+          1.2566461208579367
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          6.195418504696621,
+          0.720301248519211
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_225": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          15.219022580217363,
+          4.03628269592381
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.8,
+          0.6531972647421809
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.05509536849329682,
+          0.02746013520762857
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.47365092378611556,
+          0.15764827375597745
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          0.6179706162138491,
+          0.21392798265025842
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          118.75335200232313,
+          12.297553410384955
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          112.80100425559651,
+          21.259541153763315
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          45.67026720613858,
+          7.239992213654934
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          32.66964268217439,
+          5.423710002710002
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          26.805704824363815,
+          5.130801517094531
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          22.8517810566953,
+          4.62955375547969
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          70.558934934407,
+          1.8169083441938216
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          29.11614164854769,
+          1.6055014628522013
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          6.279948240646626,
+          0.5173433100090785
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_250": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          18.413761743639483,
+          4.193713869993435
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.6666666666666667,
+          0.7888106377466155
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.03980498598565482,
+          0.02180017305838585
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.4026574633767144,
+          0.15516207234723095
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          0.49950432224776864,
+          0.17022891152421782
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          130.75328728917833,
+          10.749982801523425
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          124.62640099705226,
+          17.560009494334942
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          51.124065404379486,
+          9.115627789598278
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          37.16764937477357,
+          5.031915823643131
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          31.067892641989506,
+          5.2024657208118485
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          27.35104633529841,
+          4.758799947821246
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          68.50354700276483,
+          2.110242647560263
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          30.68148981053678,
+          1.5927290626007238
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          6.178438904238904,
+          0.49666959749719447
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_275": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          20.06332819531432,
+          3.6718345514644093
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.8,
+          0.8717797887081347
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.031099692028940105,
+          0.012407249960539263
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.3529915971686378,
+          0.11731103297971716
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          0.4359205315659209,
+          0.11666867964814395
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          136.7658702932609,
+          7.480476097596529
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          129.46464633228015,
+          15.744270613574908
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          53.83686552984305,
+          8.888165227680284
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          39.219293948546046,
+          4.006276632877212
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          33.717716595738054,
+          3.8487695536390363
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          29.401910278180498,
+          3.993882855524512
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          67.48015576694971,
+          1.8134806720682828
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          31.423553884099125,
+          1.2653255004603614
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          6.19261173631243,
+          0.4782510096503914
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IDrest_300": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          21.608348933103667,
+          3.3916069424904833
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.6,
+          0.8
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.026481417071732783,
+          0.012662930377418235
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.3209199082300257,
+          0.1015373954623523
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          0.39476954761078387,
+          0.08719023405201363
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          140.9411836573854,
+          7.157737363761118
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          133.3149848235752,
+          16.570645021496766
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          56.65985163910956,
+          10.268747769600392
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          41.292354390297035,
+          3.388585703235539
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          34.70469500930896,
+          4.654535013064616
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          31.681878401336725,
+          4.032114918461994
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          66.30156219681409,
+          1.4146594988127295
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          32.26149480889004,
+          1.0682490046237947
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          6.139791726594867,
+          0.5721953793414473
+        ],
+        "n": 5,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_-140": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -83.26651042608478,
+          1.9848800185617046
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          -21.845372858316324,
+          1.4818818482974796
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          -22.83183680879781,
+          1.7318614541973203
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -105.44859227717033,
+          2.4218018474287577
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          56.69518239356429,
+          3.3745299465097998
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          2.6411313626996273,
+          0.6768332692234248
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.10538504478511398,
+          0.022818453132552142
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.894614955214886,
+          0.022818453132552142
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          7.972531999067284,
+          0.7098079827082981
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_-120": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -83.03165461970703,
+          1.9687761212055348
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          -20.356669447459765,
+          2.4400176121144534
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          -21.34506055467785,
+          2.597005851482332
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -103.6408800218569,
+          3.3785408176648457
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          57.088714241816106,
+          2.9154723327253063
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          2.644184628682629,
+          1.0872302004193652
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.11254486136855973,
+          0.042707844357676134
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.8874551386314401,
+          0.04270784435767614
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          7.910004513212195,
+          1.0517708704901816
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_-100": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.87597638634011,
+          1.9904043646840115
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          -18.6789881301816,
+          3.6155166415843456
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          -19.70301706513968,
+          3.6318868426877615
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -101.80091261448703,
+          4.422437860199831
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          57.18399803394211,
+          3.193545634836879
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          2.5181345121123124,
+          1.0130315172111082
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.11783995127043582,
+          0.0425648567120932
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.8821600487295642,
+          0.04256485671209321
+        ],
+        "n": 20,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          7.736435085856546,
+          1.0795379624370622
+        ],
+        "n": 20,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_-80": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.34278457303945,
+          1.906881197660669
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          -13.984802395751595,
+          2.771401196263808
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          -14.885031773352852,
+          2.8920962729730717
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -96.40786089630372,
+          3.347572419962004
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          58.442329648187254,
+          3.4990130470541767
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          2.1642068966817076,
+          1.1188439034169457
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.13190094308926942,
+          0.05000511992423021
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.8680990569107305,
+          0.05000511992423022
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          7.7837774555609,
+          1.4707406890006052
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_-60": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.268656522228,
+          1.7758410550243384
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          -10.57311589230643,
+          2.8233566415625537
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          -11.18061965439188,
+          3.1111530592830245
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -92.90462919226243,
+          3.2851436839845247
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          58.9893833427368,
+          4.6156435147899835
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          1.8514703366234282,
+          0.5999778452871336
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.15395428954287055,
+          0.05507525251996508
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.8460457104571295,
+          0.05507525251996508
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          7.8248464878469175,
+          2.199869713083435
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_-40": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.3251420636818,
+          1.6605821729489696
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          -7.394138909884465,
+          2.9100459092793947
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          -7.538138057657305,
+          3.157234730373717
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -89.57566006015905,
+          3.2689537420619232
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          60.40421408070095,
+          6.82722410904696
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          1.4689019630921858,
+          0.570582008627631
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.18084850485974266,
+          0.06255719103530441
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.8191514951402574,
+          0.06255719103530441
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          8.474796146987936,
+          2.5193019144866913
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_-20": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.46317483940761,
+          1.639648041285919
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          -3.616405814005942,
+          3.159361889777444
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          -3.565488174873345,
+          3.173960530213239
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -86.1026512234297,
+          3.435929720036536
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          60.615640323090496,
+          7.856611232259556
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          1.3309035909512543,
+          0.5212127975787562
+        ],
+        "n": 11,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.21928036482941102,
+          0.0739505820360814
+        ],
+        "n": 11,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.3767822197908072,
+          0.822653394848533
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          32.910539418362326,
+          60.40535334430854
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_0": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.41887090044673,
+          1.954814361551322
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          -0.08830705255399304,
+          3.130975702606114
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          0.07488038496543367,
+          3.113131889448722
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -82.66006068158997,
+          3.46549260876165
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          55.831342017562065,
+          11.18911897333781
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          1.0132553496824717,
+          0.20731781701710278
+        ],
+        "n": 6,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.24116022394037465,
+          0.07798342178484267
+        ],
+        "n": 6,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          -8.954410196877186,
+          29.557680643500383
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          31.98975024487869,
+          60.80029986546694
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_20": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.33001088658854,
+          2.2518197480899036
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          3.343154409540366,
+          2.4166306767241283
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          3.7152578892490586,
+          2.765369571130579
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -79.25946274653545,
+          3.183482840151852
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          50.765400549142356,
+          8.40142455026329
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          1.1181368890566574,
+          0.001
+        ],
+        "n": 1,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.3749220090088458,
+          0.001
+        ],
+        "n": 1,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          -49.0311603795025,
+          102.29720568863605
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          32.480270168298915,
+          60.81027375249006
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_40": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.40976257375236,
+          2.339561783819022
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          6.371246262582588,
+          2.529490626005317
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          7.178308017459806,
+          2.930465250793361
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -76.12292799955304,
+          3.0562218833766326
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          51.55955327440327,
+          7.254984726022514
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          -84.01965507038297,
+          153.42085538981806
+        ],
+        "n": 15,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          6.892594207496726,
+          6.021561558007462
+        ],
+        "n": 15,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "IV_60": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -82.51132034181126,
+          2.342038835721553
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
+          7.836822809401534,
+          1.7547713096093318
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
+          8.936045031209046,
+          1.8913844195903575
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -74.59039761253611,
+          2.220181227092383
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
+          52.365158706149145,
+          5.69352075744912
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          -112.43618171362434,
+          178.39321967744243
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
+          7.765996752290508,
+          6.8375372768231335
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "APWaveform_200": {
+    "soma": [
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          84.72408312950425,
+          11.872412781875619
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP1_amp",
+        "val": [
+          95.18207751111387,
+          13.458464153664499
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP2_amp",
+        "val": [
+          66.70002383591957,
+          2.7127378007333665
+        ],
+        "n": 7,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_duration_half_width",
+        "val": [
+          1.2516666666669514,
+          0.21977892933081586
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_width",
+        "val": [
+          8.301666666668554,
+          6.499245469028376
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_voltage",
+        "val": [
+          -62.57801515311,
+          11.316037227830028
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          29.02771544313395,
+          0.8454073226682083
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.0133333333340184,
+          0.4455832632006444
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "APWaveform_230": {
+    "soma": [
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          76.74644698444956,
+          5.78700418554255
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP1_amp",
+        "val": [
+          95.73551326606744,
+          13.476774273609939
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP2_amp",
+        "val": [
+          63.46495976389912,
+          2.046792211395521
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_duration_half_width",
+        "val": [
+          1.1516666666669286,
+          0.18355289882396844
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_width",
+        "val": [
+          4.573333333334373,
+          1.7135440856116508
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_voltage",
+        "val": [
+          -56.055699919826,
+          4.679725162059131
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          30.13064176624597,
+          0.9817495947224049
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.3316666666674237,
+          0.29948567021930694
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "APWaveform_260": {
+    "soma": [
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          74.34307255594804,
+          3.4605976959024853
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP1_amp",
+        "val": [
+          101.96053049603574,
+          11.522355136580344
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP2_amp",
+        "val": [
+          60.95034410896788,
+          1.5546275224102366
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_duration_half_width",
+        "val": [
+          1.1591666666669302,
+          0.2020193197582204
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_width",
+        "val": [
+          4.3966666666676675,
+          0.8949875852648137
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_voltage",
+        "val": [
+          -55.03669649764585,
+          2.6509154390108423
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          31.37054048489719,
+          0.9174164142581513
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.351666666667429,
+          0.2161789382279286
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "APWaveform_290": {
+    "soma": [
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          72.64842522817959,
+          2.5862403295684566
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP1_amp",
+        "val": [
+          108.84213000284353,
+          1.5892966164478204
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP2_amp",
+        "val": [
+          59.095526271138354,
+          1.3465956836260944
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_duration_half_width",
+        "val": [
+          1.1031666666669175,
+          0.3266985103527642
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_width",
+        "val": [
+          4.43750000000101,
+          0.2858527690185854
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_voltage",
+        "val": [
+          -54.76197232248362,
+          2.062306524977255
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          32.464597114809074,
+          0.8477831697069004
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.445833333334117,
+          0.22355244226907287
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "APWaveform_320": {
+    "soma": [
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          70.1055325915092,
+          2.3922794087552517
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP1_amp",
+        "val": [
+          109.54935767329516,
+          1.1703037273772308
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP2_amp",
+        "val": [
+          57.06627166966009,
+          1.3597985970356679
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_duration_half_width",
+        "val": [
+          1.1230000000002553,
+          0.28007320471625924
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_width",
+        "val": [
+          4.155500000000945,
+          0.10085757284410836
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_voltage",
+        "val": [
+          -53.502165393776124,
+          2.1557686730531946
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          33.34966534003192,
+          1.0703792044797749
+        ],
+        "n": 10,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.580000000000814,
+          0.16155494421407185
+        ],
+        "n": 10,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "APWaveform_350": {
+    "soma": [
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          69.11404076716926,
+          2.2363865001680403
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP1_amp",
+        "val": [
+          109.50972724427984,
+          0.9801305178673163
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP2_amp",
+        "val": [
+          56.002371904903065,
+          0.9549403599396485
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_duration_half_width",
+        "val": [
+          1.2180000000002769,
+          0.08969949832637669
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_width",
+        "val": [
+          4.096000000000932,
+          0.09281163720139793
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AP_begin_voltage",
+        "val": [
+          -53.101157847355864,
+          2.348180266842553
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          33.70092411047186,
+          1.2379126327421706
+        ],
+        "n": 5,
+        "efel_settings": {}
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.6250000000008242,
+          0.11510864433223955
+        ],
+        "n": 5,
+        "efel_settings": {}
+      }
+    ]
+  },
+  "HyperDepol_-160": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 850,
+          "stim_end": 1120
+        }
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          2.5342358408368058,
+          1.1307184919010902
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.08916618956379427,
+          0.03658330372235938
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.9108338104362058,
+          0.03658330372235938
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      }
+    ]
+  },
+  "HyperDepol_-120": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 850,
+          "stim_end": 1120
+        }
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          2.2825009419513904,
+          0.926908444683709
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.09056027592451474,
+          0.031491670066806046
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.9094397240754853,
+          0.03149167006680605
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      }
+    ]
+  },
+  "HyperDepol_-80": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 850,
+          "stim_end": 1120
+        }
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          1.857355599797748,
+          0.3055699150807069
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.11822866611291291,
+          0.019336481930449265
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.8817713338870871,
+          0.019336481930449293
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      }
+    ]
+  },
+  "HyperDepol_-40": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 850,
+          "stim_end": 1120
+        }
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
+          1.0508653143586713,
+          0.5000220362414887
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
+          0.12701955091573397,
+          0.05703861525490961
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
+          0.8729804490842661,
+          0.057038615254909594
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 400,
+          "stim_end": 850
+        }
+      }
+    ]
+  },
+  "sAHP_150": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          1.4,
+          0.4898979485566356
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          75.59352664132761,
+          3.183029365841286
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          18.919947870740447,
+          0.8048174464961394
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_depth_abs",
+        "val": [
+          -58.02662027851835,
+          1.3011067068222422
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          2.9300000000006663,
+          0.0979795897113494
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -58.780255084028944,
+          1.0486041346461241
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      }
+    ]
+  },
+  "sAHP_200": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          4.4,
+          1.0198039027185568
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          76.68781418709165,
+          2.245242806053992
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "ISI_values",
+        "val": [
+          49.51833333334459,
+          6.400026909667105
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          20.468933828639713,
+          0.76870988018897
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_depth_abs",
+        "val": [
+          -56.33602299313645,
+          1.4032896776352128
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.7880000000008613,
+          0.3773274440059518
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -54.46108533189297,
+          3.489093029545653
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      }
+    ]
+  },
+  "sAHP_250": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          8.4,
+          1.42828568570857
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          71.15195044770915,
+          1.8819146227676005
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "ISI_values",
+        "val": [
+          29.43795634921305,
+          4.467462227963015
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          23.74860521919424,
+          1.502847587934366
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_depth_abs",
+        "val": [
+          -53.91510670568537,
+          2.267606884279691
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          4.04597582972675,
+          0.36538709397309493
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -51.32642684962906,
+          3.5936836870201083
+        ],
+        "n": 10,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      }
+    ]
+  },
+  "sAHP_300": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          9.4,
+          1.0198039027185568
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          69.58106863927314,
+          1.447986385283979
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "ISI_values",
+        "val": [
+          25.733769841275695,
+          2.197217930742143
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          24.775083420424416,
+          1.3751985518686443
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_depth_abs",
+        "val": [
+          -53.19526567863604,
+          2.3454064918534905
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          4.114570707071643,
+          0.28811601513941454
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
+          -49.55831622729971,
+          3.5260466238411547
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 650,
+          "stim_end": 875
+        }
+      }
+    ]
+  },
+  "PosCheops_300": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
+          32.4,
+          8.935323161475472
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 1000,
+          "stim_end": 9000
+        }
+      }
+    ]
+  }
+}

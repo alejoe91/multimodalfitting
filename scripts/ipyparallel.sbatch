@@ -20,21 +20,20 @@ mkdir -p ${IPYTHONDIR}
 
 export IPYTHON_PROFILE=benchmark.${SLURM_JOBID}
 
-ipcontroller --init --ip='*' --profile=${IPYTHON_PROFILE} &
-sleep 20
-srun --mpi=none ipengine --profile=${IPYTHON_PROFILE} &
-sleep 20
+/gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/ipcontroller --init --ip='*' --ping=30000 --profile=${IPYTHON_PROFILE} &
+sleep 30
+srun --mpi=none /gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/ipengine --timeout=300 --profile=${IPYTHON_PROFILE} &
+sleep 30
 
-cmd="python3 run_optimizations.py --ipyparallel --cell-folder=${CELL_FOLDER} --seed=${OPT_SEED} 
---feature-set=${OPT_FEATURE_SET} --model=${OPT_MODEL} --data-folder=${DATA_FOLDER} --opt-folder=${OPT_FOLDER} 
---extra-strategy=${OPT_EXTRA_STRATEGY} --sim=${SIM}"
+/gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/python3 run_optimizations.py \
+                             --ipyparallel                            \
+                             --cell-folder=${CELL_FOLDER}             \
+                             --seed=${OPT_SEED}                       \
+                             --feature-set=${OPT_FEATURE_SET}         \
+                             --model=${OPT_MODEL}                     \
+                             --opt-folder=${OPT_FOLDER}               \
+                             --extra-strategy=${OPT_EXTRA_STRATEGY}   \
+                             --sim=${SIM}                             \
+                             --abd=${OPT_ABD}                         \
+                             --ra=${OPT_RA}
 
-if [ ${ABD} = true] ; then
-    cmd+=" --abd"
-fi
-
-if [ ${RA} = true] ; then
-    cmd+=" --ra"
-fi
-
-eval $cmd

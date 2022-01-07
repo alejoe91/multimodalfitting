@@ -1,0 +1,16 @@
+{
+  "holding_current": [
+    0.0,
+    0.0
+  ],
+  "threshold_current": [
+    0.3468000000000001,
+    0.0
+  ],
+  "all_holding_current": {
+    "hay": 0.0
+  },
+  "all_threshold_current": {
+    "hay": 0.3468000000000001
+  }
+}

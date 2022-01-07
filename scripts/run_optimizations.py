@@ -33,32 +33,28 @@ def get_parser():
     )
     parser.add_argument("--seed", type=int, default=42,
                         help="The seed used for the optimization")
-    parser.add_argument("--cell-folder", type=str, default="../cell_models", required=True,
-                        help="The folder where the cell models are (default '../cell_models/')")
+    parser.add_argument("--cell-folder", type=str, default=None, required=False,
+                        help="The folder where the cell models are (default 'multimodalfitting/cell_models/')")
     parser.add_argument("--feature-set", type=str, default="extra",
                         help="The feature set to be used ('soma' - 'extra')")
     parser.add_argument("--model", type=str, default="hay",
-                        help="the model to be optimized ('hay' - 'hay_ais' - 'hay_ais_hillock')")
-    parser.add_argument("--morphology", type=str, default="",
-                        help="the path to the morphology file (required for experimental models)")
+                        help="the model to be optimized ('hay' - 'hay_ais' - 'hay_ais_hillock' or experimental ones)")
     parser.add_argument("--sim", type=str, default="lfpy",
                         help="the simulator to be used ('lfpy' - 'neuron')")
     parser.add_argument("--extra-strategy", type=str, default="all",
                         help="The strategy for using extracellular features ('all' - 'single' - 'sections')")
     parser.add_argument("--ipyparallel", action="store_true", default=False,
                         help="If True ipyparallel is used to parallelize computations (default False)")
-    parser.add_argument("--data-folder", type=str, default=None,
-                        help="The folder containing the features and protocol json files")
     parser.add_argument("--opt-folder", type=str, default=None, required=True,
                         help="The folder containing the results of optimization "
-                             "(default is parent of data_folder/optimization_results)")
-    parser.add_argument("--abd", action="store_true", default=False,
+                             "(default is parent of ./optimization_results)")
+    parser.add_argument("--abd", type=int, default=0,
                         help="If True and model is 'experimental', the ABD section is used")
-    parser.add_argument("--ra", action="store_true", default=True,
+    parser.add_argument("--ra", type=int, default=0,
                         help="If True and model is 'experimental' and abd is used, Ra in ABD and AIS is also optimized")
     parser.add_argument("--offspring", type=int, default=20,
                         help="The population size (offspring) - default 20")
-    parser.add_argument("--maxgen", type=int, default=2000,
+    parser.add_argument("--maxgen", type=int, default=600,
                         help="The maximum number of generations - default 2000")
 
     return parser
@@ -110,36 +106,12 @@ def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed, abd, r
     return cp_filename
 
 
-def get_protocols_and_features_paths(data_folder, extra_strategy, feature_set):
-
-    feature_file = data_folder / f"features_BPO_{extra_strategy}.json"
-    protocol_file = data_folder / f"protocols_BPO_{extra_strategy}.json"
-
-    logger.info(f"Feature_file: {str(feature_file)}")
-    logger.info(f"Protocol_file: {str(protocol_file)}")
-
-    if not Path(feature_file).is_file():
-        raise Exception("Couldn't find a feature json file in the provided folder.")
-    if not Path(protocol_file).is_file():
-        raise Exception("Couldn't find a protocol json file in the provided folder.")
-
-    probe_file = None
-    if feature_set == "extra":
-        probe_file = data_folder / "probe_BPO.json"
-        if not os.path.isfile(probe_file):
-            raise Exception("Couldn't find a probe json file in the provided folder.")
-
-    return feature_file, protocol_file, probe_file
-
-
 def save_evaluator_configuration(
     model_name,
-    cell_folder,
     feature_set,
-    feature_file,
-    protocol_file,
-    probe_file,
+    extra_strategy,
     protocols_with_lfp,
+    cell_folder,
     timeout,
     cp_filename,
     simulator,
@@ -148,12 +120,10 @@ def save_evaluator_configuration(
 ):
 
     eva_args = dict(model_name=model_name,
-                    cell_model_folder=str(cell_folder),
                     feature_set=feature_set,
-                    feature_file=str(feature_file),
-                    protocol_file=str(protocol_file),
-                    probe_file=str(probe_file),
+                    extra_strategy=extra_strategy,
                     protocols_with_lfp=protocols_with_lfp,
+                    cell_folder=str(cell_folder),
                     extra_recordings=None,
                     timeout=timeout,
                     simulator=simulator,
@@ -172,10 +142,8 @@ def main():
 
     args = get_parser().parse_args()
 
-    cell_folder = Path(args.cell_folder) / f"{args.model}_model"
-    data_folder = Path(args.data_folder)
     if args.opt_folder is None:
-        opt_folder = data_folder.parent / "optimization_results"
+        opt_folder = Path(".") / "optimization_results" 
     else:
         opt_folder = Path(args.opt_folder)
 
@@ -194,25 +162,12 @@ def main():
         protocols_with_lfp = ['IDrest_300']
         timeout = 900.
 
-    feature_file, protocol_file, probe_file = get_protocols_and_features_paths(
-        data_folder, args.extra_strategy, args.feature_set
-    )
-
-    if args.model == 'experimental':
-        assert Path(args.morphology).is_file(), f"The morphology {args.morphology} doesn't exist!"
-        morphology_file = args.morphology
-    else:
-        morphology_file = None
-
     eva = mf.create_evaluator(
         model_name=args.model,
-        cell_model_folder=cell_folder,
         feature_set=feature_set,
-        feature_file=feature_file,
-        protocol_file=protocol_file,
-        probe_file=probe_file,
+        extra_strategy=args.extra_strategy,
         protocols_with_lfp=protocols_with_lfp,
-        morphology_file=morphology_file,
+        cell_folder=Path(args.cell_folder),
         extra_recordings=None,
         timeout=timeout,
         simulator=sim,
@@ -243,15 +198,13 @@ def main():
         continue_cp = False
 
     save_evaluator_configuration(
-        args.model,
-        cell_folder,
-        args.feature_set,
-        feature_file,
-        protocol_file,
-        probe_file,
-        protocols_with_lfp,
-        timeout,
-        cp_filename,
+        model_name=args.model,
+        feature_set=args.feature_set,
+        extra_strategy=args.extra_strategy,
+        protocols_with_lfp=protocols_with_lfp,
+        cell_folder=Path(args.cell_folder),
+        timeout=timeout,
+        cp_filename=cp_filename,
         simulator=sim,
         abd=args.abd,
         optimize_ra=args.ra

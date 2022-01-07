@@ -275,11 +275,11 @@ def compute_rheobase_for_model(cell, sim, step_duration=270, delay=250, step_min
 
         if spikecount == 1:
             rheobase_current = step_currents[i]
-            print(f"Rheobase found")
+            print("Rheobase found")
             break
 
     if rheobase_current is None:
-        print(f"Rheobase NOT found")
+        print("Rheobase NOT found")
 
     return rheobase_current, protocols, responses
 
@@ -389,17 +389,17 @@ def save_extracellular_template(responses, protocols, protocol_name,
         The locations at which the eap is computed
 
     """
-    if "fs" in eap_kwargs.keys():
-        del eap_kwargs["fs"]
+    if "fs" not in eap_kwargs.keys():
+        eap_kwargs["fs"] = resample_rate_khz
     eap = calculate_eap(responses, protocol_name, protocols, sweep_id=sweep_id,
-                        fs=resample_rate_khz, **eap_kwargs)
+                        **eap_kwargs)
     locations = probe.positions
 
     output_folder = Path(output_folder)
-    (output_folder / "extracellular").mkdir(exist_ok=True, parents=True)
-    np.save(output_folder / "extracellular" / "template.npy", eap)
-    np.save(output_folder / "extracellular" / "locations.npy", locations)
-    np.save(output_folder / "extracellular" / "fs.npy", resample_rate_khz * 1000)
+    output_folder.mkdir(exist_ok=True, parents=True)
+    np.save(output_folder / "template.npy", eap)
+    np.save(output_folder / "locations.npy", locations)
+    np.save(output_folder / "fs.npy", resample_rate_khz * 1000)
 
     return eap, locations
 
@@ -432,4 +432,3 @@ def _interpolate_response(response, fs=20.0):
         response_new[other] = ynew
 
     return response_new
-

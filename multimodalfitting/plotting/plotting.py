@@ -119,7 +119,7 @@ def plot_responses(responses, protocol_names=None,
 
 
 def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainbow", figsize=(10, 10),
-                            return_fig=False):
+                            return_fig=False, labels=None):
     """
     Plots a list of responses to multiple protocols
 
@@ -146,9 +146,14 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
     """
     responses = responses_list[0]
     resp_no_mea = []
+    
+    if labels is not None:
+        assert len(labels) == len(
+            responses_list), "List of labels should have same length of responses_list"
 
     if colors is not None:
-        assert len(colors) == len(responses_list)
+        assert len(colors) == len(
+            responses_list), "List of colors should have same length of responses_list"
 
     for (resp_name, response) in sorted(responses.items()):
         if 'MEA' not in resp_name:
@@ -165,6 +170,7 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
     min_v = 200
 
     for i, responses in enumerate(responses_list):
+        
         if cmap is None and colors is None:
             color = f'C{i}'
         elif colors is not None:
@@ -174,24 +180,34 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
             color = cm(i / len(responses_list))
         # print(i, responses_list)
         for index, resp_name in enumerate(sorted(resp_no_mea)):
+            if labels and index == 0:
+                label = labels[i]
+            else:
+                label = None
             c = index // nrows
             r = np.mod(index, nrows)
             # print(resp_name)
             response = responses[resp_name]
             if response is not None:
                 if ncols > 1:
-                    axes[r, c].plot(response['time'], response['voltage'], label=resp_name, color=color)
+                    axes[r, c].plot(response['time'], response['voltage'], label=label, color=color)
                     axes[r, c].set_title(resp_name)
+                    ax = axes[r, c]
                 elif ncols == 1 and nrows == 1:
-                    axes.plot(response['time'], response['voltage'], label=resp_name, color=color)
+                    axes.plot(
+                        response['time'], response['voltage'], label=label, color=color)
                     axes.set_title(resp_name)
+                    ax = axes
                 else:
-                    axes[r].plot(response['time'], response['voltage'], label=resp_name, color=color)
+                    axes[r].plot(response['time'], response['voltage'], label=label, color=color)
                     axes[r].set_title(resp_name)
+                    ax = axes[r]
                 if np.max(response['voltage']) > max_v:
                     max_v = np.max(response['voltage'])
                 if np.min(response['voltage']) < min_v:
                     min_v = np.min(response['voltage'])
+                if label:
+                    ax.legend()
 
         if ncols > 1:
             for ax in axes[r + 1:, c]:
@@ -216,7 +232,8 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
 
 
 def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1", sweep_id=0,
-                       colors="C0", norm=True, figsize=(7, 12), resample_rate_khz=20, ax=None, **eap_kwargs):
+                       colors="C0", norm=True, figsize=(7, 12), resample_rate_khz=20, ax=None, 
+                       labels=None, **eap_kwargs):
     """
     Plots multiple extracellular action potentials (EAPs)
 
@@ -252,6 +269,9 @@ def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1", 
         assert len(colors) == len(responses_list), "List of colors should have same length of responses_list"
     elif isinstance(colors, str):
         colors = [colors] * len(responses_list)
+        
+    if labels is not None:
+        assert len(labels) == len(responses_list), "List of labels should have same length of responses_list"
 
     eaps = []
     for i, fitted in enumerate(responses_list):
@@ -276,6 +296,11 @@ def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1", 
 
     for i, eap in enumerate(eaps):
         ax = mu.plot_mea_recording(eap, probe, colors=colors[i], ax=ax, vscale=vscale)
+        if labels:
+            line = ax.get_lines()[-1]
+            line.set_label(labels[i])
+    if labels:
+        ax.legend()
 
     return ax
 
@@ -508,7 +533,7 @@ def plot_probe(probe, ax=None, electrode_width=10, interactive=True, **kwargs):
     return ax
 
 
-def plot_cell(cell, sim, ax=None, detailed=False, **kwargs):
+def plot_cell(cell, sim, ax=None, detailed=False, param_values={}, **kwargs):
     """
 
     Parameters
@@ -528,14 +553,13 @@ def plot_cell(cell, sim, ax=None, detailed=False, **kwargs):
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    cell.freeze({})
-    print("Instantiate")
+    cell.freeze(param_values)
     cell.instantiate(sim=sim)
     if detailed:
         nplt.plot_detailed_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)
     else:
         nplt.plot_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)
-    cell.unfreeze({})
+    cell.unfreeze(param_values)
     cell.destroy(sim=sim)
     ax.axis("off")
 
