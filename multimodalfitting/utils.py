@@ -599,18 +599,22 @@ def load_checkpoint(checkpoint_path):
     else:
         extra_strategy = None
 
-    run = {"nevals": np.cumsum(run['logbook'].select("nevals")),
-           "population": run['population'],
-           "hof": run['halloffame'],
-           "logbook": run['logbook'],
-           "model": model,
-           "seed": seed,
-           "extra_strategy": extra_strategy,
-           "feature_set": feature_set,
-           "best_fitness": np.sum(run['halloffame'][0].fitness.values),
-           "best_scores": list(run['halloffame'][0].fitness.values),
-           "best_params": list(run['halloffame'][0]),
-           "path": checkpoint_path}
+    run = {
+        "nevals": np.cumsum(run['logbook'].select("nevals")),
+        "population": run['population'],
+        "hof": run['halloffame'],
+        "logbook": run['logbook'],
+        "model": model,
+        "seed": seed,
+        "extra_strategy": extra_strategy,
+        "feature_set": feature_set,
+        "best_fitness": np.sum(run['halloffame'][0].fitness.values),
+        "best_scores": list(run['halloffame'][0].fitness.values),
+        "best_params": list(run['halloffame'][0]),
+        "path": checkpoint_path,
+        "ra": "ra" in chkp_name,
+        "abd": "abd" in chkp_name
+    }
 
     return run
 
