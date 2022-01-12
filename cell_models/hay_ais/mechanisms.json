@@ -1,11 +1,11 @@
 {
     "all": [
-        "pas"
+        "pas",
+        "extracellular"
     ],
     "somatic": [
         "Ih",
         "CaDynamics_DC0",
-        "extracellular",
         "Ca_LVAst",
         "Ca_HVA2",
         "SKv3_1",
@@ -39,7 +39,6 @@
         "Na12Hu2009",
         "Na16Hu2009",
         "KdShu2007",
-        "CaDynamics_DC0",
-        "extracellular"
+        "CaDynamics_DC0"
     ]
 }
