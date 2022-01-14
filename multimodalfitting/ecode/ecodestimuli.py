@@ -40,8 +40,8 @@ default_ecode_params = {
     "APWaveform": {
         'duration': 50,
         'from': 2,
-        'to': 3,
-        'step': 0.25,
+        'to': 3.5,
+        'step': 0.3,
     },
     "HyperDepol": {
         'hyper_duration': 450,
