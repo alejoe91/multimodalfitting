@@ -103,7 +103,8 @@ def get_extra_kwargs():
     return deepcopy(_extra_kwargs)
 
 
-def extra_recordings_from_positions(cell, sim, positions, position_names):
+def extra_recordings_from_positions(cell, sim, positions, position_names,
+                                    with_currents=False):
     extra_recordings = []
     # instantiate lfpycell
     cell.freeze({})
@@ -157,7 +158,8 @@ def extra_recordings_from_positions(cell, sim, positions, position_names):
                        'sec_index': secarray_idx}
 
         extra_recordings.append(extra_rec_v)
-        extra_recordings.append(extra_rec_i)
+        if with_currents:
+            extra_recordings.append(extra_rec_i)
     cell.unfreeze({})
     cell.destroy(sim)
 
@@ -183,8 +185,10 @@ def get_peak_cutout(responses, peak_idx=5, ms_before=1, ms_after=5):
 
     peak_target = peak_times[peak_idx]
     cutout_ms = np.array([peak_target - ms_before, peak_target + ms_after])
-
-    cutout_idxs = np.searchsorted(soma_response["time"], cutout_ms)
+    # print(peak_target, cutout_ms)
+    cutout_idx_start = np.searchsorted(soma_response["time"], cutout_ms[0]) - 1
+    cutout_idx_stop = np.searchsorted(soma_response["time"], cutout_ms[1], side='right') + 1
+    cutout_idxs = np.array([cutout_idx_start, cutout_idx_stop])
 
     resp_cut = {}
     for resp_name in responses:
@@ -199,7 +203,9 @@ def get_peak_cutout(responses, peak_idx=5, ms_before=1, ms_after=5):
                 else:
                     resp_cut[resp_name][k] = response[k].values.copy()[
                         cutout_idxs[0]:cutout_idxs[1]]
-
+            resp_cut[resp_name] = _interpolate_response(
+                resp_cut[resp_name], fs=20, tmin=0, tmax=ms_before+ms_after)
+    
     return resp_cut
 
 
@@ -695,13 +701,21 @@ def _get_peak_times(
     return peak_times
 
 
-def _interpolate_response(response, fs=20.0):
+def _interpolate_response(response, fs=20.0, tmin=None, tmax=None):
     from scipy.interpolate import interp1d
 
     x = response["time"]
     y = response["voltage"]
-    f = interp1d(x, y, axis=1)
-    xnew = np.arange(np.min(x), np.max(x), 1.0 / fs)
+    if len(y.shape) > 1:
+        axis = 1
+    else:
+        axis = 0
+    f = interp1d(x, y, axis=axis)
+    if tmin is None:
+        tmin = np.min(x)
+    if tmax is None:
+        tmax = np.max(x)
+    xnew = np.arange(tmin, tmax, 1.0 / fs)
     ynew = f(xnew)  # use interpolation function returned by `interp1d`
 
     response_new = {}

@@ -22,6 +22,57 @@ this_file = Path(__file__)
 cell_models_folder = this_file.parent.parent.parent / "cell_models"
 
 
+def convert_all_protocols(protocols_dict, protocols_of_interest=None):
+    in_protocols = protocols_dict
+    out_protocols = {}
+
+    if protocols_of_interest is None:
+        protocols_of_interest = list(in_protocols.keys())
+
+    for protocol_name in protocols_of_interest:
+        # if protocol_name in in_protocols and protocol_name in in_efeatures:
+
+        # Convert the format of the protocols
+        stimuli = [
+            in_protocols[protocol_name]['holding'],
+            in_protocols[protocol_name]['step']
+        ]
+        out_protocols[protocol_name] = {'stimuli': stimuli}
+    
+    return out_protocols
+
+
+def convert_all_features(features_dict, protocols_dict, std_from_mean=0.05,
+                         epsilon=1e-3, exclude_features=None):
+    in_efeatures = features_dict
+    out_efeatures = {}
+
+    for protocol_name in protocols_dict:
+        # if protocol_name in in_protocols and protocol_name in in_efeatures:
+
+        # Convert the format of the efeatures
+        efeatures_def = {}
+        for loc_name, features in in_efeatures[protocol_name].items():
+            for feature in features:
+                add_feature = True
+                if exclude_features is not None:
+                    if protocol_name in exclude_features:
+                        if feature["feature"] in exclude_features[protocol_name]:
+                            add_feature = False
+                if add_feature:
+                    efeatures_def[feature['feature']] = feature['val']
+                    if std_from_mean is not None:
+                        efeatures_def[feature['feature']][1] = np.abs(std_from_mean *
+                                                                      efeatures_def[feature['feature']][0])
+                    if efeatures_def[feature['feature']][1] == 0:
+                        efeatures_def[feature['feature']][1] = epsilon
+                else:
+                    print(f"Excluding efeature {feature['feature']} from protocol {protocol_name}")
+            out_efeatures[protocol_name] = {loc_name: efeatures_def}
+
+    return out_efeatures
+
+
 def get_protocol_definitions(model_name, protocols_file=None):
     """
     Returns protocol definitions
@@ -210,7 +261,8 @@ def define_protocols(
         electrode=None,
         protocols_with_lfp=None,
         extra_recordings=None,
-        simulator="lfpy"
+        simulator="lfpy", 
+        all_protocols=False
 ):
     """
     Defines protocols for a specified feature_Set (or file)
@@ -242,6 +294,11 @@ def define_protocols(
     protocol_definitions = get_protocol_definitions(model_name, protocols_file)
     feature_definitions = get_feature_definitions(feature_file, feature_set)
     
+    if all_protocols:
+        protocol_definitions = convert_all_protocols(protocol_definitions)
+        feature_definitions = convert_all_features(
+            feature_definitions, protocol_definitions)
+
     assert simulator.lower() in ["lfpy", "neuron"]
 
     protocols = {}
@@ -426,14 +483,17 @@ def define_fitness_calculator(
     -------
 
     """
+    if feature_set is not None:
+        assert feature_set in ['multiple', 'soma', 'extra'], "feature_set should be 'multiple', 'soma' or 'extra'."
 
-    if feature_set not in ['multiple', 'soma', 'extra']:
-        raise Exception("feature_set should be 'multiple', 'soma' or 'extra'.")
+        if feature_set == 'extra' and probe is None:
+            raise Exception("Provide a MEAutility probe to use the 'extra' set.")
 
-    if feature_set == 'extra' and probe is None:
-        raise Exception("Provide a MEAutility probe to use the 'extra' set.")
-
-    feature_definitions = get_feature_definitions(feature_file, feature_set)
+        feature_definitions = get_feature_definitions(feature_file, feature_set)
+    else:
+        feature_definitions = get_feature_definitions(
+            feature_file, None)
+        feature_definitions = convert_all_features(feature_definitions, protocols)
 
     objectives = []
     efeatures = {}
@@ -552,6 +612,7 @@ def create_evaluator(
         optimize_ra=False,
         simulator="lfpy",
         interp_step=0.1,
+        all_protocols=False,
         **extra_kwargs
 ):
     """
@@ -566,6 +627,7 @@ def create_evaluator(
         * protocols_BPO_{}.json (protocol files for 'all', 'sections', and 'single' extra strategies)
         * features_BPO_{}.json (feature files for 'all', 'sections', and 'single' extra strategies)
         * holding_threshold_currents.json (information about hilding current)
+        * features.json and protocols.json for "all_protocols" option
 
     Parameters
     ----------
@@ -599,6 +661,8 @@ def create_evaluator(
         If True and abd is True, Ra is also oprimized for AIS and ABD
     simulator: str
         The simulator and cell models to use. "lfpy" | "neuron"
+    all_protocols: bool 
+        If True, all protocols (and features) are used
     extra_kwargs: keyword arguments for computing extracellular signals.
 
     Returns
@@ -630,8 +694,13 @@ def create_evaluator(
     else:
         extra_strategy = "all"
 
-    features_file = efeatures_folder / f"features_BPO_{extra_strategy}.json"
-    protocols_file = efeatures_folder / f"protocols_BPO_{extra_strategy}.json"
+    if not all_protocols:
+        features_file = efeatures_folder / f"features_BPO_{extra_strategy}.json"
+        protocols_file = efeatures_folder / f"protocols_BPO_{extra_strategy}.json"
+    else:
+        features_file = efeatures_folder / f"features.json"
+        protocols_file = efeatures_folder / f"protocols.json"
+        feature_set = None
 
     assert features_file.is_file() is not None, f"Couldn't find features file {features_file}"
     assert protocols_file.is_file() is not None, f"Couldn't find protocols file {protocols_file}"
@@ -646,7 +715,8 @@ def create_evaluator(
         electrode=probe,
         protocols_with_lfp=protocols_with_lfp,
         extra_recordings=extra_recordings,
-        simulator=simulator
+        simulator=simulator,
+        all_protocols=all_protocols
     )
 
     fitness_calculator, _ = define_fitness_calculator(
