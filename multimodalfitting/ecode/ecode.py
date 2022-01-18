@@ -156,9 +156,9 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
     stimuli = []
     for amp in amplitude_steps:
         stimulus = sAHP(phase1_amplitude=amp_phase1, phase3_amplitude=amp_phase3, phase2_amplitude=amp,
-                        delay=delay_pre, sahp_tmid=delay_pre + duration_phase1,
-                        sahp_tmid2=delay_pre + duration_phase1 + duration_phase2,
-                        sahp_toff=delay_pre + duration_phase1 + duration_phase2 + duration_phase3,
+                        delay=delay_pre, tmid=delay_pre + duration_phase1,
+                        tmid2=delay_pre + duration_phase1 + duration_phase2,
+                        toff=delay_pre + duration_phase1 + duration_phase2 + duration_phase3,
                         total_duration=delay_pre + duration_phase1 + duration_phase2 + duration_phase3 + delay_post,
                         location=soma_loc)
         stimuli.append(stimulus)
@@ -209,11 +209,11 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
 def compute_rheobase_for_model(cell, sim, step_duration=270, delay=250, step_min=0.1, step_max=1,
                                step_increment=0.02, isolate=True):
     """
-    
+
     Parameters
     ----------
     cell: BluePyOpt.ephys.Cell
-        The BluePyOpt cell model 
+        The BluePyOpt cell model
     step_duration: float
         Step duration in ms
     delay: float

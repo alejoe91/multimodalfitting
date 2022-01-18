@@ -7,6 +7,8 @@ from copy import deepcopy
 from bluepyefe.reader import _check_metadata
 from bluepyopt.ephys.extra_features_utils import calculate_features, all_1D_features
 
+from ..ecode import HyperDepol, sAHP, PosCheops
+
 
 ###### BUILD METADATA #####
 def get_ecode_protocol_names():
@@ -298,52 +300,115 @@ def model_csv_reader(in_data):
 
 ##### TARGETS ########
 
-def _get_hyper_depol_efeatures(timings):
-    hyper_depol_efeatures = {
-        'Spikecount': {"stim_start": timings["HyperDepol"]["tmid"],
-                       "stim_end": timings["HyperDepol"]["toff"]},
-        'burst_number': {"stim_start": timings["HyperDepol"]["tmid"],
-                         "stim_end": timings["HyperDepol"]["toff"]},
-        'AP_amplitude': {"stim_start": timings["HyperDepol"]["tmid"],
-                         "stim_end": timings["HyperDepol"]["toff"]},
-        'ISI_values': {"stim_start": timings["HyperDepol"]["tmid"],
-                       "stim_end": timings["HyperDepol"]["toff"]},
-        'sag_amplitude': {"stim_start": timings["HyperDepol"]["ton"],
-                          "stim_end": timings["HyperDepol"]["tmid"]},
-        'sag_ratio1': {"stim_start": timings["HyperDepol"]["ton"],
-                       "stim_end": timings["HyperDepol"]["tmid"]},
-        'sag_ratio2': {"stim_start": timings["HyperDepol"]["ton"],
-                       "stim_end": timings["HyperDepol"]["tmid"]},
-    }
+def get_hyper_depol_efeatures(timings=None, stimulus=None):
+    if timings is not None:
+        hyper_depol_efeatures = {
+            'Spikecount': {"stim_start": timings["HyperDepol"]["tmid"],
+                           "stim_end": timings["HyperDepol"]["toff"]},
+            'burst_number': {"stim_start": timings["HyperDepol"]["tmid"],
+                             "stim_end": timings["HyperDepol"]["toff"]},
+            'AP_amplitude': {"stim_start": timings["HyperDepol"]["tmid"],
+                             "stim_end": timings["HyperDepol"]["toff"]},
+            'ISI_values': {"stim_start": timings["HyperDepol"]["tmid"],
+                           "stim_end": timings["HyperDepol"]["toff"]},
+            'sag_amplitude': {"stim_start": timings["HyperDepol"]["ton"],
+                              "stim_end": timings["HyperDepol"]["tmid"]},
+            'sag_ratio1': {"stim_start": timings["HyperDepol"]["ton"],
+                           "stim_end": timings["HyperDepol"]["tmid"]},
+            'sag_ratio2': {"stim_start": timings["HyperDepol"]["ton"],
+                           "stim_end": timings["HyperDepol"]["tmid"]},
+        }
+    else:
+        assert stimulus is not None
+        assert isinstance(stimulus, HyperDepol)
+        hyper_depol_efeatures = {
+            'Spikecount': {"stim_start": stimulus.tmid,
+                           "stim_end": stimulus.toff,
+                           "stimulus_current": stimulus.hyperpol_amplitude},
+            'burst_number': {"stim_start": stimulus.tmid,
+                             "stim_end": stimulus.toff,
+                             "stimulus_current": stimulus.hyperpol_amplitude},
+            'AP_amplitude': {"stim_start": stimulus.tmid,
+                             "stim_end": stimulus.toff,
+                             "stimulus_current": stimulus.hyperpol_amplitude},
+            'ISI_values': {"stim_start": stimulus.tmid,
+                           "stim_end": stimulus.toff,
+                           "stimulus_current": stimulus.hyperpol_amplitude},
+            'sag_amplitude': {"stim_start": stimulus.delay,
+                              "stim_end": stimulus.tmid,
+                              "stimulus_current": stimulus.depol_amplitude},
+            'sag_ratio1': {"stim_start": stimulus.delay,
+                           "stim_end": stimulus.tmid,
+                           "stimulus_current": stimulus.depol_amplitude},
+            'sag_ratio2': {"stim_start": stimulus.delay,
+                           "stim_end": stimulus.tmid,
+                           "stimulus_current": stimulus.depol_amplitude},
+        }
 
     return hyper_depol_efeatures
 
 
-def _get_sahp_efeatures(timings):
-    sahp_efeatures = {
-        'Spikecount': {"stim_start": timings["sAHP"]["tmid"],
-                       "stim_end": timings["sAHP"]["tmid2"]},
-        'AP_amplitude': {"stim_start": timings["sAHP"]["tmid"],
-                         "stim_end": timings["sAHP"]["tmid2"]},
-        'ISI_values': {"stim_start": timings["sAHP"]["tmid"],
-                       "stim_end": timings["sAHP"]["tmid2"]},
-        'AHP_depth': {"stim_start": timings["sAHP"]["tmid"],
-                      "stim_end": timings["sAHP"]["tmid2"]},
-        'AHP_depth_abs': {"stim_start": timings["sAHP"]["tmid"],
+def get_sahp_efeatures(timings=None, stimulus=None):
+    if timings is not None:
+        sahp_efeatures = {
+            'Spikecount': {"stim_start": timings["sAHP"]["tmid"],
+                           "stim_end": timings["sAHP"]["tmid2"]},
+            'AP_amplitude': {"stim_start": timings["sAHP"]["tmid"],
+                             "stim_end": timings["sAHP"]["tmid2"]},
+            'ISI_values': {"stim_start": timings["sAHP"]["tmid"],
+                           "stim_end": timings["sAHP"]["tmid2"]},
+            'AHP_depth': {"stim_start": timings["sAHP"]["tmid"],
                           "stim_end": timings["sAHP"]["tmid2"]},
-        'AHP_time_from_peak': {"stim_start": timings["sAHP"]["tmid"],
-                               "stim_end": timings["sAHP"]["tmid2"]},
-        'steady_state_voltage_stimend': {"stim_start": timings["sAHP"]["tmid"],
-                                         "stim_end": timings["sAHP"]["tmid2"]},
-    }
+            'AHP_depth_abs': {"stim_start": timings["sAHP"]["tmid"],
+                              "stim_end": timings["sAHP"]["tmid2"]},
+            'AHP_time_from_peak': {"stim_start": timings["sAHP"]["tmid"],
+                                   "stim_end": timings["sAHP"]["tmid2"]},
+            'steady_state_voltage_stimend': {"stim_start": timings["sAHP"]["tmid"],
+                                             "stim_end": timings["sAHP"]["tmid2"]},
+        }
+    else:
+        assert stimulus is not None
+        assert isinstance(stimulus, sAHP)
+        sahp_efeatures = {
+            'Spikecount': {"stim_start": stimulus.tmid,
+                           "stim_end": stimulus.tmid2,
+                           "stimulus_current": stimulus.phase2_amplitude},
+            'AP_amplitude': {"stim_start": stimulus.tmid,
+                             "stim_end": stimulus.tmid2,
+                             "stimulus_current": stimulus.phase2_amplitude},
+            'ISI_values': {"stim_start": stimulus.tmid,
+                           "stim_end": stimulus.tmid2,
+                           "stimulus_current": stimulus.phase2_amplitude},
+            'AHP_depth': {"stim_start": stimulus.tmid,
+                          "stim_end": stimulus.tmid2,
+                          "stimulus_current": stimulus.phase2_amplitude},
+            'AHP_depth_abs': {"stim_start": stimulus.tmid,
+                              "stim_end": stimulus.tmid2,
+                              "stimulus_current": stimulus.phase2_amplitude},
+            'AHP_time_from_peak': {"stim_start": stimulus.tmid,
+                                   "stim_end": stimulus.tmid2,
+                                   "stimulus_current": stimulus.phase2_amplitude},
+            'steady_state_voltage_stimend': {"stim_start": stimulus.tmid,
+                                             "stim_end": stimulus.tmid2,
+                                             "stimulus_current": stimulus.phase2_amplitude},
+        }
     return sahp_efeatures
 
 
-def _get_poscheops_efeatures(timings):
-    poscheops_efeatures = {
-        'Spikecount': {"stim_start": timings["PosCheops"]["ton"],
-                       "stim_end": timings["PosCheops"]["t1"]}
-    }
+def get_poscheops_efeatures(timings=None, stimulus=None):
+    if timings is not None:
+        poscheops_efeatures = {
+            'Spikecount': {"stim_start": timings["PosCheops"]["ton"],
+                           "stim_end": timings["PosCheops"]["t1"]}
+        }
+    else:
+        assert stimulus is not None
+        assert isinstance(stimulus, PosCheops)
+        poscheops_efeatures = {
+            'Spikecount': {"stim_start": stimulus.delay,
+                           "stim_end": stimulus.delay + 2 * stimulus.ramp1_dur,
+                           "stimulus_current": stimulus.ramp1_amp}
+        }
     return poscheops_efeatures
 
 
@@ -463,21 +528,21 @@ def get_ecode_targets(timings):
         "HyperDepol": {  # Used for validation
             "amplitudes": [-160, -120, -80, -40],  # Arbitrary choice
             "tolerances": [10],
-            "efeatures": _get_hyper_depol_efeatures(timings),
+            "efeatures": get_hyper_depol_efeatures(timings),
             "location": "soma"
         },
         "sAHP": {
             # Used for validation, It's not obvious in Mikael's schema if the percentage is relative to the base or to the first step
             "amplitudes": [150, 200, 250, 300],  # Arbitrary choice
             "tolerances": [10],
-            "efeatures": _get_sahp_efeatures(timings),
+            "efeatures": get_sahp_efeatures(timings),
             "location": "soma"
         },
         "PosCheops":
             {  # Used for validation, need to check exact timings
                 "amplitudes": [300],
                 "tolerances": [10],
-                "efeatures": _get_poscheops_efeatures(timings),
+                "efeatures": get_poscheops_efeatures(timings),
                 "location": "soma"
             }
     }

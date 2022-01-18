@@ -77,9 +77,9 @@ class sAHP(Stimulus):
     def __init__(self,
                  holding_amplitude=0.0,
                  delay=250.0,
-                 sahp_tmid=500.0,
-                 sahp_tmid2=725.0,
-                 sahp_toff=1175.0,
+                 tmid=500.0,
+                 tmid2=725.0,
+                 toff=1175.0,
                  total_duration=1425.0,
                  phase1_amplitude=None,
                  phase2_amplitude=None,
@@ -90,9 +90,9 @@ class sAHP(Stimulus):
         Args:
             holding_amplitude : holding potential (mV)
             delay (float): time to longstep of sahp (ms)
-            sahp_tmid : time to second delay (ms) 
-            sahp_tmid2: time to second delay being off (ms) 
-            sahp_toff (float): amplitude at end of sahp (nA)
+            tmid : time to second delay (ms) 
+            tmid2: time to second delay being off (ms) 
+            toff (float): amplitude at end of sahp (nA)
             total_duration (float): total duration (ms)
             phase1_amplitude (float): amplitude of phase1 (nA)
             phase1_amplitude (float): amplitude of phase2 (nA)
@@ -103,9 +103,9 @@ class sAHP(Stimulus):
         super().__init__()
         self.holding_amplitude = holding_amplitude
         self.delay = delay
-        self.sahp_tmid = sahp_tmid
-        self.sahp_tmid2 = sahp_tmid2
-        self.sahp_toff = sahp_toff
+        self.tmid = tmid
+        self.tmid2 = tmid2
+        self.toff = toff
         self.total_duration = total_duration
         self.phase1_amplitude = phase1_amplitude
         self.phase2_amplitude = phase2_amplitude
@@ -146,22 +146,22 @@ class sAHP(Stimulus):
         times.append(self.delay)
         amps.append(self.holding_amplitude + self.phase1_amplitude)
 
-        times.append(self.sahp_tmid)
+        times.append(self.tmid)
         amps.append(self.holding_amplitude + self.phase1_amplitude)
 
-        times.append(self.sahp_tmid)
+        times.append(self.tmid)
         amps.append(self.holding_amplitude + self.phase2_amplitude)
 
-        times.append(self.sahp_tmid2)
+        times.append(self.tmid2)
         amps.append(self.holding_amplitude + self.phase2_amplitude)
 
-        times.append(self.sahp_tmid2)
+        times.append(self.tmid2)
         amps.append(self.holding_amplitude + self.phase3_amplitude)
 
-        times.append(self.sahp_toff)
+        times.append(self.toff)
         amps.append(self.holding_amplitude + self.phase3_amplitude)
 
-        times.append(self.sahp_toff)
+        times.append(self.toff)
         amps.append(self.holding_amplitude)
 
         times.append(self.total_duration)
@@ -198,8 +198,8 @@ class sAHP(Stimulus):
                    self.phase2_amplitude,
                    self.phase3_amplitude,
                    self.delay,
-                   self.sahp_tmid,
-                   self.sahp_tmid2,
+                   self.tmid,
+                   self.tmid2,
                    self.total_duration,
                    self.location)
 
@@ -231,6 +231,11 @@ class HyperDepol(Stimulus):
         self.toff = toff
         self.total_duration = total_duration
         self.location = location
+
+        # for efeature
+        self.stim_start = self.tmid
+        self.stim_end = self.toff
+        self.step_amplitude = self.depol_amplitude
 
         self.iclamp = None
         self.persistent = []
