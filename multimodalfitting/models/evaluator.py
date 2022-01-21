@@ -11,7 +11,7 @@ import bluepyopt.ephys as ephys
 import logging
 
 from .model import define_electrode, create_ground_truth_model, create_experimental_model
-from ..efeatures_extraction import get_sahp_efeatures, get_hyper_depol_efeatures, get_poscheops_efeatures
+# from ..efeatures_extraction import get_sahp_efeatures, get_hyper_depol_efeatures, get_poscheops_efeatures
 
 logger = logging.getLogger("__main__")
 
@@ -61,14 +61,30 @@ def convert_all_features(features_dict, protocols_dict, std_from_mean=0.05,
                         if feature["feature"] in exclude_features[protocol_name]:
                             add_feature = False
                 if add_feature:
-                    efeatures_def[feature['feature']] = feature['val']
+                    if feature['feature'] in efeatures_def:
+                        orig_feature_name = feature['feature']
+                        feature_name = orig_feature_name
+                        i = 1
+                        while feature_name in efeatures_def:
+                            feature_name = f"{orig_feature_name}_{i}"
+                            i += 1
+                        efel_feature_name = orig_feature_name
+                    else:
+                        efel_feature_name = feature['feature']
+                        feature_name = feature['feature']
+                    efeatures_def[feature_name] = {}
+                    efeatures_def[feature_name]['mean'] = feature['val'][0]
+                    efeatures_def[feature_name]['std'] = feature['val'][1]
+
                     if std_from_mean is not None:
-                        efeatures_def[feature['feature']][1] = np.abs(std_from_mean *
-                                                                      efeatures_def[feature['feature']][0])
-                    if efeatures_def[feature['feature']][1] == 0:
-                        efeatures_def[feature['feature']][1] = epsilon
+                        efeatures_def[feature_name]['std'] = np.abs(
+                            std_from_mean * efeatures_def[feature_name]['mean'])
+                    if efeatures_def[feature_name]['std'] == 0:
+                        efeatures_def[feature_name]['std'] = epsilon
+                    efeatures_def[feature_name]['efel_settings'] = feature['efel_settings']
+                    efeatures_def[feature_name]['efel_feature_name'] = efel_feature_name
                 else:
-                    print(f"Excluding efeature {feature['feature']} from protocol {protocol_name}")
+                    print(f"Excluding efeature {feature_name} from protocol {protocol_name}")
             out_efeatures[protocol_name] = {loc_name: efeatures_def}
 
     return out_efeatures
@@ -277,17 +293,12 @@ def define_stimuli(protocol_definition, simulator="lfpy",
                                     location=soma_loc)
             stimuli.append(hyperdepol)
         elif "poscheops" in protocol_name.lower():
-            ramp1_dur = (stimulus_definition["t1"] - stimulus_definition["delay"]) / 2
-            ramp2_dur = (stimulus_definition["t3"] - stimulus_definition["t2"]) / 2
-            ramp3_dur = (stimulus_definition["toff"] - stimulus_definition["t4"]) / 2
-            ramp12_delay = stimulus_definition["t2"] - stimulus_definition["t1"]
-            ramp23_delay = stimulus_definition["t4"] - stimulus_definition["t3"]
             poscheops = PosCheops(delay=stimulus_definition["delay"],
-                                  ramp1_dur=ramp1_dur,
-                                  ramp2_dur=ramp2_dur,
-                                  ramp3_dur=ramp3_dur,
-                                  ramp12_delay=ramp12_delay,
-                                  ramp23_delay=ramp23_delay,
+                                  t1=stimulus_definition["t1"],
+                                  t2=stimulus_definition["t2"],
+                                  t3=stimulus_definition["t3"],
+                                  t4=stimulus_definition["t4"],
+                                  toff=stimulus_definition["toff"],
                                   total_duration=stimulus_definition["totduration"],
                                   ramp1_amp=stimulus_definition["amp"],
                                   ramp2_amp=stimulus_definition["amp"],
@@ -562,8 +573,19 @@ def define_fitness_calculator(
         if protocol_name not in exclude_protocols:
             efeatures[protocol_name] = []
             for location, features in locations.items():
-                for efel_feature_name, meanstd in features.items():
-                    feature_name = f'{protocol_name}.{location}.{efel_feature_name}'
+                for feat_name, efeat_values in features.items():
+                    if isinstance(efeat_values, dict):
+                        mean = efeat_values['mean']
+                        std = efeat_values['std']
+                        efel_settings = efeat_values['efel_settings']
+                        efel_feature_name = efeat_values.get(
+                            'efel_feature_name', feat_name)
+                    else:
+                        mean = efeat_values[0]
+                        std = efeat_values[1]
+                        efel_settings = {}
+                        efel_feature_name = feat_name
+                    feature_name = f'{protocol_name}.{location}.{feat_name}'
 
                     if protocols[protocol_name].stimuli[0].step_delay > 0.:
                         stimulus = protocols[protocol_name].stimuli[0]
@@ -571,105 +593,102 @@ def define_fitness_calculator(
                         stimulus = protocols[protocol_name].stimuli[1]
 
                     kwargs = {
-                        'exp_mean': meanstd[0],
-                        'exp_std': meanstd[1],
+                        'exp_mean': mean,
+                        'exp_std': std,
                     }
 
                     stim_kwargs = {}
-                    if "hyperdepol" in protocol_name.lower():
-                        stim_efeatures = get_hyper_depol_efeatures(stimulus=stimulus)
-                    elif "sahp" in protocol_name.lower():
-                        stim_efeatures = get_sahp_efeatures(stimulus=stimulus)
-                    elif "poscheops" in protocol_name.lower():
-                        stim_efeatures = get_poscheops_efeatures(stimulus=stimulus)
+
+                    if isinstance(stimulus, (ephys.stimuli.NrnSquarePulse, ephys.stimuli.LFPySquarePulse)):
+                        stim_kwargs['stim_start'] = efel_settings.get(
+                            'stim_start', stimulus.step_delay)
+                        stim_kwargs['stim_end'] = efel_settings.get(
+                            'stim_end', stimulus.step_delay + stimulus.step_duration)
+                        stim_kwargs['stimulus_current'] = efel_settings.get(
+                            'stimulus_current', stimulus.step_amplitude)
                     else:
-                        stim_efeatures = {efel_feature_name: {'stimulus_current': stimulus.step_amplitude,
-                                                              'stim_start': stimulus.step_delay,
-                                                              'stim_end': stimulus.step_delay + stimulus.step_duration}}
-                    if efel_feature_name in stim_efeatures:
-                        stim_kwargs = stim_efeatures[efel_feature_name]
-                    else:
-                        continue
+                        stim_kwargs = efel_settings
 
-                    if location == 'MEA':
-                        del stim_kwargs['stimulus_current']
+                    feature, objective = _get_feature_and_objective(feature_name, efel_feature_name, protocol_name,
+                                                                    location, objective_weight_mea, stim_kwargs,
+                                                                    extra_kwargs, kwargs, interp_step)
 
-                    kwargs.update(stim_kwargs)
-
-                    if location == 'soma':
-                        kwargs['threshold'] = -20
-                    elif 'dend' in location:
-                        kwargs['threshold'] = -55
-                    else:
-                        kwargs['threshold'] = -20
-
-                    # if protocol_name == 'bAP':
-                    #     kwargs['stim_end'] = stimulus.total_duration
-                    # else:
-                    #     kwargs['stim_end'] = stimulus.step_delay + stimulus.step_duration
-
-                    if location == 'MEA':
-                        recording_names = '%s.%s.LFP' % (protocol_name, location)
-                        somatic_recording_name = f'{protocol_name}.soma.v'
-
-                        kwargs.update(extra_kwargs)
-
-                        # depending on "exp_std" value, different strategies can be identified
-                        if kwargs["exp_std"] is None:
-                            # full cosine dist strategy
-                            objective_weight = objective_weight_mea
-                            channel_ids = None
-                        elif np.isscalar(kwargs["exp_std"]):
-                            # single channel strategy
-                            objective_weight = 1  # in this case weight is the same as other intra-features
-                            channel_ids = int(efel_feature_name.split("_")[-1])
-                            efel_feature_name = "_".join(efel_feature_name.split("_")[:-1])
-                        else:
-                            # sections strategy
-                            objective_weight = objective_weight_mea
-                            channel_ids = kwargs["exp_std"]
-                            efel_feature_name = "_".join(efel_feature_name.split("_")[:-1])
-                            kwargs["exp_std"] = None
-
-                        feature = ephys.efeatures.extraFELFeature(
-                            name=feature_name,
-                            extrafel_feature_name=efel_feature_name,
-                            recording_names={'': recording_names},
-                            somatic_recording_name=somatic_recording_name,
-                            channel_ids=channel_ids,
-                            interp_step=interp_step,
-                            **kwargs
-                        )
-
-                    else:
-
-                        objective_weight = 1
-
-                        recording_names = {'': '%s.%s.v' % (protocol_name, location)}
-
-                        feature = ephys.efeatures.eFELFeature(
-                            name=feature_name,
-                            efel_feature_name=efel_feature_name,
-                            recording_names=recording_names,
-                            max_score=250,
-                            force_max_score=True,
-                            int_settings={'strict_stiminterval': True},
-                            interp_step=interp_step,
-                            **kwargs
-                        )
-
+                    objectives.append(objective)
                     efeatures[protocol_name].append(feature)
-
-                    objectives.append(
-                        ephys.objectives.SingletonWeightObjective(
-                            feature_name,
-                            feature,
-                            weight=objective_weight
-                        )
-                    )
 
     return ephys.objectivescalculators.ObjectivesCalculator(
         objectives), efeatures
+
+
+def _get_feature_and_objective(feature_name, efel_feature_name, protocol_name, location, objective_weight_mea,
+                               stim_kwargs, extra_kwargs, kwargs, interp_step):
+    if location == 'MEA':
+        del stim_kwargs['stimulus_current']
+
+    kwargs.update(stim_kwargs)
+
+    if location == 'soma':
+        kwargs['threshold'] = -20
+    elif 'dend' in location:
+        kwargs['threshold'] = -55
+    else:
+        kwargs['threshold'] = -20
+
+    if location == 'MEA':
+        recording_names = '%s.%s.LFP' % (protocol_name, location)
+        somatic_recording_name = f'{protocol_name}.soma.v'
+
+        kwargs.update(extra_kwargs)
+
+        # depending on "exp_std" value, different strategies can be identified
+        if kwargs["exp_std"] is None:
+            # full cosine dist strategy
+            objective_weight = objective_weight_mea
+            channel_ids = None
+        elif np.isscalar(kwargs["exp_std"]):
+            # single channel strategy
+            objective_weight = 1  # in this case weight is the same as other intra-features
+            channel_ids = int(efel_feature_name.split("_")[-1])
+            efel_feature_name = "_".join(efel_feature_name.split("_")[:-1])
+        else:
+            # sections strategy
+            objective_weight = objective_weight_mea
+            channel_ids = kwargs["exp_std"]
+            efel_feature_name = "_".join(efel_feature_name.split("_")[:-1])
+            kwargs["exp_std"] = None
+
+        feature = ephys.efeatures.extraFELFeature(
+            name=feature_name,
+            extrafel_feature_name=efel_feature_name,
+            recording_names={'': recording_names},
+            somatic_recording_name=somatic_recording_name,
+            channel_ids=channel_ids,
+            interp_step=interp_step,
+            **kwargs
+        )
+
+    else:
+
+        objective_weight = 1
+
+        recording_names = {'': '%s.%s.v' % (protocol_name, location)}
+
+        feature = ephys.efeatures.eFELFeature(
+            name=feature_name,
+            efel_feature_name=efel_feature_name,
+            recording_names=recording_names,
+            max_score=250,
+            force_max_score=True,
+            int_settings={'strict_stiminterval': True},
+            interp_step=interp_step,
+            **kwargs
+        )
+    objective = ephys.objectives.SingletonWeightObjective(
+        feature_name,
+        feature,
+        weight=objective_weight
+    )
+    return feature, objective
 
 
 def create_evaluator(
