@@ -3489,6 +3489,30 @@
           "stim_start": 1000,
           "stim_end": 9000
         }
+      },
+      {
+        "feature": "Spikecount",
+        "val": [
+          21.4,
+          1.3564659966250536
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 10500,
+          "stim_end": 14500
+        }
+      },
+      {
+        "feature": "Spikecount",
+        "val": [
+          14.0,
+          0.8944271909999159
+        ],
+        "n": 5,
+        "efel_settings": {
+          "stim_start": 16000,
+          "stim_end": 18660
+        }
       }
     ]
   }

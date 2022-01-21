@@ -77,9 +77,9 @@ class sAHP(Stimulus):
     def __init__(self,
                  holding_amplitude=0.0,
                  delay=250.0,
-                 sahp_tmid=500.0,
-                 sahp_tmid2=725.0,
-                 sahp_toff=1175.0,
+                 tmid=500.0,
+                 tmid2=725.0,
+                 toff=1175.0,
                  total_duration=1425.0,
                  phase1_amplitude=None,
                  phase2_amplitude=None,
@@ -90,9 +90,9 @@ class sAHP(Stimulus):
         Args:
             holding_amplitude : holding potential (mV)
             delay (float): time to longstep of sahp (ms)
-            sahp_tmid : time to second delay (ms) 
-            sahp_tmid2: time to second delay being off (ms) 
-            sahp_toff (float): amplitude at end of sahp (nA)
+            tmid : time to second delay (ms) 
+            tmid2: time to second delay being off (ms) 
+            toff (float): amplitude at end of sahp (nA)
             total_duration (float): total duration (ms)
             phase1_amplitude (float): amplitude of phase1 (nA)
             phase1_amplitude (float): amplitude of phase2 (nA)
@@ -103,9 +103,9 @@ class sAHP(Stimulus):
         super().__init__()
         self.holding_amplitude = holding_amplitude
         self.delay = delay
-        self.sahp_tmid = sahp_tmid
-        self.sahp_tmid2 = sahp_tmid2
-        self.sahp_toff = sahp_toff
+        self.tmid = tmid
+        self.tmid2 = tmid2
+        self.toff = toff
         self.total_duration = total_duration
         self.phase1_amplitude = phase1_amplitude
         self.phase2_amplitude = phase2_amplitude
@@ -146,22 +146,22 @@ class sAHP(Stimulus):
         times.append(self.delay)
         amps.append(self.holding_amplitude + self.phase1_amplitude)
 
-        times.append(self.sahp_tmid)
+        times.append(self.tmid)
         amps.append(self.holding_amplitude + self.phase1_amplitude)
 
-        times.append(self.sahp_tmid)
+        times.append(self.tmid)
         amps.append(self.holding_amplitude + self.phase2_amplitude)
 
-        times.append(self.sahp_tmid2)
+        times.append(self.tmid2)
         amps.append(self.holding_amplitude + self.phase2_amplitude)
 
-        times.append(self.sahp_tmid2)
+        times.append(self.tmid2)
         amps.append(self.holding_amplitude + self.phase3_amplitude)
 
-        times.append(self.sahp_toff)
+        times.append(self.toff)
         amps.append(self.holding_amplitude + self.phase3_amplitude)
 
-        times.append(self.sahp_toff)
+        times.append(self.toff)
         amps.append(self.holding_amplitude)
 
         times.append(self.total_duration)
@@ -198,8 +198,8 @@ class sAHP(Stimulus):
                    self.phase2_amplitude,
                    self.phase3_amplitude,
                    self.delay,
-                   self.sahp_tmid,
-                   self.sahp_tmid2,
+                   self.tmid,
+                   self.tmid2,
                    self.total_duration,
                    self.location)
 
@@ -231,6 +231,11 @@ class HyperDepol(Stimulus):
         self.toff = toff
         self.total_duration = total_duration
         self.location = location
+
+        # for efeature
+        self.stim_start = self.tmid
+        self.stim_end = self.toff
+        self.step_amplitude = self.depol_amplitude
 
         self.iclamp = None
         self.persistent = []
@@ -315,15 +320,15 @@ class PosCheops(Stimulus):
     def __init__(self,
                  delay=250.0,
                  holding_amplitude=0,
-                 ramp1_dur=4000.0,
-                 ramp2_dur=2000.0,
-                 ramp3_dur=1330.0,
+                 t1=8250.,
+                 t2=10250.,
+                 t3=14250.,
+                 t4=16250.,
+                 toff=18910.,
+                 total_duration=20910.0,
                  ramp1_amp=None,
                  ramp2_amp=None,
                  ramp3_amp=None,
-                 ramp12_delay=2000.0,
-                 ramp23_delay=2000.0,
-                 total_duration=20910.0,
                  location=None):
         """Constructor
 
@@ -336,15 +341,17 @@ class PosCheops(Stimulus):
         self.holding_amplitude = holding_amplitude
         self.delay = delay
         self.holding_amplitude = holding_amplitude
-        self.ramp1_dur = ramp1_dur
-        self.ramp2_dur = ramp2_dur
-        self.ramp3_dur = ramp3_dur
+        self.t1 = t1
+        self.t2 = t2
+        self.t3 = t3
+        self.t4 = t4
+        self.toff = toff
+        self.total_duration = total_duration
+
         self.ramp1_amp = ramp1_amp
         self.ramp2_amp = ramp2_amp
         self.ramp3_amp = ramp3_amp
-        self.ramp12_delay = ramp12_delay
-        self.ramp23_delay = ramp23_delay
-        self.total_duration = total_duration
+
         self.location = location
 
         self.iclamp = None
@@ -365,6 +372,10 @@ class PosCheops(Stimulus):
         else:
             raise NotImplementedError(f"{type(self.location)} is currently not implemented with the LFPy backend")
 
+        ramp1_dur = (self.t1 - self.delay) / 2
+        ramp2_dur = (self.t3 - self.t2) / 2
+        ramp3_dur = (self.toff - self.t4) / 2
+
         current_vec = sim.neuron.h.Vector()
         time_vec = sim.neuron.h.Vector()
 
@@ -374,30 +385,28 @@ class PosCheops(Stimulus):
         time_vec.append(self.delay)
         current_vec.append(self.holding_amplitude)
 
-        time_vec.append(self.delay + self.ramp1_dur)
+        time_vec.append(self.delay + ramp1_dur)
         current_vec.append(self.holding_amplitude + self.ramp1_amp)
 
-        time_vec.append(self.delay + 2 * self.ramp1_dur)
+        time_vec.append(self.t1)
         current_vec.append(self.holding_amplitude)
 
-        time_vec.append(self.delay + 2 * self.ramp1_dur + self.ramp12_delay)
+        time_vec.append(self.t2)
         current_vec.append(self.holding_amplitude)
 
-        time_vec.append(self.delay + 2 * self.ramp1_dur + self.ramp12_delay + self.ramp2_dur)
+        time_vec.append(self.t2 + ramp2_dur)
         current_vec.append(self.holding_amplitude + self.ramp2_amp)
 
-        time_vec.append(self.delay + 2 * self.ramp1_dur + self.ramp12_delay + 2 * self.ramp2_dur)
+        time_vec.append(self.t3)
         current_vec.append(self.holding_amplitude)
 
-        time_vec.append(self.delay + 2 * self.ramp1_dur + self.ramp12_delay + 2 * self.ramp2_dur + self.ramp23_delay)
+        time_vec.append(self.t4)
         current_vec.append(self.holding_amplitude)
 
-        time_vec.append(
-            self.delay + 2 * self.ramp1_dur + self.ramp12_delay + 2 * self.ramp2_dur + self.ramp23_delay + self.ramp3_dur)
+        time_vec.append(self.t4 + ramp3_dur)
         current_vec.append(self.holding_amplitude + self.ramp3_amp)
 
-        time_vec.append(
-            self.delay + 2 * self.ramp1_dur + self.ramp12_delay + 2 * self.ramp2_dur + self.ramp23_delay + 2 * self.ramp3_dur)
+        time_vec.append(self.toff)
         current_vec.append(self.holding_amplitude)
 
         time_vec.append(self.total_duration)
@@ -431,11 +440,11 @@ class PosCheops(Stimulus):
         return "PosCheops with ramp1_amp %f - ramp1_dur %f, ramp2_amp %f - ramp2_dur %f, and ramp3_amp %f " \
                "- ramp3_dur %fat %s" % (
             self.ramp1_amp,
-            self.ramp1_dur,
+            (self.t1 - self.delay) / 2,
             self.ramp2_amp,
-            self.ramp2_dur,
+            (self.t3 - self.de2lay) / 2,
             self.ramp3_amp,
-            self.ramp3_dur,
+            (self.toff - self.t4) / 2,
             self.location)
 
 
