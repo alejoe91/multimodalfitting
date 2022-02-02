@@ -11,8 +11,12 @@ this_file = Path(__file__)
 cell_models_folder = this_file.parent.parent.parent / "cell_models"
 
 
-def define_mechanisms(cell_model_folder, abd=False):
-    """Defines mechanisms"""
+def define_mechanisms(cell_model_folder, extracellularmech=None, abd=False):
+    """Defines mechanisms
+    extracellularmech : bool, optional
+        If True, extracellular mechanism in inserted into the model for recording i_membrane
+        Default is None
+    """
 
     mechanism_file_name = "mechanisms"
     if abd:
@@ -41,6 +45,17 @@ def define_mechanisms(cell_model_folder, abd=False):
                     preloaded=True,
                 )
             )
+
+        if extracellularmech == True:
+            mechanisms.append(
+            ephys.mechanisms.NrnMODMechanism(
+                name="extracellular.%s" % (sectionlist),
+                mod_path="",
+                suffix="extracellular",
+                locations=seclist_loc,
+                preloaded=True,
+            )
+        )
 
     return mechanisms
 
@@ -354,7 +369,7 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
     )
 
 
-def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
+def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, extracellularmech=None, model_type="LFPy",
                               **morph_kwargs):
     """Create ground-truth model
 
@@ -369,6 +384,9 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
         by default False
     v_init : float, optional
         Initial membrane potential value, by default None
+    extracellularmech : bool, optional
+        If True, extracellular mechanism in inserted into the model for recording i_membrane
+        Default is None
     model_type : str, optional
         * "neuron": instantiate a CellModel
         * "LFPy": instantiate an LFPyCellModel
@@ -410,7 +428,12 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
     cell_model_folder = cell_folder / model_name
 
     morph = define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **morph_kwargs)
-    mechs = define_mechanisms(cell_model_folder)
+
+    if extracellularmech==True:
+        mechs = define_mechanisms(cell_model_folder, extracellularmech=True)
+    else:
+        mechs = define_mechanisms(cell_model_folder)
+
     params = define_parameters(cell_model_folder, release=release)
 
     assert "v_init" in [param.name for param in params], ("Couldn't find v_init in the parameters. "
@@ -439,7 +462,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
     return cell
 
 
-def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
+def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, extracellularmech=None, model_type="LFPy",
                               abd=False, optimize_ra=False, **morph_kwargs):
     """Create experimental cell model
 
@@ -454,6 +477,9 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
         by default False
     v_init : float, optional
         Initial membrane potential value, by default None
+    extracellularmech : bool, optional
+        If True, extracellular mechanism in inserted into the model for recording i_membrane
+        Default is None
     model_type : str, optional
         * "neuron": instantiate a CellModel
         * "LFPy": instantiate an LFPyCellModel
@@ -511,7 +537,11 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
         morph_modifiers_kwargs=morph_kwargs
     )
 
-    mechs = define_mechanisms(cell_model_folder, abd=abd)
+    if extracellularmech==True:
+        mechs = define_mechanisms(cell_model_folder, extracellularmech==True, abd=abd)
+    else:
+        mechs = define_mechanisms(cell_model_folder, abd=abd)
+
     params = define_parameters(cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra)
 
     assert "v_init" in [param.name for param in params], ("Couldn't find v_init in the parameters. "
