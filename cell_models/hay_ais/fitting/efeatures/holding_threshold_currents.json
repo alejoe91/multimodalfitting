@@ -4,13 +4,13 @@
     0.0
   ],
   "threshold_current": [
-    0.141,
+    0.15,
     0.0
   ],
   "all_holding_current": {
     "hay_ais": 0.0
   },
   "all_threshold_current": {
-    "hay_ais": 0.141
+    "hay_ais": 0.15
   }
 }

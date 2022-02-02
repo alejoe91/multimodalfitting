@@ -156,9 +156,9 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
     stimuli = []
     for amp in amplitude_steps:
         stimulus = sAHP(phase1_amplitude=amp_phase1, phase3_amplitude=amp_phase3, phase2_amplitude=amp,
-                        delay=delay_pre, sahp_tmid=delay_pre + duration_phase1,
-                        sahp_tmid2=delay_pre + duration_phase1 + duration_phase2,
-                        sahp_toff=delay_pre + duration_phase1 + duration_phase2 + duration_phase3,
+                        delay=delay_pre, tmid=delay_pre + duration_phase1,
+                        tmid2=delay_pre + duration_phase1 + duration_phase2,
+                        toff=delay_pre + duration_phase1 + duration_phase2 + duration_phase3,
                         total_duration=delay_pre + duration_phase1 + duration_phase2 + duration_phase3 + delay_post,
                         location=soma_loc)
         stimuli.append(stimulus)
@@ -173,11 +173,14 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
     duration3 = params["PosCheops"]["duration3"]
     interramp_delay = params["PosCheops"]["delay"]
 
-    total_duration = delay_pre + 2 * duration1 + 2 * duration2 + 2 * duration3 + 2 * interramp_delay + delay_post
-
-    stimulus = PosCheops(ramp1_dur=duration1, ramp2_dur=duration2, ramp3_dur=duration3,
+    t1 = delay_pre + 2 * duration1
+    t2 = t1 + interramp_delay
+    t3 = t2 + 2 * duration2
+    t4 = t3 + interramp_delay
+    toff = t4 + 2 * duration3
+    total_duration = toff + delay_post
+    stimulus = PosCheops(delay=delay_pre, t1=t1, t2=t2, t3=t3, t4=t4, toff=toff,
                          ramp1_amp=amp, ramp2_amp=amp, ramp3_amp=amp,
-                         ramp12_delay=interramp_delay, ramp23_delay=interramp_delay,
                          total_duration=total_duration,
                          location=soma_loc)
     ecode_stimuli["PosCheops"] = [stimulus]
@@ -209,11 +212,11 @@ def generate_ecode_protocols(rheobase_current, delay_pre=250, delay_post=250,
 def compute_rheobase_for_model(cell, sim, step_duration=270, delay=250, step_min=0.1, step_max=1,
                                step_increment=0.02, isolate=True):
     """
-    
+
     Parameters
     ----------
     cell: BluePyOpt.ephys.Cell
-        The BluePyOpt cell model 
+        The BluePyOpt cell model
     step_duration: float
         Step duration in ms
     delay: float

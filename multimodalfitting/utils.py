@@ -103,7 +103,8 @@ def get_extra_kwargs():
     return deepcopy(_extra_kwargs)
 
 
-def extra_recordings_from_positions(cell, sim, positions, position_names):
+def extra_recordings_from_positions(cell, sim, positions, position_names,
+                                    with_currents=False):
     extra_recordings = []
     # instantiate lfpycell
     cell.freeze({})
@@ -157,7 +158,8 @@ def extra_recordings_from_positions(cell, sim, positions, position_names):
                        'sec_index': secarray_idx}
 
         extra_recordings.append(extra_rec_v)
-        extra_recordings.append(extra_rec_i)
+        if with_currents:
+            extra_recordings.append(extra_rec_i)
     cell.unfreeze({})
     cell.destroy(sim)
 
@@ -174,33 +176,86 @@ def construct_efel_trace(response, stim_start=250, stim_end=1600):
     return trace
 
 
-def get_peak_cutout(responses, peak_idx=5, ms_before=1, ms_after=5):
+def get_peak_cutout(responses, peak_idx=None, ms_before=1., ms_after=5.,
+                    skip_first_and_last=True, average=True): 
+    """Compute peak cutout respones
+
+    Parameters
+    ----------
+    responses : dict
+        Dictionary with responses to cut
+    peak_idx : int or None, optional
+        Peak index to use, when not None, by default None
+    ms_before : float, optional
+        Ms to cutout before the peak, by default 1
+    ms_after : float, optional
+        Ms to cutout after the peak, by default 5
+    average : bool, optional
+        If True, all peaks are averaged in the output response, by default True
+
+    Returns
+    -------
+    dict
+        Cutout responses
+    """
     soma_resp_name = [resp for resp in responses if "soma.v" in resp][0]
     soma_response = responses[soma_resp_name]
     soma_trace = construct_efel_trace(soma_response)
     peak_times = efel.getFeatureValues([soma_trace], featureNames=[
                                        "peak_time"])[0]["peak_time"]
 
-    peak_target = peak_times[peak_idx]
-    cutout_ms = np.array([peak_target - ms_before, peak_target + ms_after])
+    if not average:
+        assert peak_idx is not None
+        peak_targets = [peak_times[peak_idx]]
+    else:
+        peak_targets = peak_times
+        if skip_first_and_last:
+            peak_targets = peak_targets[1:-1]
+    responses_list = []
+    for peak_target in peak_targets:
+        cutout_ms = np.array([peak_target - ms_before, peak_target + ms_after])
+        cutout_idx_start = np.searchsorted(soma_response["time"], cutout_ms[0]) - 1
+        cutout_idx_stop = np.searchsorted(soma_response["time"], cutout_ms[1], side='right') + 1
+        cutout_idxs = np.array([cutout_idx_start, cutout_idx_stop])
 
-    cutout_idxs = np.searchsorted(soma_response["time"], cutout_ms)
+        resp_cut = {}
+        for resp_name in responses:
+            response = responses[resp_name]
+            if not isinstance(response, ephys.responses.TimeLFPResponse):
+                resp_cut[resp_name] = {}
+                for k in response.response.keys():
+                    if k == "time":
+                        resp_time = response[k].values.copy(
+                        )[cutout_idxs[0]:cutout_idxs[1]]
+                        resp_cut[resp_name][k] = resp_time - resp_time[0]
+                    else:
+                        resp_cut[resp_name][k] = response[k].values.copy()[
+                            cutout_idxs[0]:cutout_idxs[1]]
+                resp_cut[resp_name] = _interpolate_response(
+                    resp_cut[resp_name], fs=20, tmin=0, tmax=ms_before+ms_after)
+        responses_list.append(resp_cut)
 
-    resp_cut = {}
-    for resp_name in responses:
-        response = responses[resp_name]
-        if not isinstance(response, ephys.responses.TimeLFPResponse):
-            resp_cut[resp_name] = {}
-            for k in response.response.keys():
-                if k == "time":
-                    resp_time = response[k].values.copy(
-                    )[cutout_idxs[0]:cutout_idxs[1]]
-                    resp_cut[resp_name][k] = resp_time - resp_time[0]
-                else:
-                    resp_cut[resp_name][k] = response[k].values.copy()[
-                        cutout_idxs[0]:cutout_idxs[1]]
+    if len(responses_list) == 1:
+        responses_cut = responses[0]
+    else:
+        responses_cut = {}
+        for i, response_single in enumerate(responses_list):
+            for resp_name, response in response_single.items():
+                for k in response.keys():
+                    if i == 0:
+                        if resp_name not in responses_cut:
+                            responses_cut[resp_name] = {}
+                        responses_cut[resp_name][k] = response[k]
+                    else:
+                        if k != "time":
+                            responses_cut[resp_name][k] += response[k]
+        # divide by num responses
+        for resp_name, response in responses_cut.items():
+            for k in response.keys():
+                if k != "time":
+                    responses_cut[resp_name][k] /= len(responses_list)
 
-    return resp_cut
+    return responses_cut
 
 
 def simulate_BAC_responses(cell, params, sim, pulse_delay=15, pulse_amp=1, pulse_dur=5,
@@ -599,18 +654,22 @@ def load_checkpoint(checkpoint_path):
     else:
         extra_strategy = None
 
-    run = {"nevals": np.cumsum(run['logbook'].select("nevals")),
-           "population": run['population'],
-           "hof": run['halloffame'],
-           "logbook": run['logbook'],
-           "model": model,
-           "seed": seed,
-           "extra_strategy": extra_strategy,
-           "feature_set": feature_set,
-           "best_fitness": np.sum(run['halloffame'][0].fitness.values),
-           "best_scores": list(run['halloffame'][0].fitness.values),
-           "best_params": list(run['halloffame'][0]),
-           "path": checkpoint_path}
+    run = {
+        "nevals": np.cumsum(run['logbook'].select("nevals")),
+        "population": run['population'],
+        "hof": run['halloffame'],
+        "logbook": run['logbook'],
+        "model": model,
+        "seed": seed,
+        "extra_strategy": extra_strategy,
+        "feature_set": feature_set,
+        "best_fitness": np.sum(run['halloffame'][0].fitness.values),
+        "best_scores": list(run['halloffame'][0].fitness.values),
+        "best_params": list(run['halloffame'][0]),
+        "path": checkpoint_path,
+        "ra": "ra" in chkp_name,
+        "abd": "abd" in chkp_name
+    }
 
     return run
 
@@ -691,13 +750,21 @@ def _get_peak_times(
     return peak_times
 
 
-def _interpolate_response(response, fs=20.0):
+def _interpolate_response(response, fs=20.0, tmin=None, tmax=None):
     from scipy.interpolate import interp1d
 
     x = response["time"]
     y = response["voltage"]
-    f = interp1d(x, y, axis=1)
-    xnew = np.arange(np.min(x), np.max(x), 1.0 / fs)
+    if len(y.shape) > 1:
+        axis = 1
+    else:
+        axis = 0
+    f = interp1d(x, y, axis=axis)
+    if tmin is None:
+        tmin = np.min(x)
+    if tmax is None:
+        tmax = np.max(x)
+    xnew = np.arange(tmin, tmax, 1.0 / fs)
     ynew = f(xnew)  # use interpolation function returned by `interp1d`
 
     response_new = {}

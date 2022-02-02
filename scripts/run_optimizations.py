@@ -157,10 +157,9 @@ def main():
         feature_set = "soma"
 
     protocols_with_lfp = None
-    timeout = 300.
+    timeout = 900.
     if feature_set == "extra":
         protocols_with_lfp = ['IDrest_300']
-        timeout = 900.
 
     eva = mf.create_evaluator(
         model_name=args.model,

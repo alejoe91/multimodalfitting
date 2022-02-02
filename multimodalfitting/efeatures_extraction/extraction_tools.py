@@ -7,6 +7,21 @@ from copy import deepcopy
 from bluepyefe.reader import _check_metadata
 from bluepyopt.ephys.extra_features_utils import calculate_features, all_1D_features
 
+from ..ecode import HyperDepol, sAHP, PosCheops
+from .targets import get_firepattern_targets, get_idrest_targets, get_iv_targets, get_apwaveform_targets, \
+    get_hyperdepol_targets, get_sahp_targets, get_poscheops_targets
+
+
+protocol_name_to_target_function = {
+    "firepattern": get_firepattern_targets,
+    "idrest": get_idrest_targets,
+    "iv": get_iv_targets,
+    "apwaveform": get_apwaveform_targets,
+    "hyperdepol": get_hyperdepol_targets,
+    "sahp": get_sahp_targets,
+    "poscheops": get_poscheops_targets
+}
+
 
 ###### BUILD METADATA #####
 def get_ecode_protocol_names():
@@ -297,195 +312,15 @@ def model_csv_reader(in_data):
     return data
 
 ##### TARGETS ########
-
-def _get_hyper_depol_efeatures(timings):
-    hyper_depol_efeatures = {
-        'Spikecount': {"stim_start": timings["HyperDepol"]["tmid"],
-                       "stim_end": timings["HyperDepol"]["toff"]},
-        'burst_number': {"stim_start": timings["HyperDepol"]["tmid"],
-                         "stim_end": timings["HyperDepol"]["toff"]},
-        'AP_amplitude': {"stim_start": timings["HyperDepol"]["tmid"],
-                         "stim_end": timings["HyperDepol"]["toff"]},
-        'ISI_values': {"stim_start": timings["HyperDepol"]["tmid"],
-                       "stim_end": timings["HyperDepol"]["toff"]},
-        'sag_amplitude': {"stim_start": timings["HyperDepol"]["ton"],
-                          "stim_end": timings["HyperDepol"]["tmid"]},
-        'sag_ratio1': {"stim_start": timings["HyperDepol"]["ton"],
-                       "stim_end": timings["HyperDepol"]["tmid"]},
-        'sag_ratio2': {"stim_start": timings["HyperDepol"]["ton"],
-                       "stim_end": timings["HyperDepol"]["tmid"]},
-    }
-
-    return hyper_depol_efeatures
-
-
-def _get_sahp_efeatures(timings):
-    sahp_efeatures = {
-        'Spikecount': {"stim_start": timings["sAHP"]["tmid"],
-                       "stim_end": timings["sAHP"]["tmid2"]},
-        'AP_amplitude': {"stim_start": timings["sAHP"]["tmid"],
-                         "stim_end": timings["sAHP"]["tmid2"]},
-        'ISI_values': {"stim_start": timings["sAHP"]["tmid"],
-                       "stim_end": timings["sAHP"]["tmid2"]},
-        'AHP_depth': {"stim_start": timings["sAHP"]["tmid"],
-                      "stim_end": timings["sAHP"]["tmid2"]},
-        'AHP_depth_abs': {"stim_start": timings["sAHP"]["tmid"],
-                          "stim_end": timings["sAHP"]["tmid2"]},
-        'AHP_time_from_peak': {"stim_start": timings["sAHP"]["tmid"],
-                               "stim_end": timings["sAHP"]["tmid2"]},
-        'steady_state_voltage_stimend': {"stim_start": timings["sAHP"]["tmid"],
-                                         "stim_end": timings["sAHP"]["tmid2"]},
-    }
-    return sahp_efeatures
-
-
-def _get_poscheops_efeatures(timings):
-    poscheops_efeatures = {
-        'Spikecount': {"stim_start": timings["PosCheops"]["ton"],
-                       "stim_end": timings["PosCheops"]["t1"]}
-    }
-    return poscheops_efeatures
-
-
-def _get_poscheops_targets(timings):
-    poscheops_targets = {
-        "PosCheops1":
-            {  # Used for validation, need to check exact timings
-                "amplitudes": [300],
-                "tolerances": [10],
-                "efeatures": {'Spikecount': {"stim_start": timings["PosCheops"]["ton"],
-                                             "stim_end": timings["PosCheops"]["t1"]}},
-                "location": "soma"
-            },
-        "PosCheops2":
-            {  # Used for validation, need to check exact timings
-                "amplitudes": [300],
-                "tolerances": [10],
-                "efeatures": {'Spikecount': {"stim_start": timings["PosCheops"]["t2"],
-                                             "stim_end": timings["PosCheops"]["t3"]}},
-                "location": "soma"
-            },
-        "PosCheops3":
-            {  # Used for validation, need to check exact timings
-                "amplitudes": [300],
-                "tolerances": [10],
-                "efeatures": {'Spikecount': {"stim_start": timings["PosCheops"]["t4"],
-                                             "stim_end": timings["PosCheops"]["toff"]}},
-                "location": "soma"
-            },
-    }
-
-    return poscheops_targets
-
-
 def get_ecode_targets(timings):
-    targets = {
-        "IDthres": {
-            "amplitudes": [],  # Not used to extract actual e-features, just to compute the rheobase
-            "tolerances": [10],
-            "efeatures": [],
-            "location": "soma"
-        },
-        "firepattern": {
-            "amplitudes": [120, 200],  # Amplitudes will have to change if the rheobase shifted.
-            "tolerances": [20],
-            "efeatures": [
-                'mean_frequency',
-                'burst_number',
-                'adaptation_index2',
-                'ISI_CV',
-                'ISI_log_slope',
-                'inv_time_to_first_spike',
-                'inv_first_ISI',
-                'inv_second_ISI',
-                'inv_third_ISI',
-                'inv_fourth_ISI',
-                'inv_fifth_ISI',
-                'AP_amplitude',
-                'AHP_depth',
-                'AHP_time_from_peak',
-            ],
-            "location": "soma"
-        },
-        "IDrest": {  # Not sure what to use it for, except to get the IF curve.
-            "amplitudes": [50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
-            "tolerances": [20],
-            "efeatures": [
-                'mean_frequency',
-                'burst_number',
-                'adaptation_index2',
-                'ISI_CV',
-                'ISI_log_slope',
-                'inv_time_to_first_spike',
-                'inv_first_ISI',
-                'inv_second_ISI',
-                'inv_third_ISI',
-                'inv_fourth_ISI',
-                'inv_fifth_ISI',
-                'AP_amplitude',
-                'AHP_depth',
-                'AHP_time_from_peak',
-            ],
-            "location": "soma"
-        },
-        "IV": {
-            "amplitudes": [-140, -120, -100, -80, -60, -40, -20, 0, 20, 40, 60],  # -100 for the sag, -20 for the "passives", 0 for the RMP
-            "tolerances": [10],
-            "efeatures": [
-                'Spikecount',
-                'voltage_base',
-                'voltage_deflection',
-                'voltage_deflection_begin',
-                'steady_state_voltage_stimend',
-                'ohmic_input_resistance_vb_ssse',
-                'sag_amplitude',
-                'sag_ratio1',
-                'sag_ratio2',
-                'decay_time_constant_after_stim',
-            ],
-            "location": "soma"
-        },
-        "APWaveform": {
-            "amplitudes": [200, 230, 260, 290, 320, 350],  # Arbitrary choice
-            "tolerances": [20],
-            "efeatures": [
-                'AP_amplitude',
-                'AP1_amp',
-                'AP2_amp',
-                'AP_duration_half_width',
-                'AP_begin_width',
-                'AP_begin_voltage',
-                'AHP_depth',
-                'AHP_time_from_peak'
-            ],
-            "location": "soma"
-        },
-        "HyperDepol": {  # Used for validation
-            "amplitudes": [-160, -120, -80, -40],  # Arbitrary choice
-            "tolerances": [10],
-            "efeatures": _get_hyper_depol_efeatures(timings),
-            "location": "soma"
-        },
-        "sAHP": {
-            # Used for validation, It's not obvious in Mikael's schema if the percentage is relative to the base or to the first step
-            "amplitudes": [150, 200, 250, 300],  # Arbitrary choice
-            "tolerances": [10],
-            "efeatures": _get_sahp_efeatures(timings),
-            "location": "soma"
-        },
-        "PosCheops":
-            {  # Used for validation, need to check exact timings
-                "amplitudes": [300],
-                "tolerances": [10],
-                "efeatures": _get_poscheops_efeatures(timings),
-                "location": "soma"
-            }
-    }
-
+    targets = []
+    for protocol_name, target_function in protocol_name_to_target_function.items():
+        new_targets = target_function(timings=timings)
+        targets += new_targets
     return targets
 
-###### CONVERT TO BPO #####
 
+###### CONVERT TO BPO #####
 def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
                           out_protocol_path=None, out_efeatures_path=None,
                           epsilon=1e-3, protocols_of_interest=None,
