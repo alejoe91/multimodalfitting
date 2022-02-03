@@ -2,27 +2,19 @@ import argparse
 import logging
 import os
 import sys
-from pathlib import Path
 import json
+from pathlib import Path
 from datetime import datetime
 
 import bluepyopt
 
 import multimodalfitting as mf
-
+from multimodalfitting.utils import _extra_kwargs
 logger = logging.getLogger()
 
 logging.basicConfig(
     level=logging.DEBUG,
     stream=sys.stdout,
-)
-
-# kwargs for extracellular computation
-EXTRA_EVALUATOR_KWARGS = dict(
-    fs=20,
-    fcut=[300, 6000],
-    filt_type="filtfilt",
-    ms_cut=[3, 10]
 )
 
 
@@ -55,7 +47,9 @@ def get_parser():
     parser.add_argument("--offspring", type=int, default=20,
                         help="The population size (offspring) - default 20")
     parser.add_argument("--maxgen", type=int, default=600,
-                        help="The maximum number of generations - default 2000")
+                        help="The maximum number of generations - default 600")
+    parser.add_argument("--timeout", type=int, default=900,
+                        help="Maximum run time for a protocol (in seconds)")
 
     return parser
 
@@ -83,22 +77,18 @@ def get_mapper(args):
 
 def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed, abd, ra):
 
-    cp_folder = opt_folder / 'checkpoints'
-    if extra_strategy is not None:
-        cp_name = f'model={model}_featureset={feature_set}_strategy={extra_strategy}'
-    else:
-        cp_name = f'model={model}_featureset={feature_set}'
+    cp_name = f'model={model}_featureset={feature_set}'
 
+    if extra_strategy:
+        cp_name += f'strategy={extra_strategy}'
     if abd:
         cp_name = cp_name + "_abd"
-
     if ra:
         cp_name = cp_name + "_ra"
 
-    # add seed
     cp_name = cp_name + f"_seed={seed}"
 
-    cp_filename = cp_folder / cp_name
+    cp_filename = opt_folder / 'checkpoints' / cp_name
 
     if not cp_filename.parent.is_dir():
         os.makedirs(cp_filename.parent)
@@ -129,11 +119,10 @@ def save_evaluator_configuration(
                     simulator=simulator,
                     abd=abd,
                     optimize_ra=optimize_ra)
-
-    eva_args.update(EXTRA_EVALUATOR_KWARGS)
+    eva_args.update(_extra_kwargs)
 
     eva_file = cp_filename.parent / f"{cp_filename.stem}.json"
-    print(eva_file)
+
     with eva_file.open("w") as f:
         json.dump(eva_args, f, indent=4)
 
@@ -149,30 +138,23 @@ def main():
 
     map_function = get_mapper(args)
 
-    sim = args.sim
-    feature_set = args.feature_set
+    if args.feature_set == "extra" and args.sim == "neuron":
+        raise Exception("With feature set 'extra' , please use the lfpy simulator.")
 
-    if feature_set == "extra" and sim == "neuron":
-        print("For 'extra' features use the lfpy simulator. Setting feature_set to 'soma'")
-        feature_set = "soma"
-
-    protocols_with_lfp = None
-    timeout = 900.
-    if feature_set == "extra":
-        protocols_with_lfp = ['IDrest_300']
+    protocols_with_lfp = ['IDrest_300'] if args.feature_set == "extra" else None
 
     eva = mf.create_evaluator(
         model_name=args.model,
-        feature_set=feature_set,
+        feature_set=args.feature_set,
         extra_strategy=args.extra_strategy,
         protocols_with_lfp=protocols_with_lfp,
         cell_folder=Path(args.cell_folder),
         extra_recordings=None,
-        timeout=timeout,
-        simulator=sim,
+        timeout=args.timeout,
+        simulator=args.sim,
         abd=args.abd,
         optimize_ra=args.ra,
-        **EXTRA_EVALUATOR_KWARGS
+        **_extra_kwargs
     )
 
     opt = bluepyopt.deapext.optimisationsCMA.DEAPOptimisationCMA(
@@ -184,7 +166,6 @@ def main():
         selector_name="multi_objective"
     )
 
-    # add abd and ra
     cp_filename = get_cp_filename(
         opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed, args.abd, args.ra
     )
@@ -202,9 +183,9 @@ def main():
         extra_strategy=args.extra_strategy,
         protocols_with_lfp=protocols_with_lfp,
         cell_folder=Path(args.cell_folder),
-        timeout=timeout,
+        timeout=args.timeout,
         cp_filename=cp_filename,
-        simulator=sim,
+        simulator=args.sim,
         abd=args.abd,
         optimize_ra=args.ra
     )
