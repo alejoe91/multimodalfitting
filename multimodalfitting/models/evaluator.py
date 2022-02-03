@@ -11,7 +11,6 @@ import bluepyopt.ephys as ephys
 import logging
 
 from .model import define_electrode, create_ground_truth_model, create_experimental_model
-# from ..efeatures_extraction import get_sahp_efeatures, get_hyper_depol_efeatures, get_poscheops_efeatures
 
 logger = logging.getLogger("__main__")
 
@@ -397,7 +396,7 @@ def define_protocols(
 def define_test_step_protocol(step_amplitude=0.5, tot_duration=500, delay=50,
                               step_duration=400, probe=None, protocol_name="TestStep",
                               simulator="lfpy", extra_recordings=None):
-    """Generates test protocol with a current pulse.
+    """Generates tests protocol with a current pulse.
 
     Parameters
     ----------
