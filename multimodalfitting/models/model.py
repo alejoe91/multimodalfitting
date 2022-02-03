@@ -11,11 +11,11 @@ this_file = Path(__file__)
 cell_models_folder = this_file.parent.parent.parent / "cell_models"
 
 
-def define_mechanisms(cell_model_folder, extracellularmech=None, abd=False):
+def define_mechanisms(cell_model_folder, extracellularmech=False, abd=False):
     """Defines mechanisms
     extracellularmech : bool, optional
         If True, extracellular mechanism in inserted into the model for recording i_membrane
-        Default is None
+        Default is False
     """
 
     mechanism_file_name = "mechanisms"
@@ -369,7 +369,7 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
     )
 
 
-def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, extracellularmech=None, model_type="LFPy",
+def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, extracellularmech=False, model_type="LFPy",
                               **morph_kwargs):
     """Create ground-truth model
 
@@ -384,9 +384,9 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
         by default False
     v_init : float, optional
         Initial membrane potential value, by default None
-    extracellularmech : bool, optional
+    extracellularmech : bool
         If True, extracellular mechanism in inserted into the model for recording i_membrane
-        Default is None
+        Default is False
     model_type : str, optional
         * "neuron": instantiate a CellModel
         * "LFPy": instantiate an LFPyCellModel
@@ -432,7 +432,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
     if extracellularmech==True:
         mechs = define_mechanisms(cell_model_folder, extracellularmech=True)
     else:
-        mechs = define_mechanisms(cell_model_folder)
+        mechs = define_mechanisms(cell_model_folder, extracellularmech=False)
 
     params = define_parameters(cell_model_folder, release=release)
 
@@ -462,7 +462,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
     return cell
 
 
-def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, extracellularmech=None, model_type="LFPy",
+def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, extracellularmech=False, model_type="LFPy",
                               abd=False, optimize_ra=False, **morph_kwargs):
     """Create experimental cell model
 
@@ -477,9 +477,9 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
         by default False
     v_init : float, optional
         Initial membrane potential value, by default None
-    extracellularmech : bool, optional
+    extracellularmech : bool
         If True, extracellular mechanism in inserted into the model for recording i_membrane
-        Default is None
+        Default is False
     model_type : str, optional
         * "neuron": instantiate a CellModel
         * "LFPy": instantiate an LFPyCellModel
@@ -540,7 +540,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
     if extracellularmech==True:
         mechs = define_mechanisms(cell_model_folder, extracellularmech==True, abd=abd)
     else:
-        mechs = define_mechanisms(cell_model_folder, abd=abd)
+        mechs = define_mechanisms(cell_model_folder, extracellularmech==False, abd=abd)
 
     params = define_parameters(cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra)
 
