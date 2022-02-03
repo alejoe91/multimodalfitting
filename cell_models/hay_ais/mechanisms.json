@@ -1,7 +1,6 @@
 {
     "all": [
-        "pas",
-        "extracellular"
+        "pas"
     ],
     "somatic": [
         "Ih",
