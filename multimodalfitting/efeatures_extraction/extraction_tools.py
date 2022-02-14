@@ -416,7 +416,7 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
 
 
 def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, efeatures_path=None, channel_ids=None,
-                                 single_channel_features=False, std_from_mean=None, epsilon=1e-5):
+                                 single_channel_features=False, std_from_mean=None, epsilon=1e-3):
     """
     Appends extracellualar features to existing efeatures json file in BPO format
 
@@ -478,7 +478,7 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, 
             for chan in channel_ids:
                 std = np.abs(std_from_mean * feature_list[chan])
                 if std == 0:
-                    print(extra_feat_name, chan)
+                    print(f"Setting {extra_feat_name} channel {chan} std to {epsilon}")
                     std = epsilon
                 new_efeatures_dict[feature_set][protocol_name]["MEA"][f"{extra_feat_name}_{chan}"] = \
                     [feature_list[chan], std]
