@@ -177,7 +177,7 @@ def construct_efel_trace(response, stim_start=250, stim_end=1600):
 
 
 def get_peak_cutout(responses, peak_idx=None, ms_before=1., ms_after=5.,
-                    skip_first_and_last=True, average=True): 
+                    skip_first_and_last=True, average=True):
     """Compute peak cutout respones
 
     Parameters
@@ -214,25 +214,26 @@ def get_peak_cutout(responses, peak_idx=None, ms_before=1., ms_after=5.,
     responses_list = []
     for peak_target in peak_targets:
         cutout_ms = np.array([peak_target - ms_before, peak_target + ms_after])
-        cutout_idx_start = np.searchsorted(soma_response["time"], cutout_ms[0]) - 1
-        cutout_idx_stop = np.searchsorted(soma_response["time"], cutout_ms[1], side='right') + 1
-        cutout_idxs = np.array([cutout_idx_start, cutout_idx_stop])
 
         resp_cut = {}
         for resp_name in responses:
             response = responses[resp_name]
+            resp_interp = _interpolate_response(response, fs=20)
+            cutout_idx_start = np.searchsorted(
+                resp_interp["time"], cutout_ms[0]) - 1
+            cutout_idx_stop = np.searchsorted(
+                resp_interp["time"], cutout_ms[1], side='right') + 1
+            cutout_idxs = np.array([cutout_idx_start, cutout_idx_stop])
             if not isinstance(response, ephys.responses.TimeLFPResponse):
                 resp_cut[resp_name] = {}
                 for k in response.response.keys():
                     if k == "time":
-                        resp_time = response[k].values.copy(
-                        )[cutout_idxs[0]:cutout_idxs[1]]
+                        resp_time = resp_interp[k][cutout_idxs[0]:cutout_idxs[1]]
                         resp_cut[resp_name][k] = resp_time - resp_time[0]
                     else:
-                        resp_cut[resp_name][k] = response[k].values.copy()[
-                            cutout_idxs[0]:cutout_idxs[1]]
-                resp_cut[resp_name] = _interpolate_response(
-                    resp_cut[resp_name], fs=20, tmin=0, tmax=ms_before+ms_after)
+                        resp_cut[resp_name][k] = resp_interp[k][cutout_idxs[0]:cutout_idxs[1]]
+                # resp_cut[resp_name] = _interpolate_response(
+                #     resp_cut[resp_name], fs=20, tmin=0, tmax=ms_before+ms_after)
         responses_list.append(resp_cut)
 
     if len(responses_list) == 1:
@@ -510,7 +511,7 @@ def compute_feature_values(params, cell_model, protocols, sim, feature_set='bap'
 
 def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1,
                   ms_cut=[2, 10], filt_type="filtfilt", skip_first_spike=True, skip_last_spike=True,
-                  upsample=None, raise_warnings=False, verbose=False, **efel_kwargs):
+                  align_extra=False, upsample=None, raise_warnings=False, verbose=False, **efel_kwargs):
     """
     Calculate extracellular action potential (EAP) by combining intracellular spike times and extracellular signals
 
@@ -539,6 +540,8 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
         If True, the first spike is not used to compute the EAP
     skip_last_spike: bool
         If True, the last spike is not used to compute the EAP
+    align_extra: bool
+        If True, extracellular template is aligned at extracellular peak
     raise_warnings: bool
         If True, eFEL raise warnings
     verbose: bool
@@ -605,7 +608,7 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
             print('filter disabled')
         response_filter = response_interp
 
-    ewf = _get_waveforms(response_filter, peak_times, ms_cut)
+    ewf = _get_waveforms(response_filter, peak_times, ms_cut, align_extra)
     mean_wf = np.mean(ewf, axis=0)
 
     return mean_wf
@@ -819,7 +822,7 @@ def _upsample_wf(waveforms, upsample):
     return waveforms_up
 
 
-def _get_waveforms(response, peak_times, snippet_len_ms):
+def _get_waveforms(response, peak_times, snippet_len_ms, align_extra=False):
     times = response["time"]
     traces = response["voltage"]
 
@@ -831,12 +834,20 @@ def _get_waveforms(response, peak_times, snippet_len_ms):
 
     reference_frames = (peak_times * fs).astype(int)
 
-    if isinstance(snippet_len_ms, (tuple, list, np.ndarray)):
-        snippet_len_before = int(snippet_len_ms[0] * fs)
-        snippet_len_after = int(snippet_len_ms[1] * fs)
+    if align_extra:
+        ms_extra = 3
     else:
-        snippet_len_before = int((snippet_len_ms + 1) / 2 * fs)
-        snippet_len_after = int((snippet_len_ms - snippet_len_before) * fs)
+        ms_extra = 0
+    
+    if isinstance(snippet_len_ms, (tuple, list, np.ndarray)):
+        snippet_len_before = int((snippet_len_ms[0]) * fs)
+        snippet_len_after = int((snippet_len_ms[1]) * fs)
+    else:
+        snippet_len_before = int((snippet_len_ms / 2 ) * fs)
+        snippet_len_after = int((snippet_len_ms / 2 ) * fs)
+        
+    snippet_len_before_ext = snippet_len_before + int(ms_extra * fs)
+    snippet_len_after_ext = snippet_len_after + int(ms_extra * fs)
 
     num_snippets = len(peak_times)
     if len(traces.shape) == 2:
@@ -845,21 +856,22 @@ def _get_waveforms(response, peak_times, snippet_len_ms):
         num_channels = 1
         traces = traces[np.newaxis, :]
     num_frames = len(times)
+    snippet_len_total_ext = int(snippet_len_before_ext + snippet_len_after_ext)
     snippet_len_total = int(snippet_len_before + snippet_len_after)
     waveforms = np.zeros(
         (num_snippets, num_channels, snippet_len_total), dtype=traces.dtype
     )
 
     for i in range(num_snippets):
-        snippet_chunk = np.zeros((num_channels, snippet_len_total), dtype=traces.dtype)
+        snippet_chunk = np.zeros((num_channels, snippet_len_total_ext), dtype=traces.dtype)
         if 0 <= reference_frames[i] < num_frames:
             snippet_range = np.array(
                 [
-                    int(reference_frames[i]) - snippet_len_before,
-                    int(reference_frames[i]) + snippet_len_after,
+                    int(reference_frames[i]) - snippet_len_before_ext,
+                    int(reference_frames[i]) + snippet_len_after_ext,
                 ]
             )
-            snippet_buffer = np.array([0, snippet_len_total], dtype="int")
+            snippet_buffer = np.array([0, snippet_len_total_ext], dtype="int")
             # The following handles the out-of-bounds cases
             if snippet_range[0] < 0:
                 snippet_buffer[0] -= snippet_range[0]
@@ -868,6 +880,13 @@ def _get_waveforms(response, peak_times, snippet_len_ms):
                 snippet_buffer[1] -= snippet_range[1] - num_frames
                 snippet_range[1] -= snippet_range[1] - num_frames
             snippet_chunk[:, snippet_buffer[0]:snippet_buffer[1]] = traces[:, snippet_range[0]:snippet_range[1]]
-        waveforms[i] = snippet_chunk
+            
+            if align_extra:
+                _, min_sample = np.unravel_index(np.argmin(snippet_chunk), snippet_chunk.shape)
+                waveform = snippet_chunk[:, min_sample - snippet_len_before:min_sample + snippet_len_after]
+            else:
+                waveform = snippet_chunk
+            
+        waveforms[i] = waveform
 
     return waveforms

@@ -416,7 +416,7 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
 
 
 def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, efeatures_path=None, channel_ids=None,
-                                 single_channel_features=False, std_from_mean=None):
+                                 single_channel_features=False, std_from_mean=None, epsilon=1e-5):
     """
     Appends extracellualar features to existing efeatures json file in BPO format
 
@@ -442,7 +442,9 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, 
     single_channel_features: bool
         If True and 'channel_ids' is a list, features from different channels are saved as separate features
     std_from_mean: float or None
-        If 'single_channel_features' is True,
+        If 'single_channel_features' is True, the std of the feature is std_from_mean times the feature mean
+    epsilon: float
+        If 'single_channel_features' and the feature mean is 0, the value of the std is set to epsilon (default 1e-5)
 
 
     Returns
@@ -474,8 +476,12 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, 
             assert std_from_mean is not None, "When 'single_channel_features' is used, the 'std_from_mean' argument " \
                                               "should be specified"
             for chan in channel_ids:
+                std = np.abs(std_from_mean * feature_list[chan])
+                if std == 0:
+                    print(extra_feat_name, chan)
+                    std = epsilon
                 new_efeatures_dict[feature_set][protocol_name]["MEA"][f"{extra_feat_name}_{chan}"] = \
-                    [feature_list[chan], np.abs(std_from_mean * feature_list[chan])]
+                    [feature_list[chan], std]
         else:
             if np.isscalar(channel_ids[0]):
                 # subset
