@@ -11,6 +11,7 @@ import bluepyopt.ephys as ephys
 import logging
 
 from .model import define_electrode, create_ground_truth_model, create_experimental_model
+# from ..efeatures_extraction import get_sahp_efeatures, get_hyper_depol_efeatures, get_poscheops_efeatures
 
 logger = logging.getLogger("__main__")
 
@@ -373,7 +374,7 @@ def define_protocols(
         exclude_protocols = []
 
     for protocol_name in feature_definitions:
-        if protocol_name not in exclude_protocols:
+        if np.all([excl not in protocol_name for excl in exclude_protocols]):
             if protocol_name in protocols_with_lfp:
                 recordings = define_recordings(
                     protocol_name, protocol_definitions[protocol_name], electrode, extra_recordings
@@ -728,7 +729,7 @@ def create_evaluator(
     feature_set: str
         "soma", "extra"
     extra_strategy: str or None
-        "all", "sections", "single" (only needed if feature_set is "extra")
+        "all", "sections", "single", "validation" (only needed if feature_set is "extra")
     protocols_with_lfp: list or None
         If given, the list of protocols to compute LFP from
     cell_folder: path or None
@@ -765,7 +766,7 @@ def create_evaluator(
     """
     probe = None
     if extra_strategy:
-        assert extra_strategy in ["all", "sections", "single"]
+        assert extra_strategy in ["all", "sections", "single", "validation"]
     if model_name not in ['hay', 'hay_ais', 'hay_ais_hillock']:
         cell = create_experimental_model(model_name=model_name, abd=abd, optimize_ra=optimize_ra, model_type=simulator)
     else:

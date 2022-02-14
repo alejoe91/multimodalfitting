@@ -24,7 +24,9 @@ def natural_keys(text):
 
 
 def plot_responses(responses, protocol_names=None,
-                   max_rows=6, figsize=(10, 10), color="C0", return_fig=False):
+                   max_rows=6, titles=None,
+                   figsize=(10, 10), color="C0",
+                   return_fig=False):
     """
     Plots one response to multiple protocols
 
@@ -56,15 +58,17 @@ def plot_responses(responses, protocol_names=None,
 
     if protocol_names is not None:
         resp_to_plot = {}
-        for resp_name, response in resp_no_mea.items():
-            if np.any([pn in resp_name for pn in protocol_names]):
-                resp_to_plot[resp_name] = response
+        for pn in protocol_names:
+            for resp_name in list(resp_no_mea):
+                if pn in resp_name:
+                    resp_to_plot[resp_name] = response
     else:
         resp_to_plot = resp_no_mea
 
     # sort responses if multiple runs of the same protocol
     protocol_keys = list(resp_to_plot.keys())
-    protocol_keys.sort(key=natural_keys)
+    if protocol_names is None:
+        protocol_keys.sort(key=natural_keys)
 
     if len(resp_to_plot) <= max_rows:
         nrows = len(resp_to_plot)
@@ -84,13 +88,22 @@ def plot_responses(responses, protocol_names=None,
         response = responses[resp_name]
         if ncols > 1:
             axes[r, c].plot(response['time'], response['voltage'], label=resp_name, color=color)
-            axes[r, c].set_title(resp_name)
+            ax = axes[r, c]
         elif ncols == 1 and nrows == 1:
             axes.plot(response['time'], response['voltage'], label=resp_name, color=color)
-            axes.set_title(resp_name)
+            ax = axes
         else:
             axes[r].plot(response['time'], response['voltage'], label=resp_name, color=color)
-            axes[r].set_title(resp_name)
+            ax = axes[r]
+        if titles is not None:
+            title = [t for t in titles if t in resp_name][0]
+            ax.set_title(title, fontsize=15)
+        else:
+            ax.set_title(resp_name, fontsize=15)
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.set_ylabel("$V_m$ (mV)", fontsize=12)
+        ax.set_xlabel("$time$ (ms)", fontsize=12)
         if np.max(response['voltage']) > max_v:
             max_v = np.max(response['voltage'])
         if np.min(response['voltage']) < min_v:
@@ -111,15 +124,16 @@ def plot_responses(responses, protocol_names=None,
         for ax in axes:
             ax.set_ylim(min_v - 10, max_v + 10)
 
-    fig.tight_layout()
+    fig.subplots_adjust(hspace=0.8)
     fig.show()
 
     if return_fig:
         return fig
 
 
-def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainbow", figsize=(10, 10),
-                            return_fig=False, labels=None):
+def plot_multiple_responses(responses_list, max_rows=6, protocol_names=None,
+                            colors=None, cmap="rainbow", figsize=(10, 10),
+                            return_fig=False, titles=None, labels=None):
     """
     Plots a list of responses to multiple protocols
 
@@ -146,7 +160,8 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
     """
     responses = responses_list[0]
     resp_no_mea = []
-    
+    resp_to_plot = []
+
     if labels is not None:
         assert len(labels) == len(
             responses_list), "List of labels should have same length of responses_list"
@@ -158,19 +173,33 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
     for (resp_name, response) in sorted(responses.items()):
         if 'MEA' not in resp_name:
             resp_no_mea.append(resp_name)
-    if len(resp_no_mea) <= max_rows:
-        nrows = len(resp_no_mea)
+    if protocol_names is not None:
+        resp_to_plot = {}
+        for pn in protocol_names:
+            for resp_name in list(resp_no_mea):
+                if pn in resp_name:
+                    resp_to_plot[resp_name] = response
+    else:
+        resp_to_plot = resp_no_mea
+
+    # sort responses if multiple runs of the same protocol
+    protocol_keys = list(resp_to_plot.keys())
+    if protocol_names is None:
+        protocol_keys.sort(key=natural_keys)
+
+    if len(resp_to_plot) <= max_rows:
+        nrows = len(resp_to_plot)
         ncols = 1
     else:
         nrows = max_rows
-        ncols = int(np.ceil(len(resp_no_mea) / max_rows))
+        ncols = int(np.ceil(len(resp_to_plot) / max_rows))
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
 
     max_v = -200
     min_v = 200
 
     for i, responses in enumerate(responses_list):
-        
+
         if cmap is None and colors is None:
             color = f'C{i}'
         elif colors is not None:
@@ -179,7 +208,7 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
             cm = plt.get_cmap(cmap)
             color = cm(i / len(responses_list))
         # print(i, responses_list)
-        for index, resp_name in enumerate(sorted(resp_no_mea)):
+        for index, resp_name in enumerate(resp_to_plot):
             if labels and index == 0:
                 label = labels[i]
             else:
@@ -188,19 +217,20 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
             r = np.mod(index, nrows)
             # print(resp_name)
             response = responses[resp_name]
+            if titles is not None:
+                title = [t for t in titles if t in resp_name][0]
+            else:
+                title = resp_name
             if response is not None:
                 if ncols > 1:
                     axes[r, c].plot(response['time'], response['voltage'], label=label, color=color)
-                    axes[r, c].set_title(resp_name)
                     ax = axes[r, c]
                 elif ncols == 1 and nrows == 1:
                     axes.plot(
                         response['time'], response['voltage'], label=label, color=color)
-                    axes.set_title(resp_name)
                     ax = axes
                 else:
                     axes[r].plot(response['time'], response['voltage'], label=label, color=color)
-                    axes[r].set_title(resp_name)
                     ax = axes[r]
                 if np.max(response['voltage']) > max_v:
                     max_v = np.max(response['voltage'])
@@ -208,6 +238,11 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
                     min_v = np.min(response['voltage'])
                 if label:
                     ax.legend()
+                ax.set_title(title)
+                ax.spines['right'].set_visible(False)
+                ax.spines['top'].set_visible(False)
+                ax.set_ylabel("$V_m$ (mV)", fontsize=12)
+                ax.set_xlabel("$time$ (ms)", fontsize=12)
 
         if ncols > 1:
             for ax in axes[r + 1:, c]:
@@ -224,7 +259,8 @@ def plot_multiple_responses(responses_list, max_rows=6, colors=None, cmap="rainb
             for ax in axes:
                 ax.set_ylim(min_v - 10, max_v + 10)
 
-    fig.tight_layout()
+    fig.subplots_adjust(hspace=0.8)
+    fig.subplots_adjust(wspace=0.4)
     fig.show()
 
     if return_fig:
@@ -340,7 +376,7 @@ def plot_eap(responses, protocols, probe, color="C0", protocol_name="Step1", nor
     eap = calculate_eap(responses=responses, protocols=protocols, protocol_name=protocol_name,
                         **calculate_eap_kwargs)
     if norm:
-        eap = eap / np.max(np.abs(eap), 1, keepdims=True)
+        eap = eap / np.ptp(np.abs(eap), 1, keepdims=True)
         vscale = 2
     else:
         vscale = 1.5 * np.max(np.abs(eap))
@@ -398,7 +434,8 @@ def plot_feature_map(feature, probe, cmap='viridis', log=False,
     return ax
 
 
-def plot_feature_map_w_colorbar(feature, probe, label=None, feature_name=None, height_ratio=[10, 1]):
+def plot_feature_map_w_colorbar(feature, probe, label=None, feature_name=None, cmap='viridis', 
+                                height_ratio=[10, 1]):
     import matplotlib as mpl
 
     fig, axs = plt.subplots(
@@ -406,9 +443,9 @@ def plot_feature_map_w_colorbar(feature, probe, label=None, feature_name=None, h
         gridspec_kw={'height_ratios': height_ratio}
     )
 
-    plot_feature_map(feature, probe, bg=False, ax=axs[0])
+    plot_feature_map(feature, probe, bg=False, ax=axs[0], cmap=cmap)
 
-    cmap = plt.get_cmap("viridis")
+    cmap = plt.get_cmap(cmap)
     norm = mpl.colors.Normalize(vmin=np.min(feature),
                                 vmax=np.max(feature))
 
