@@ -20,12 +20,12 @@ mkdir -p ${IPYTHONDIR}
 
 export IPYTHON_PROFILE=benchmark.${SLURM_JOBID}
 
-/gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/ipcontroller --init --ip='*' --ping=30000 --profile=${IPYTHON_PROFILE} &
+ipcontroller --init --ip='*' --ping=30000 --profile=${IPYTHON_PROFILE} &
 sleep 30
-srun --mpi=none /gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/ipengine --timeout=300 --profile=${IPYTHON_PROFILE} &
+srun --mpi=none ipengine --timeout=300 --profile=${IPYTHON_PROFILE} &
 sleep 30
 
-/gpfs/bbp.cscs.ch/project/proj38/home/damart/LFPy_NEW/lfpyenv_new/bin/python3 run_optimizations.py \
+python3 run_optimizations.py \
                              --ipyparallel                            \
                              --cell-folder=${CELL_FOLDER}             \
                              --seed=${OPT_SEED}                       \
@@ -36,4 +36,3 @@ sleep 30
                              --sim=${SIM}                             \
                              --abd=${OPT_ABD}                         \
                              --ra=${OPT_RA}
-

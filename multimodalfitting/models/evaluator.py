@@ -374,7 +374,11 @@ def define_protocols(
         exclude_protocols = []
 
     for protocol_name in feature_definitions:
+<<<<<<< HEAD
         if np.all([excl not in protocol_name for excl in exclude_protocols]):
+=======
+        if protocol_name not in exclude_protocols:
+>>>>>>> 15c82d2e01e81319ff42b5fbad5504c3f72437c4
             if protocol_name in protocols_with_lfp:
                 recordings = define_recordings(
                     protocol_name, protocol_definitions[protocol_name], electrode, extra_recordings
@@ -397,7 +401,7 @@ def define_protocols(
 def define_test_step_protocol(step_amplitude=0.5, tot_duration=500, delay=50,
                               step_duration=400, probe=None, protocol_name="TestStep",
                               simulator="lfpy", extra_recordings=None):
-    """Generates test protocol with a current pulse.
+    """Generates tests protocol with a current pulse.
 
     Parameters
     ----------
