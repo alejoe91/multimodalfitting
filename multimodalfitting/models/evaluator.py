@@ -374,11 +374,7 @@ def define_protocols(
         exclude_protocols = []
 
     for protocol_name in feature_definitions:
-<<<<<<< HEAD
         if np.all([excl not in protocol_name for excl in exclude_protocols]):
-=======
-        if protocol_name not in exclude_protocols:
->>>>>>> 15c82d2e01e81319ff42b5fbad5504c3f72437c4
             if protocol_name in protocols_with_lfp:
                 recordings = define_recordings(
                     protocol_name, protocol_definitions[protocol_name], electrode, extra_recordings
