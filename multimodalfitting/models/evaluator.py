@@ -662,6 +662,8 @@ def _get_feature_and_objective(feature_name, efel_feature_name, protocol_name, l
             extrafel_feature_name=efel_feature_name,
             recording_names={'': recording_names},
             somatic_recording_name=somatic_recording_name,
+            max_score=250,
+            force_max_score=True,
             channel_ids=channel_ids,
             interp_step=interp_step,
             **kwargs

@@ -159,8 +159,8 @@ def plot_multiple_responses(responses_list, max_rows=6, protocol_names=None,
 
     """
     responses = responses_list[0]
-    resp_no_mea = []
-    resp_to_plot = []
+    resp_no_mea = {}
+    resp_to_plot = {}
 
     if labels is not None:
         assert len(labels) == len(
@@ -172,7 +172,8 @@ def plot_multiple_responses(responses_list, max_rows=6, protocol_names=None,
 
     for (resp_name, response) in sorted(responses.items()):
         if 'MEA' not in resp_name:
-            resp_no_mea.append(resp_name)
+            resp_no_mea[resp_name] = response
+
     if protocol_names is not None:
         resp_to_plot = {}
         for pn in protocol_names:
