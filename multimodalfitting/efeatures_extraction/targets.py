@@ -135,7 +135,7 @@ def get_iv_targets(timings=None, stimulus=None):
     steady_state_voltage_stimend, ohmic_input_resistance_vb_ssse, sag_amplitude, sag_ratio1,
     sag_ratio2, decay_time_constant_after_stim"""
 
-    protocol = 'firepattern'
+    protocol = 'IV'
     location = 'soma'
     amplitudes = [-140, -120, -100, -80, -60, -40, -20, 0, 20, 40, 60]
     tolerances = 10
