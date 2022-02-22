@@ -10,23 +10,21 @@ def generate_targets_at_amplitudes(template, amplitudes, tolerances, protocol, l
     targets = []
     for amp, tol in zip(amplitudes, tolerances):
         for target in template:
-
             targets.append({
                 'efeature': target['efeature'],
                 'efel_settings': target['efel_settings'],
-                'tolerance': amp,
-                'amplitude': tol,
+                'tolerance': tol,
+                'amplitude': amp,
                 'location': location,
                 'protocol': protocol
             })
-
             if "efeature_name" in target:
                 targets[-1]["efeature_name"] = target["efeature_name"]
 
     return targets
 
 
-def get_idrest_targets(timings=None, stimulus=None):
+def get_idrest_targets(timings=None, stimulus=None, include_pre_post=True):
     """IDrest targets: mean_frequency burst_number, adaptation_index2, ISI_CV,
     ISI_log_slope, inv_time_to_first_spike, inv_first_ISI, inv_second_ISI,
     inv_third_ISI, inv_fourth_ISI, inv_fifth_ISI, AP_amplitude, AHP_depth, AHP_time_from_peak,
@@ -38,17 +36,6 @@ def get_idrest_targets(timings=None, stimulus=None):
     tolerances = 20
 
     template = [
-        {'efeature': 'voltage_base',
-         'efel_settings': {}},
-        {'efeature_name': 'Spikecount_pre_step',
-         'efeature': 'Spikecount',
-         'efel_settings': {'stim_start': 0., 'stim_end': timings['IDrest']['ton']}},
-        {'efeature_name': 'Spikecount_post_step',
-         'efeature': 'Spikecount',
-         'efel_settings': {'stim_start': timings['IDrest']['toff'] + 100,
-                           'stim_end': timings['IDrest']['tend']}},
-        {'efeature': 'voltage_base',
-         'efel_settings': {}},
         {'efeature': 'AHP_depth',
          'efel_settings': {}},
         {'efeature': 'AHP_time_from_peak',
@@ -59,7 +46,7 @@ def get_idrest_targets(timings=None, stimulus=None):
          'efel_settings': {}},
         {'efeature': 'adaptation_index2',
          'efel_settings': {}},
-        {'efeature  ': 'ISI_CV',
+        {'efeature': 'ISI_CV',
          'efel_settings': {}},
         {'efeature': 'ISI_log_slope',
          'efel_settings': {}},
@@ -82,11 +69,23 @@ def get_idrest_targets(timings=None, stimulus=None):
         {'efeature': 'AHP_time_from_peak',
          'efel_settings': {}},
     ]
+    if include_pre_post:
+        template += [
+            {'efeature': 'voltage_base',
+             'efel_settings': {}},
+            {'efeature_name': 'Spikecount_pre_step',
+             'efeature': 'Spikecount',
+             'efel_settings': {'stim_start': 0., 'stim_end': timings['IDrest']['ton']}},
+            {'efeature_name': 'Spikecount_post_step',
+             'efeature': 'Spikecount',
+             'efel_settings': {'stim_start': timings['IDrest']['toff'] + 100,
+                               'stim_end': timings['IDrest']['toff'] + 600}}
+        ]
 
     return generate_targets_at_amplitudes(template, amplitudes, tolerances, protocol, location)
 
 
-def get_firepattern_targets(timings=None, stimulus=None):
+def get_firepattern_targets(timings=None, stimulus=None, include_pre_post=False):
     """firepattern targets: mean_frequency, burst_number, adaptation_index2, ISI_CV,
     ISI_log_slope, inv_time_to_first_spike, inv_first_ISI, inv_second_ISI,
     inv_third_ISI, inv_fourth_ISI, inv_fifth_ISI, AP_amplitude, AHP_depth, AHP_time_from_peak"""
@@ -130,7 +129,7 @@ def get_firepattern_targets(timings=None, stimulus=None):
     return generate_targets_at_amplitudes(template, amplitudes, tolerances, protocol, location)
 
 
-def get_iv_targets(timings=None, stimulus=None):
+def get_iv_targets(timings=None, stimulus=None, include_pre_post=False):
     """IV targets: Spikecount, voltage_base, voltage_deflection, voltage_deflection_begin,
     steady_state_voltage_stimend, ohmic_input_resistance_vb_ssse, sag_amplitude, sag_ratio1,
     sag_ratio2, decay_time_constant_after_stim"""
@@ -166,7 +165,7 @@ def get_iv_targets(timings=None, stimulus=None):
     return generate_targets_at_amplitudes(template, amplitudes, tolerances, protocol, location)
 
 
-def get_apwaveform_targets(timings=None, stimulus=None):
+def get_apwaveform_targets(timings=None, stimulus=None, include_pre_post=False):
     """APWaveform targets: AP_amplitude, AP1_amp, AP2_amp, AP_duration_half_width,
     AP_begin_width, AP_begin_voltage, AHP_depth, AHP_time_from_peak"""
 
@@ -197,7 +196,7 @@ def get_apwaveform_targets(timings=None, stimulus=None):
     return generate_targets_at_amplitudes(template, amplitudes, tolerances, protocol, location)
 
 
-def get_hyperdepol_targets(timings=None, stimulus=None):
+def get_hyperdepol_targets(timings=None, stimulus=None, include_pre_post=False):
     """HyperDepol targets:
     depol: Spikecount, burst_number, AP_amplitude, ISI_values
     hyper: sag_amplitude, sag_ratio1, sag_ratio2
@@ -239,7 +238,7 @@ def get_hyperdepol_targets(timings=None, stimulus=None):
     return generate_targets_at_amplitudes(template, amplitudes, tolerances, protocol, location)
 
 
-def get_sahp_targets(timings=None, stimulus=None):
+def get_sahp_targets(timings=None, stimulus=None, include_pre_post=False):
     """sAHP targets: Spikecount, AP_amplitude, ISI_values, AHP_depth, AHP_depth_abs,
     AHP_time_from_peak, steady_state_voltage_stimend
     """
@@ -278,7 +277,7 @@ def get_sahp_targets(timings=None, stimulus=None):
     return generate_targets_at_amplitudes(template, amplitudes, tolerances, protocol, location)
 
 
-def get_poscheops_targets(timings=None, stimulus=None):
+def get_poscheops_targets(timings=None, stimulus=None, include_pre_post=False):
     """PosCheops targets: Spikecount, mean_frequency, burst_number, adaptation_index2,
     ISI_CV, ISI_log_slope, inv_time_to_first_spike, inv_first_ISI, inv_second_ISI,
     inv_third_ISI, inv_fourth_ISI, inv_fifth_ISI"""

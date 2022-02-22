@@ -312,10 +312,10 @@ def model_csv_reader(in_data):
     return data
 
 ##### TARGETS ########
-def get_ecode_targets(timings):
+def get_ecode_targets(timings, include_pre_post=True):
     targets = []
     for protocol_name, target_function in protocol_name_to_target_function.items():
-        new_targets = target_function(timings=timings)
+        new_targets = target_function(timings=timings, include_pre_post=include_pre_post)
         targets += new_targets
     return targets
 
@@ -361,11 +361,11 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
 
     out_efeatures = {}
 
-    feature_set = "soma"
-    out_efeatures[feature_set] = {}
+    # feature_set = "soma"
+    # out_efeatures[feature_set] = {}
 
     out_protocols = {}
-    out_efeatures = {"soma": {}}
+    out_efeatures = {}
 
     if protocols_of_interest is None:
         protocols_of_interest = list(in_protocols.keys())
@@ -383,8 +383,10 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
             out_protocols[protocol_name] = {'stimuli': stimuli}
 
             # Convert the format of the efeatures
-            efeatures_def = {}
+            out_efeatures[protocol_name] = {}
             for loc_name, features in in_efeatures[protocol_name].items():
+                efeatures_list = []
+
                 for feature in features:
                     add_feature = True
                     if exclude_features is not None:
@@ -392,15 +394,15 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
                             if feature["feature"] in exclude_features[protocol_name]:
                                 add_feature = False
                     if add_feature:
-                        efeatures_def[feature['feature']] = feature['val']
+                        efeatures_dict = feature
                         if std_from_mean is not None:
-                            efeatures_def[feature['feature']][1] = np.abs(std_from_mean *
-                                                                          efeatures_def[feature['feature']][0])
-                        if efeatures_def[feature['feature']][1] == 0:
-                            efeatures_def[feature['feature']][1] = epsilon
+                            efeatures_dict["val"][1] = np.abs(std_from_mean * efeatures_dict["val"][0])
+                        if efeatures_dict["val"][1] == 0:
+                            efeatures_dict["val"][1] = epsilon
                     else:
                         print(f"Excluding efeature {feature['feature']} from protocol {protocol_name}")
-                out_efeatures[feature_set][protocol_name] = {loc_name: efeatures_def}
+                    efeatures_list.append(efeatures_dict)
+                out_efeatures[protocol_name][loc_name] = efeatures_list
 
     if out_protocol_path is not None:
         s = json.dumps(out_protocols, indent=2)
@@ -453,24 +455,23 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, 
        Modified dictionary with efeatures dict, including MEA features, saved to json
 
     """
-    feature_set = "extra"
-    new_efeatures_dict = efeatures_dict
+    # TODO refactor to new list-based format
+    new_efeatures_dict = deepcopy(efeatures_dict)
 
-    available_feature_sets = list(efeatures_dict.keys())
-    assert len(available_feature_sets) == 1
-    new_efeatures_dict[feature_set] = deepcopy(efeatures_dict[available_feature_sets[0]])
-
-    if protocol_name not in list(new_efeatures_dict[feature_set].keys()):
+    if protocol_name not in list(new_efeatures_dict.keys()):
         # create protocol if non existing
-        new_efeatures_dict[feature_set][protocol_name] = {}
+        new_efeatures_dict[protocol_name] = {}
 
     # create MEA location
-    new_efeatures_dict[feature_set][protocol_name]["MEA"] = {}
-
+    append_features = []
     for extra_feat_name, feature_values in extra_features.items():
         feature_list = feature_values.tolist()
+        feature_dict = {"n": 1,
+                        "efel_settings": {}}
         if channel_ids is None:
-            new_efeatures_dict[feature_set][protocol_name]["MEA"][extra_feat_name] = [feature_list, None]
+            feature_dict["feature"] = extra_feat_name
+            feature_dict["val"] = [feature_list, None]
+            append_features.append(deepcopy(feature_dict))
         elif isinstance(channel_ids, list) and np.isscalar(channel_ids[0]) and single_channel_features:
             # save channels separately
             assert std_from_mean is not None, "When 'single_channel_features' is used, the 'std_from_mean' argument " \
@@ -480,17 +481,21 @@ def append_extrafeatures_to_json(extra_features, protocol_name, efeatures_dict, 
                 if std == 0:
                     print(f"Setting {extra_feat_name} channel {chan} std to {epsilon}")
                     std = epsilon
-                new_efeatures_dict[feature_set][protocol_name]["MEA"][f"{extra_feat_name}_{chan}"] = \
-                    [feature_list[chan], std]
+                feature_dict["feature"] = f"{extra_feat_name}_{chan}"
+                feature_dict["val"] = [feature_list[chan], std]
+                append_features.append(deepcopy(feature_dict))
         else:
             if np.isscalar(channel_ids[0]):
                 # subset
-                new_efeatures_dict[feature_set][protocol_name]["MEA"][extra_feat_name] = \
-                    [list(np.array(feature_list)[channel_ids]), channel_ids]
+                feature_dict["feature"] = extra_feat_name
+                feature_dict["val"] = [list(np.array(feature_list)[channel_ids]), channel_ids]
+                append_features.append(deepcopy(feature_dict))
             else:
                 for sec, channels in enumerate(channel_ids):
-                    new_efeatures_dict[feature_set][protocol_name]["MEA"][f"{extra_feat_name}_{sec}"] = \
-                        [list(np.array(feature_list)[channels]), channels]
+                    feature_dict["feature"] = f"{extra_feat_name}_{sec}"
+                    feature_dict["val"] = [list(np.array(feature_list)[channels]), channels]
+                    append_features.append(deepcopy(feature_dict))
+    new_efeatures_dict[protocol_name]["MEA"] = append_features
 
     if efeatures_path is not None:
         s = json.dumps(new_efeatures_dict, indent=2)

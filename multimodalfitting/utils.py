@@ -150,7 +150,7 @@ def extra_recordings_from_positions(cell, sim, positions, position_names,
                        'name': pos_name,
                        'seclist_name': selected_seclist,
                        'sec_index': secarray_idx}
-        extra_rec_i = {'var': 'i_membrane_',
+        extra_rec_i = {'var': 'i_membrane',
                        'comp_x': 0,
                        'type': 'nrnseclistcomp',
                        'name': pos_name,
