@@ -450,26 +450,6 @@
   "IDrest_100": {
     "soma": [
       {
-        "feature": "AHP_depth",
-        "val": [
-          22.609465463624222,
-          1.4062833823003054
-        ],
-        "n": 2,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          2.700000000000614,
-          0.10000000000002274
-        ],
-        "n": 2,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
-      {
         "feature": "mean_frequency",
         "val": [
           35.3657591197015,
@@ -609,26 +589,6 @@
   },
   "IDrest_125": {
     "soma": [
-      {
-        "feature": "AHP_depth",
-        "val": [
-          24.596149858429854,
-          2.2613489199822463
-        ],
-        "n": 6,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          3.1666666666666123,
-          0.6599663291067251
-        ],
-        "n": 6,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
       {
         "feature": "mean_frequency",
         "val": [
@@ -810,26 +770,6 @@
   "IDrest_150": {
     "soma": [
       {
-        "feature": "AHP_depth",
-        "val": [
-          26.066393168551684,
-          2.056079779225743
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          3.892083333332936,
-          1.0449507398007245
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
-      {
         "feature": "mean_frequency",
         "val": [
           12.932372572188234,
@@ -1009,26 +949,6 @@
   },
   "IDrest_175": {
     "soma": [
-      {
-        "feature": "AHP_depth",
-        "val": [
-          26.74441036423325,
-          1.87387230071739
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          5.13340277777746,
-          1.3045619726209217
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
       {
         "feature": "mean_frequency",
         "val": [
@@ -1210,26 +1130,6 @@
   "IDrest_200": {
     "soma": [
       {
-        "feature": "AHP_depth",
-        "val": [
-          27.677529619264572,
-          1.9744396849238919
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          5.944956779331157,
-          0.8967190612949903
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
-      {
         "feature": "mean_frequency",
         "val": [
           9.471610144855076,
@@ -1409,26 +1309,6 @@
   },
   "IDrest_225": {
     "soma": [
-      {
-        "feature": "AHP_depth",
-        "val": [
-          29.854801090946722,
-          1.9982271139543446
-        ],
-        "n": 12,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          6.104409471246563,
-          0.6458005362249521
-        ],
-        "n": 12,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
       {
         "feature": "mean_frequency",
         "val": [
@@ -1610,26 +1490,6 @@
   "IDrest_250": {
     "soma": [
       {
-        "feature": "AHP_depth",
-        "val": [
-          31.50802654699355,
-          2.062155968860996
-        ],
-        "n": 12,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          6.203713297050169,
-          0.522705614310946
-        ],
-        "n": 12,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
-      {
         "feature": "mean_frequency",
         "val": [
           15.939779249611123,
@@ -1810,26 +1670,6 @@
   "IDrest_275": {
     "soma": [
       {
-        "feature": "AHP_depth",
-        "val": [
-          32.37350201219677,
-          1.7727783107533592
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          6.341473208979011,
-          0.25033495443148335
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
-      {
         "feature": "mean_frequency",
         "val": [
           17.482191798974043,
@@ -2009,26 +1849,6 @@
   },
   "IDrest_300": {
     "soma": [
-      {
-        "feature": "AHP_depth",
-        "val": [
-          33.36920915947383,
-          1.6666454184139226
-        ],
-        "n": 4,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          6.3051861471844735,
-          0.31802034398401835
-        ],
-        "n": 4,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
       {
         "feature": "mean_frequency",
         "val": [

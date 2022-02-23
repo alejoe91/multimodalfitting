@@ -36,10 +36,6 @@ def get_idrest_targets(timings=None, stimulus=None, include_pre_post=True):
     tolerances = 20
 
     template = [
-        {'efeature': 'AHP_depth',
-         'efel_settings': {}},
-        {'efeature': 'AHP_time_from_peak',
-         'efel_settings': {}},
         {'efeature': 'mean_frequency',
          'efel_settings': {}},
         {'efeature': 'burst_number',

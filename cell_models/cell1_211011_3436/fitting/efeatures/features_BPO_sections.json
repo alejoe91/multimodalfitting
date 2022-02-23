@@ -2,26 +2,6 @@
   "IDrest_150": {
     "soma": [
       {
-        "feature": "AHP_depth",
-        "val": [
-          26.066393168551684,
-          2.056079779225743
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          3.892083333332936,
-          1.0449507398007245
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
-      {
         "feature": "mean_frequency",
         "val": [
           12.932372572188234,
@@ -202,26 +182,6 @@
   "IDrest_250": {
     "soma": [
       {
-        "feature": "AHP_depth",
-        "val": [
-          31.50802654699355,
-          2.062155968860996
-        ],
-        "n": 12,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          6.203713297050169,
-          0.522705614310946
-        ],
-        "n": 12,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
-      {
         "feature": "mean_frequency",
         "val": [
           15.939779249611123,
@@ -401,26 +361,6 @@
   },
   "IDrest_300": {
     "soma": [
-      {
-        "feature": "AHP_depth",
-        "val": [
-          33.36920915947383,
-          1.6666454184139226
-        ],
-        "n": 4,
-        "efel_settings": {},
-        "efeature_name": "AHP_depth"
-      },
-      {
-        "feature": "AHP_time_from_peak",
-        "val": [
-          6.3051861471844735,
-          0.31802034398401835
-        ],
-        "n": 4,
-        "efel_settings": {},
-        "efeature_name": "AHP_time_from_peak"
-      },
       {
         "feature": "mean_frequency",
         "val": [
@@ -2670,36 +2610,6 @@
         "n": 12,
         "efel_settings": {},
         "efeature_name": "steady_state_voltage_stimend"
-      },
-      {
-        "feature": "ohmic_input_resistance_vb_ssse",
-        "val": [
-          57.87426036147227,
-          4.876435929643501
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "ohmic_input_resistance_vb_ssse"
-      },
-      {
-        "feature": "ohmic_input_resistance_vb_ssse",
-        "val": [
-          57.87426036147227,
-          4.876435929643501
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "ohmic_input_resistance_vb_ssse"
-      },
-      {
-        "feature": "ohmic_input_resistance_vb_ssse",
-        "val": [
-          57.87426036147227,
-          4.876435929643501
-        ],
-        "n": 8,
-        "efel_settings": {},
-        "efeature_name": "ohmic_input_resistance_vb_ssse"
       },
       {
         "feature": "ohmic_input_resistance_vb_ssse",

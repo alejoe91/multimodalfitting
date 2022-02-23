@@ -399,9 +399,9 @@ def convert_to_bpo_format(in_protocol_path, in_efeatures_path,
                             efeatures_dict["val"][1] = np.abs(std_from_mean * efeatures_dict["val"][0])
                         if efeatures_dict["val"][1] == 0:
                             efeatures_dict["val"][1] = epsilon
+                        efeatures_list.append(efeatures_dict)
                     else:
                         print(f"Excluding efeature {feature['feature']} from protocol {protocol_name}")
-                    efeatures_list.append(efeatures_dict)
                 out_efeatures[protocol_name][loc_name] = efeatures_list
 
     if out_protocol_path is not None:
