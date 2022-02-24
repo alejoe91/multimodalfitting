@@ -12,6 +12,16 @@
         "efeature_name": "mean_frequency"
       },
       {
+        "feature": "burst_number",
+        "val": [
+          1.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {},
+        "efeature_name": "burst_number"
+      },
+      {
         "feature": "adaptation_index2",
         "val": [
           0.00832200761982162,
@@ -182,6 +192,16 @@
         "efeature_name": "mean_frequency"
       },
       {
+        "feature": "burst_number",
+        "val": [
+          1.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {},
+        "efeature_name": "burst_number"
+      },
+      {
         "feature": "adaptation_index2",
         "val": [
           0.006019987651876863,
@@ -350,6 +370,16 @@
         "n": 10,
         "efel_settings": {},
         "efeature_name": "mean_frequency"
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          1.0,
+          0.001
+        ],
+        "n": 10,
+        "efel_settings": {},
+        "efeature_name": "burst_number"
       },
       {
         "feature": "adaptation_index2",

@@ -1599,36 +1599,6 @@
         "efeature_name": "ohmic_input_resistance_vb_ssse"
       },
       {
-        "feature": "sag_amplitude",
-        "val": [
-          0.001247294800393206,
-          6.236474001966031e-05
-        ],
-        "n": 1,
-        "efel_settings": {},
-        "efeature_name": "sag_amplitude"
-      },
-      {
-        "feature": "sag_ratio1",
-        "val": [
-          0.0004111507422741746,
-          2.0557537113708734e-05
-        ],
-        "n": 1,
-        "efel_settings": {},
-        "efeature_name": "sag_ratio1"
-      },
-      {
-        "feature": "sag_ratio2",
-        "val": [
-          0.9995888492577258,
-          0.0499794424628863
-        ],
-        "n": 1,
-        "efel_settings": {},
-        "efeature_name": "sag_ratio2"
-      },
-      {
         "feature": "decay_time_constant_after_stim",
         "val": [
           27.63973934857518,
