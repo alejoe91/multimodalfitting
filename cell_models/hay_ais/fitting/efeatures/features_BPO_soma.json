@@ -706,36 +706,6 @@
         "efeature_name": "ohmic_input_resistance_vb_ssse"
       },
       {
-        "feature": "ohmic_input_resistance_vb_ssse",
-        "val": [
-          101.0806861504482,
-          5.054034307522411
-        ],
-        "n": 1,
-        "efel_settings": {},
-        "efeature_name": "ohmic_input_resistance_vb_ssse"
-      },
-      {
-        "feature": "ohmic_input_resistance_vb_ssse",
-        "val": [
-          101.0806861504482,
-          5.054034307522411
-        ],
-        "n": 1,
-        "efel_settings": {},
-        "efeature_name": "ohmic_input_resistance_vb_ssse"
-      },
-      {
-        "feature": "ohmic_input_resistance_vb_ssse",
-        "val": [
-          101.0806861504482,
-          5.054034307522411
-        ],
-        "n": 1,
-        "efel_settings": {},
-        "efeature_name": "ohmic_input_resistance_vb_ssse"
-      },
-      {
         "feature": "decay_time_constant_after_stim",
         "val": [
           27.63973934857518,
