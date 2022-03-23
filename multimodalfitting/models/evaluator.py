@@ -566,9 +566,8 @@ def define_fitness_calculator(
 
     if exclude_protocols is None:
         exclude_protocols = []
-
     for protocol_name, locations in feature_definitions.items():
-        if protocol_name not in exclude_protocols:
+        if np.all([excl not in protocol_name for excl in exclude_protocols]):
             efeatures[protocol_name] = []
             for location, features in locations.items():
                 for feat in features:
@@ -837,10 +836,10 @@ def create_evaluator(
 
     if simulator.lower() == "lfpy":
         sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
-                                             mechs_folders=cell_model_folder)
+                                             mechanisms_directory=cell_model_folder)
     else:
         sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,
-                                            mechs_folders=cell_model_folder)
+                                            mechanisms_directory=cell_model_folder)
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,
