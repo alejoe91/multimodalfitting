@@ -11,8 +11,23 @@ this_file = Path(__file__)
 cell_models_folder = this_file.parent.parent.parent / "cell_models"
 
 
-def define_mechanisms(cell_model_folder, abd=False):
-    """Defines mechanisms"""
+def define_mechanisms(cell_model_folder, abd=False, extracellularmech=False):
+    """Define cell model mechanism
+
+    Parameters
+    ----------
+    cell_model_folder : str or Path
+        Path to the cell model
+    abd : bool, optional
+        If True, the axon-bearing dendrite (ABD) parameters are added, by default False
+    extracellularmech : bool, optional
+        If True, the 'extracellular' mechanism is added to all sections, by default False
+
+    Returns
+    -------
+    mechanism: list
+        List of BluePyOpt NrnMODMechanism
+    """
 
     mechanism_file_name = "mechanisms"
     if abd:
@@ -37,6 +52,17 @@ def define_mechanisms(cell_model_folder, abd=False):
                     name="%s.%s" % (channel, sectionlist),
                     mod_path="",
                     suffix=channel,
+                    locations=seclist_loc,
+                    preloaded=True,
+                )
+            )
+
+        if extracellularmech:
+            mechanisms.append(
+                ephys.mechanisms.NrnMODMechanism(
+                    name="extracellular.%s" % (sectionlist),
+                    mod_path="",
+                    suffix="extracellular",
                     locations=seclist_loc,
                     preloaded=True,
                 )
@@ -130,7 +156,7 @@ def define_electrode(
     return probe
 
 
-def define_parameters(cell_model_folder, parameter_file=None, release=False, 
+def define_parameters(cell_model_folder, parameter_file=None, release=False,
                       abd=False, optimize_ra=False):
     """
     Defines parameters
@@ -334,7 +360,8 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
     morphology: bluepyopt.ephys.morphologies.NrnFileMorphology
         The morphology object
     """
-    morphology_files = [p for p in cell_model_folder.iterdir() if "morphology" in p.name]
+    morphology_files = [
+        p for p in cell_model_folder.iterdir() if "morphology" in p.name]
 
     if len(morphology_files) == 1:
         path_morpho = morphology_files[0]
@@ -355,7 +382,7 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
 
 
 def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              **morph_kwargs):
+                              extracellularmech=False, **morph_kwargs):
     """Create ground-truth model
 
     Parameters
@@ -373,6 +400,9 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
         * "neuron": instantiate a CellModel
         * "LFPy": instantiate an LFPyCellModel
         by default "LFPy"
+    extracellularmech : bool
+        If True, extracellular mechanism is inserted into the model for recording i_membrane
+        Default is False
     **morph_kwargs: kwargs for morphology modifiers
 
     Returns
@@ -390,13 +420,15 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
         do_replace_axon = True
     elif model_name == "hay_ais_hillock":
         morph_modifiers = [replace_axon_with_hillock_ais]
-        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated', 
+        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'hillockal', 'myelinated',
                          'axonal']
-        secarray_names = ['soma', 'dend', 'apic', 'ais', 'hillock', 'myelin', 'axon']
+        secarray_names = ['soma', 'dend', 'apic',
+                          'ais', 'hillock', 'myelin', 'axon']
         do_replace_axon = False
     elif model_name == "hay_ais":
         morph_modifiers = [replace_axon_with_ais]
-        seclist_names = ['all', 'somatic', 'basal', 'apical', 'axon_initial_segment', 'myelinated', 'axonal']
+        seclist_names = ['all', 'somatic', 'basal', 'apical',
+                         'axon_initial_segment', 'myelinated', 'axonal']
         secarray_names = ['soma', 'dend', 'apic', 'ais', 'myelin', 'axon']
         do_replace_axon = False
     else:
@@ -409,8 +441,9 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
         cell_folder = cell_models_folder
     cell_model_folder = cell_folder / model_name
 
-    morph = define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **morph_kwargs)
-    mechs = define_mechanisms(cell_model_folder)
+    morph = define_morphology(
+        cell_model_folder, morph_modifiers, do_replace_axon, **morph_kwargs)
+    mechs = define_mechanisms(cell_model_folder, extracellularmech=extracellularmech)
     params = define_parameters(cell_model_folder, release=release)
 
     assert "v_init" in [param.name for param in params], ("Couldn't find v_init in the parameters. "
@@ -440,7 +473,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
 
 
 def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              abd=False, optimize_ra=False, **morph_kwargs):
+                              extracellularmech=False, abd=False, optimize_ra=False, **morph_kwargs):
     """Create experimental cell model
 
     Parameters
@@ -458,6 +491,9 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
         * "neuron": instantiate a CellModel
         * "LFPy": instantiate an LFPyCellModel
         by default "LFPy"
+    extracellularmech : bool
+        If True, extracellular mechanism is inserted into the model for recording i_membrane
+        Default is False
     abd: bool
         If True, the axon-bearing-dendrite section is used. Default False
     optimize_ra: bool
@@ -511,8 +547,10 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
         morph_modifiers_kwargs=morph_kwargs
     )
 
-    mechs = define_mechanisms(cell_model_folder, abd=abd)
-    params = define_parameters(cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra)
+    mechs = define_mechanisms(
+        cell_model_folder, abd=abd, extracellularmech=extracellularmech)
+    params = define_parameters(
+        cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra)
 
     assert "v_init" in [param.name for param in params], ("Couldn't find v_init in the parameters. "
                                                           "Add it as a global parameter")

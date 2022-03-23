@@ -117,14 +117,12 @@ def get_protocol_definitions(model_name, protocols_file=None):
     return json.load(open(path_protocols))
 
 
-def get_feature_definitions(feature_file, feature_set=None):
+def get_feature_definitions(feature_file):
     """
     Returns features definitions
 
     Parameters
     ----------
-    feature_set: str
-        "soma", "multiple", "extra", or "all"
     feature_file: str
         Path to json file specifying list of features for each fetaure set
 
@@ -141,9 +139,6 @@ def get_feature_definitions(feature_file, feature_set=None):
         feature_definitions = json.load(open(feature_file))
     else:
         raise Exception("feature_file is neither or pickle nor a json file.")
-
-    if feature_set:
-        return feature_definitions[feature_set]
 
     return feature_definitions
 
@@ -319,7 +314,6 @@ def define_stimuli(protocol_definition, simulator="lfpy",
 
 def define_protocols(
         model_name,
-        feature_set=None,
         feature_file=None,
         protocols_file=None,
         electrode=None,
@@ -336,8 +330,6 @@ def define_protocols(
     ----------
     model_name: str
         "hay", "hallermann", "cultured"
-    feature_set: str
-        "soma", "multiple", "extra", or "all"
     feature_file: str
         Path to a feature json file to load protocols from
     protocols_file: str
@@ -357,12 +349,12 @@ def define_protocols(
     """
 
     protocol_definitions = get_protocol_definitions(model_name, protocols_file)
-    feature_definitions = get_feature_definitions(feature_file, feature_set)
+    feature_definitions = get_feature_definitions(feature_file)
 
     if all_protocols:
         protocol_definitions = convert_all_protocols(protocol_definitions)
-        feature_definitions = convert_all_features(
-            feature_definitions, protocol_definitions)
+        # feature_definitions = convert_all_features(
+        #     feature_definitions, protocol_definitions)
 
     assert simulator.lower() in ["lfpy", "neuron"]
 
@@ -529,7 +521,7 @@ def get_unfrozen_params_bounds(model_name):
 
 
 def define_fitness_calculator(
-        protocols, feature_file, feature_set, probe=None, objective_weight_mea=2.5,
+        protocols, feature_file, probe=None, objective_weight_mea=2.5,
         interp_step=0.1, exclude_protocols=None,
         **extra_kwargs
 ):
@@ -542,49 +534,64 @@ def define_fitness_calculator(
         Dictionary with defined protocols
     feature_file: str
         Path to json file specifying list of features for each feature set
-    feature_set: str
-        "soma", "multiple", "extra", or "all"
     probe: MEAutility.MEA
         The probe to use for extracellular features
+    objective_weight_mea: float
+        Weight for cosine distance ectraFELFeatures (default=2.5)
+    interp_step: float
+        EFEl interpolation step (default=0.1)
+    exclude_protocols: list or None
+        If given, list of protocols to exclude from fitness objectives    
+    **extra_kwargs: keyword arguments for extracellular fitness (see `multimodalfitting.get_extra_kwargs()`)
 
     Returns
     -------
     objectives_calculator
     """
-    if feature_set is not None:
-        assert feature_set in ['multiple', 'soma', 'extra'], "feature_set should be 'multiple', 'soma' or 'extra'."
+    # if feature_set is not None:
+    #     assert feature_set in ['multiple', 'soma', 'extra'], "feature_set should be 'multiple', 'soma' or 'extra'."
 
-        if feature_set == 'extra' and probe is None:
-            raise Exception("Provide a MEAutility probe to use the 'extra' set.")
+    #     if feature_set == 'extra' and probe is None:
+    #         raise Exception("Provide a MEAutility probe to use the 'extra' set.")
 
-        feature_definitions = get_feature_definitions(feature_file, feature_set)
-    else:
-        feature_definitions = get_feature_definitions(
-            feature_file, None)
-        feature_definitions = convert_all_features(feature_definitions, protocols)
+    #     feature_definitions = get_feature_definitions(feature_file, feature_set)
+    # else:
+    # feature_definitions = get_feature_definitions(
+    #     feature_file, None)
+    # feature_definitions = convert_all_features(feature_definitions, protocols)
+    feature_definitions = get_feature_definitions(feature_file)
 
     objectives = []
     efeatures = {}
 
     if exclude_protocols is None:
         exclude_protocols = []
-
     for protocol_name, locations in feature_definitions.items():
-        if protocol_name not in exclude_protocols:
+        if np.all([excl not in protocol_name for excl in exclude_protocols]):
             efeatures[protocol_name] = []
             for location, features in locations.items():
-                for feat_name, efeat_values in features.items():
-                    if isinstance(efeat_values, dict):
-                        mean = efeat_values['mean']
-                        std = efeat_values['std']
-                        efel_settings = efeat_values['efel_settings']
-                        efel_feature_name = efeat_values.get(
+                for feat in features:
+                    if "val" not in feat:
+                        efeat_values = features[feat]
+                        feat_name = feat
+                        if isinstance(efeat_values, dict):
+                            mean = efeat_values['mean']
+                            std = efeat_values['std']
+                            efel_settings = efeat_values['efel_settings']
+                            efel_feature_name = efeat_values.get(
+                                'efel_feature_name', feat_name)
+                        else:
+                            mean = efeat_values[0]
+                            std = efeat_values[1]
+                            efel_settings = {}
+                            efel_feature_name = feat_name
+                    else: # new format
+                        feat_name = feat["feature"]
+                        mean = feat["val"][0]
+                        std = feat["val"][1]
+                        efel_settings = feat['efel_settings']
+                        efel_feature_name = feat.get(
                             'efel_feature_name', feat_name)
-                    else:
-                        mean = efeat_values[0]
-                        std = efeat_values[1]
-                        efel_settings = {}
-                        efel_feature_name = feat_name
                     feature_name = f'{protocol_name}.{location}.{feat_name}'
 
                     if protocols[protocol_name].stimuli[0].step_delay > 0.:
@@ -695,14 +702,14 @@ def _get_feature_and_objective(feature_name, efel_feature_name, protocol_name, l
 
 def create_evaluator(
         model_name,
-        feature_set,
-        extra_strategy=None,
+        strategy,
         protocols_with_lfp=None,
         extra_recordings=None,
         cell_folder=None,
         release=False,
         timeout=900.,
         abd=False,
+        extracellularmech=False,
         optimize_ra=False,
         simulator="lfpy",
         interp_step=0.1,
@@ -728,10 +735,8 @@ def create_evaluator(
     ----------
     model_name: str
         "hay", "hay_ais", or "hallermann"
-    feature_set: str
-        "soma", "extra"
-    extra_strategy: str or None
-        "all", "sections", "single", "validation" (only needed if feature_set is "extra")
+    strategy: str
+        "soma", "all", "single", "sections", ("validation")
     protocols_with_lfp: list or None
         If given, the list of protocols to compute LFP from
     cell_folder: path or None
@@ -752,6 +757,9 @@ def create_evaluator(
         Timeout in seconds
     abd: bool
         If True and model is 'experimental', the ABD section is used
+    extracellularmech: bool
+        If True, extracellular mechanism is inserted into the model for recording i_membrane
+        Default is False
     optimize_ra: bool
         If True and abd is True, Ra is also oprimized for AIS and ABD
     simulator: str
@@ -766,13 +774,19 @@ def create_evaluator(
     -------
     CellEvaluator
     """
+    if extra_recordings is not None:
+        if not extracellularmech:
+            print("Setting 'extracellularmech' to True for extra_recordings")
+            extracellularmech = True
     probe = None
-    if extra_strategy:
-        assert extra_strategy in ["all", "sections", "single", "validation"]
+    if strategy:
+        assert strategy in ["soma", "all", "sections", "single", "validation"]
     if model_name not in ['hay', 'hay_ais', 'hay_ais_hillock']:
-        cell = create_experimental_model(model_name=model_name, abd=abd, optimize_ra=optimize_ra, model_type=simulator)
+        cell = create_experimental_model(model_name=model_name, abd=abd, optimize_ra=optimize_ra, 
+                                         model_type=simulator, extracellularmech=extracellularmech)
     else:
-        cell = create_ground_truth_model(model_name=model_name, release=release, model_type=simulator)
+        cell = create_ground_truth_model(model_name=model_name, release=release, model_type=simulator,
+                                         extracellularmech=extracellularmech)
 
     if cell_folder is None:
         cell_folder = cell_models_folder
@@ -782,22 +796,17 @@ def create_evaluator(
 
     assert efeatures_folder.is_dir(), f"Couldn't find fitting folder {efeatures_folder}"
 
-    if feature_set == "extra":
+    if strategy in ["all", "sections", "single", "validation"]:
         probe_file = efeatures_folder / "probe_BPO.json"
         assert probe_file.is_file() is not None, f"Couldn't find probe file {probe_file}"
         probe = define_electrode(probe_file=probe_file)
 
-        assert extra_strategy is not None, "'extra_strategy' must be specified for 'extra' feature_set"
-    else:
-        extra_strategy = "all"
-
     if not all_protocols:
-        features_file = efeatures_folder / f"features_BPO_{extra_strategy}.json"
-        protocols_file = efeatures_folder / f"protocols_BPO_{extra_strategy}.json"
+        features_file = efeatures_folder / f"features_BPO_{strategy}.json"
+        protocols_file = efeatures_folder / f"protocols_BPO_{strategy}.json"
     else:
         features_file = efeatures_folder / "features.json"
         protocols_file = efeatures_folder / "protocols.json"
-        feature_set = None
 
     assert features_file.is_file() is not None, f"Couldn't find features file {features_file}"
     assert protocols_file.is_file() is not None, f"Couldn't find protocols file {protocols_file}"
@@ -806,7 +815,6 @@ def create_evaluator(
 
     fitness_protocols = define_protocols(
         model_name,
-        feature_set=feature_set,
         feature_file=features_file,
         protocols_file=protocols_file,
         electrode=probe,
@@ -820,7 +828,6 @@ def create_evaluator(
     fitness_calculator, _ = define_fitness_calculator(
         protocols=fitness_protocols,
         feature_file=features_file,
-        feature_set=feature_set,
         probe=probe,
         interp_step=interp_step,
         exclude_protocols=exclude_protocols,
@@ -829,10 +836,10 @@ def create_evaluator(
 
     if simulator.lower() == "lfpy":
         sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
-                                             mechs_folders=cell_model_folder)
+                                             mechanisms_directory=cell_model_folder)
     else:
         sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,
-                                            mechs_folders=cell_model_folder)
+                                            mechanisms_directory=cell_model_folder)
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,

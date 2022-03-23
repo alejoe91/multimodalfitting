@@ -27,14 +27,12 @@ def get_parser():
                         help="The seed used for the optimization")
     parser.add_argument("--cell-folder", type=str, default=None, required=False,
                         help="The folder where the cell models are (default 'multimodalfitting/cell_models/')")
-    parser.add_argument("--feature-set", type=str, default="extra",
-                        help="The feature set to be used ('soma' - 'extra')")
+    parser.add_argument("--strategy", type=str, default="soma",
+                        help="The feature set to be used ('soma' - 'all' - 'single' - 'extra')")
     parser.add_argument("--model", type=str, default="hay",
                         help="the model to be optimized ('hay' - 'hay_ais' - 'hay_ais_hillock' or experimental ones)")
     parser.add_argument("--sim", type=str, default="lfpy",
                         help="the simulator to be used ('lfpy' - 'neuron')")
-    parser.add_argument("--extra-strategy", type=str, default="all",
-                        help="The strategy for using extracellular features ('all' - 'single' - 'sections')")
     parser.add_argument("--ipyparallel", action="store_true", default=False,
                         help="If True ipyparallel is used to parallelize computations (default False)")
     parser.add_argument("--opt-folder", type=str, default=None, required=True,
@@ -75,12 +73,10 @@ def get_mapper(args):
         return None
 
 
-def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed, abd, ra):
+def get_cp_filename(opt_folder, model, strategy, seed, abd, ra):
 
-    cp_name = f'model={model}_featureset={feature_set}'
+    cp_name = f'model={model}_strategy={strategy}'
 
-    if extra_strategy:
-        cp_name += f'strategy={extra_strategy}'
     if abd:
         cp_name = cp_name + "_abd"
     if ra:
@@ -98,8 +94,7 @@ def get_cp_filename(opt_folder, model, feature_set, extra_strategy, seed, abd, r
 
 def save_evaluator_configuration(
     model_name,
-    feature_set,
-    extra_strategy,
+    strategy,
     protocols_with_lfp,
     cell_folder,
     timeout,
@@ -110,8 +105,7 @@ def save_evaluator_configuration(
 ):
 
     eva_args = dict(model_name=model_name,
-                    feature_set=feature_set,
-                    extra_strategy=extra_strategy,
+                    strategy=strategy,
                     protocols_with_lfp=protocols_with_lfp,
                     cell_folder=str(cell_folder),
                     extra_recordings=None,
@@ -138,15 +132,15 @@ def main():
 
     map_function = get_mapper(args)
 
-    if args.feature_set == "extra" and args.sim == "neuron":
-        raise Exception("With feature set 'extra' , please use the lfpy simulator.")
+    if args.strategy in ["all", "sections", "single"] and args.sim == "neuron":
+        raise Exception(
+            f"With strategy {args.strategy}, please use the lfpy simulator.")
 
-    protocols_with_lfp = ['IDrest_300'] if args.feature_set == "extra" else None
+    protocols_with_lfp = ['IDrest_300'] if args.strategy in ["all", "sections", "single"] else None
 
     eva = mf.create_evaluator(
         model_name=args.model,
-        feature_set=args.feature_set,
-        extra_strategy=args.extra_strategy,
+        strategy=args.strategy,
         protocols_with_lfp=protocols_with_lfp,
         cell_folder=Path(args.cell_folder),
         extra_recordings=None,
@@ -167,7 +161,7 @@ def main():
     )
 
     cp_filename = get_cp_filename(
-        opt_folder, args.model, args.feature_set, args.extra_strategy, args.seed, args.abd, args.ra
+        opt_folder, args.model, args.strategy, args.seed, args.abd, args.ra
     )
 
     if cp_filename.is_file():
@@ -179,8 +173,7 @@ def main():
 
     save_evaluator_configuration(
         model_name=args.model,
-        feature_set=args.feature_set,
-        extra_strategy=args.extra_strategy,
+        strategy=args.strategy,
         protocols_with_lfp=protocols_with_lfp,
         cell_folder=Path(args.cell_folder),
         timeout=args.timeout,

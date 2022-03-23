@@ -29,10 +29,9 @@ python3 run_optimizations.py \
                              --ipyparallel                            \
                              --cell-folder=${CELL_FOLDER}             \
                              --seed=${OPT_SEED}                       \
-                             --feature-set=${OPT_FEATURE_SET}         \
+                             --strategy=${OPT_STRATEGY}               \
                              --model=${OPT_MODEL}                     \
                              --opt-folder=${OPT_FOLDER}               \
-                             --extra-strategy=${OPT_EXTRA_STRATEGY}   \
                              --sim=${SIM}                             \
                              --abd=${OPT_ABD}                         \
                              --ra=${OPT_RA}

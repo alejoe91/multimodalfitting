@@ -1,900 +1,1499 @@
 {
-  "soma": {
-    "IDrest_150": {
-      "soma": {
-        "mean_frequency": [
+  "IDrest_150": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
           12.932372572188234,
           13.562514014074905
         ],
-        "burst_number": [
-          1.0,
-          0.001
-        ],
-        "adaptation_index2": [
-          0.2845673334527762,
-          0.11972518305173534
-        ],
-        "ISI_CV": [
-          0.6421543874224691,
-          0.08817286078165838
-        ],
-        "ISI_log_slope": [
-          1.360201804631526,
-          0.4231885041015336
-        ],
-        "inv_time_to_first_spike": [
-          64.70046125596855,
-          14.663704542238962
-        ],
-        "inv_first_ISI": [
-          34.499603928676265,
-          24.51960332984863
-        ],
-        "inv_second_ISI": [
-          10.309821735981684,
-          9.7870010112208
-        ],
-        "inv_third_ISI": [
-          4.2192676694348545,
-          5.646772782217728
-        ],
-        "inv_fourth_ISI": [
-          3.430691175106029,
-          4.539188389217941
-        ],
-        "inv_fifth_ISI": [
-          1.548387964808525,
-          2.485811772611582
-        ],
-        "AP_amplitude": [
-          81.08323018238923,
-          11.05073948970391
-        ],
-        "AHP_depth": [
-          26.066393168551684,
-          2.056079779225743
-        ],
-        "AHP_time_from_peak": [
-          3.892083333332936,
-          1.0449507398007245
-        ]
-      }
-    },
-    "IDrest_250": {
-      "soma": {
-        "mean_frequency": [
-          15.939779249611123,
-          3.9970038867151816
-        ],
-        "burst_number": [
-          2.0,
-          0.816496580927726
-        ],
-        "adaptation_index2": [
-          0.05139377060947594,
-          0.024573141662939096
-        ],
-        "ISI_CV": [
-          0.5052490791026782,
-          0.1615854009742826
-        ],
-        "ISI_log_slope": [
-          0.6134101906438079,
-          0.197457505321754
-        ],
-        "inv_time_to_first_spike": [
-          130.73459784582658,
-          11.202282816660508
-        ],
-        "inv_first_ISI": [
-          109.22465794785076,
-          16.979603639393872
-        ],
-        "inv_second_ISI": [
-          46.290687150041684,
-          5.272115403552276
-        ],
-        "inv_third_ISI": [
-          34.959731758289486,
-          4.418088036781364
-        ],
-        "inv_fourth_ISI": [
-          29.52452450668419,
-          4.636196078660864
-        ],
-        "inv_fifth_ISI": [
-          26.264890122823633,
-          4.150397618864643
-        ],
-        "AP_amplitude": [
-          67.51653232354853,
-          1.9268987492864678
-        ],
-        "AHP_depth": [
-          31.50802654699355,
-          2.062155968860996
-        ],
-        "AHP_time_from_peak": [
-          6.203713297050169,
-          0.522705614310946
-        ]
-      }
-    },
-    "IDrest_300": {
-      "soma": {
-        "mean_frequency": [
-          18.987383905892834,
-          3.5044837247258536
-        ],
-        "burst_number": [
-          2.25,
-          0.82915619758885
-        ],
-        "adaptation_index2": [
-          0.03587852959154521,
-          0.016405504678964497
-        ],
-        "ISI_CV": [
-          0.40732999268012837,
-          0.10963590369002776
-        ],
-        "ISI_log_slope": [
-          0.4741050987751889,
-          0.10081731154232612
-        ],
-        "inv_time_to_first_spike": [
-          141.0296300733363,
-          8.000149459119788
-        ],
-        "inv_first_ISI": [
-          114.78883336866208,
-          19.50603456669289
-        ],
-        "inv_second_ISI": [
-          50.622827894122054,
-          5.983332440710937
-        ],
-        "inv_third_ISI": [
-          39.23855349390672,
-          3.21786320513674
-        ],
-        "inv_fourth_ISI": [
-          33.27632189238575,
-          4.575691528374228
-        ],
-        "inv_fifth_ISI": [
-          30.137793774604045,
-          3.4655303522913927
-        ],
-        "AP_amplitude": [
-          65.18592681713707,
-          0.43328113153076403
-        ],
-        "AHP_depth": [
-          33.36920915947383,
-          1.6666454184139226
-        ],
-        "AHP_time_from_peak": [
-          6.3051861471844735,
-          0.31802034398401835
-        ]
-      }
-    },
-    "IV_-100": {
-      "soma": {
-        "Spikecount": [
-          0.0,
-          0.001
-        ],
-        "voltage_base": [
-          -81.79989958528589,
-          1.1441551270577661
-        ],
-        "voltage_deflection": [
-          -19.083749795934423,
-          3.8075174365535456
-        ],
-        "voltage_deflection_begin": [
-          -20.12719210494883,
-          3.824436731503457
-        ],
-        "steady_state_voltage_stimend": [
-          -101.12518819260545,
-          4.578088458080138
-        ],
-        "ohmic_input_resistance_vb_ssse": [
-          58.24399601858572,
-          3.0217532801670552
-        ],
-        "sag_amplitude": [
-          2.738071514979451,
-          1.0567719146877337
-        ],
-        "sag_ratio1": [
-          0.12574824890360997,
-          0.046941428534852364
-        ],
-        "sag_ratio2": [
-          0.8742517510963901,
-          0.04694142853485237
-        ],
-        "decay_time_constant_after_stim": [
-          7.546121512936132,
-          1.0123321836831134
-        ]
-      }
-    },
-    "IV_-20": {
-      "soma": {
-        "Spikecount": [
-          0.0,
-          0.001
-        ],
-        "voltage_base": [
-          -81.7070471084569,
-          0.8267172628332372
-        ],
-        "voltage_deflection": [
-          -3.399037127686281,
-          2.7726074034744896
-        ],
-        "voltage_deflection_begin": [
-          -3.6406312121786057,
-          2.9400394759090953
-        ],
-        "steady_state_voltage_stimend": [
-          -85.13578496369372,
-          2.960875961648277
-        ],
-        "ohmic_input_resistance_vb_ssse": [
-          57.87426036147227,
-          4.876435929643501
-        ],
-        "decay_time_constant_after_stim": [
-          13.386582903529131,
-          13.417992506445545
-        ]
-      }
-    },
-    "APWaveform_290": {
-      "soma": {
-        "AP_amplitude": [
-          73.50807647706307,
-          2.4400301600352012
-        ],
-        "AP1_amp": [
-          108.30054299932672,
-          1.2289218986242827
-        ],
-        "AP2_amp": [
-          58.76972311604614,
-          0.971335918166252
-        ],
-        "AP_duration_half_width": [
-          1.1000000000002501,
-          0.28498294295942467
-        ],
-        "AP_begin_width": [
-          4.428125000001007,
-          0.29936093680731274
-        ],
-        "AP_begin_voltage": [
-          -53.67700525731547,
-          1.6418301041028065
-        ],
-        "AHP_depth": [
-          33.2022480222802,
-          1.522592920363057
-        ],
-        "AHP_time_from_peak": [
-          3.402083333334107,
-          0.20752970001642768
-        ]
-      }
-    }
-  },
-  "extra": {
-    "IDrest_150": {
-      "soma": {
-        "mean_frequency": [
-          12.932372572188234,
-          13.562514014074905
-        ],
-        "burst_number": [
-          1.0,
-          0.001
-        ],
-        "adaptation_index2": [
-          0.2845673334527762,
-          0.11972518305173534
-        ],
-        "ISI_CV": [
-          0.6421543874224691,
-          0.08817286078165838
-        ],
-        "ISI_log_slope": [
-          1.360201804631526,
-          0.4231885041015336
-        ],
-        "inv_time_to_first_spike": [
-          64.70046125596855,
-          14.663704542238962
-        ],
-        "inv_first_ISI": [
-          34.499603928676265,
-          24.51960332984863
-        ],
-        "inv_second_ISI": [
-          10.309821735981684,
-          9.7870010112208
-        ],
-        "inv_third_ISI": [
-          4.2192676694348545,
-          5.646772782217728
-        ],
-        "inv_fourth_ISI": [
-          3.430691175106029,
-          4.539188389217941
-        ],
-        "inv_fifth_ISI": [
-          1.548387964808525,
-          2.485811772611582
-        ],
-        "AP_amplitude": [
-          81.08323018238923,
-          11.05073948970391
-        ],
-        "AHP_depth": [
-          26.066393168551684,
-          2.056079779225743
-        ],
-        "AHP_time_from_peak": [
-          3.892083333332936,
-          1.0449507398007245
-        ]
-      }
-    },
-    "IDrest_250": {
-      "soma": {
-        "mean_frequency": [
-          15.939779249611123,
-          3.9970038867151816
-        ],
-        "burst_number": [
-          2.0,
-          0.816496580927726
-        ],
-        "adaptation_index2": [
-          0.05139377060947594,
-          0.024573141662939096
-        ],
-        "ISI_CV": [
-          0.5052490791026782,
-          0.1615854009742826
-        ],
-        "ISI_log_slope": [
-          0.6134101906438079,
-          0.197457505321754
-        ],
-        "inv_time_to_first_spike": [
-          130.73459784582658,
-          11.202282816660508
-        ],
-        "inv_first_ISI": [
-          109.22465794785076,
-          16.979603639393872
-        ],
-        "inv_second_ISI": [
-          46.290687150041684,
-          5.272115403552276
-        ],
-        "inv_third_ISI": [
-          34.959731758289486,
-          4.418088036781364
-        ],
-        "inv_fourth_ISI": [
-          29.52452450668419,
-          4.636196078660864
-        ],
-        "inv_fifth_ISI": [
-          26.264890122823633,
-          4.150397618864643
-        ],
-        "AP_amplitude": [
-          67.51653232354853,
-          1.9268987492864678
-        ],
-        "AHP_depth": [
-          31.50802654699355,
-          2.062155968860996
-        ],
-        "AHP_time_from_peak": [
-          6.203713297050169,
-          0.522705614310946
-        ]
-      }
-    },
-    "IDrest_300": {
-      "soma": {
-        "mean_frequency": [
-          18.987383905892834,
-          3.5044837247258536
-        ],
-        "burst_number": [
-          2.25,
-          0.82915619758885
-        ],
-        "adaptation_index2": [
-          0.03587852959154521,
-          0.016405504678964497
-        ],
-        "ISI_CV": [
-          0.40732999268012837,
-          0.10963590369002776
-        ],
-        "ISI_log_slope": [
-          0.4741050987751889,
-          0.10081731154232612
-        ],
-        "inv_time_to_first_spike": [
-          141.0296300733363,
-          8.000149459119788
-        ],
-        "inv_first_ISI": [
-          114.78883336866208,
-          19.50603456669289
-        ],
-        "inv_second_ISI": [
-          50.622827894122054,
-          5.983332440710937
-        ],
-        "inv_third_ISI": [
-          39.23855349390672,
-          3.21786320513674
-        ],
-        "inv_fourth_ISI": [
-          33.27632189238575,
-          4.575691528374228
-        ],
-        "inv_fifth_ISI": [
-          30.137793774604045,
-          3.4655303522913927
-        ],
-        "AP_amplitude": [
-          65.18592681713707,
-          0.43328113153076403
-        ],
-        "AHP_depth": [
-          33.36920915947383,
-          1.6666454184139226
-        ],
-        "AHP_time_from_peak": [
-          6.3051861471844735,
-          0.31802034398401835
-        ]
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "mean_frequency"
       },
-      "MEA": {
-        "peak_to_valley_208": [
+      {
+        "feature": "burst_number",
+        "val": [
+          1.0,
+          0.001
+        ],
+        "n": 5,
+        "efel_settings": {},
+        "efeature_name": "burst_number"
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.2845673334527762,
+          0.11972518305173534
+        ],
+        "n": 5,
+        "efel_settings": {},
+        "efeature_name": "adaptation_index2"
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.6421543874224691,
+          0.08817286078165838
+        ],
+        "n": 5,
+        "efel_settings": {},
+        "efeature_name": "ISI_CV"
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          1.360201804631526,
+          0.4231885041015336
+        ],
+        "n": 5,
+        "efel_settings": {},
+        "efeature_name": "ISI_log_slope"
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          64.70046125596855,
+          14.663704542238962
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "inv_time_to_first_spike"
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          34.499603928676265,
+          24.51960332984863
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "inv_first_ISI"
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          10.309821735981684,
+          9.7870010112208
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "inv_second_ISI"
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          4.2192676694348545,
+          5.646772782217728
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "inv_third_ISI"
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          3.430691175106029,
+          4.539188389217941
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "inv_fourth_ISI"
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          1.548387964808525,
+          2.485811772611582
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "inv_fifth_ISI"
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          81.08323018238923,
+          11.05073948970391
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AP_amplitude"
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          26.066393168551684,
+          2.056079779225743
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AHP_depth"
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          3.892083333332936,
+          1.0449507398007245
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AHP_time_from_peak"
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -83.19906073311621,
+          1.7252679942514146
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "voltage_base"
+      },
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 8,
+        "efel_settings": {
+          "stim_start": 0.0,
+          "stim_end": 400
+        },
+        "efeature_name": "Spikecount_pre_step"
+      },
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 8,
+        "efel_settings": {
+          "stim_start": 1850,
+          "stim_end": 2350
+        },
+        "efeature_name": "Spikecount_post_step"
+      }
+    ]
+  },
+  "IDrest_250": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          15.939779249611123,
+          3.9970038867151816
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "mean_frequency"
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          2.0,
+          0.816496580927726
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "burst_number"
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.05139377060947594,
+          0.024573141662939096
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "adaptation_index2"
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.5052490791026782,
+          0.1615854009742826
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "ISI_CV"
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          0.6134101906438079,
+          0.197457505321754
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "ISI_log_slope"
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          130.73459784582658,
+          11.202282816660508
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "inv_time_to_first_spike"
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          109.22465794785076,
+          16.979603639393872
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "inv_first_ISI"
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          46.290687150041684,
+          5.272115403552276
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "inv_second_ISI"
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          34.959731758289486,
+          4.418088036781364
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "inv_third_ISI"
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          29.52452450668419,
+          4.636196078660864
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "inv_fourth_ISI"
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          26.264890122823633,
+          4.150397618864643
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "inv_fifth_ISI"
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          67.51653232354853,
+          1.9268987492864678
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "AP_amplitude"
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          31.50802654699355,
+          2.062155968860996
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "AHP_depth"
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          6.203713297050169,
+          0.522705614310946
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "AHP_time_from_peak"
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -84.71825015321394,
+          0.9932384146596873
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "voltage_base"
+      },
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 12,
+        "efel_settings": {
+          "stim_start": 0.0,
+          "stim_end": 400
+        },
+        "efeature_name": "Spikecount_pre_step"
+      },
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 12,
+        "efel_settings": {
+          "stim_start": 1850,
+          "stim_end": 2350
+        },
+        "efeature_name": "Spikecount_post_step"
+      }
+    ]
+  },
+  "IDrest_300": {
+    "soma": [
+      {
+        "feature": "mean_frequency",
+        "val": [
+          18.987383905892834,
+          3.5044837247258536
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "mean_frequency"
+      },
+      {
+        "feature": "burst_number",
+        "val": [
+          2.25,
+          0.82915619758885
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "burst_number"
+      },
+      {
+        "feature": "adaptation_index2",
+        "val": [
+          0.03587852959154521,
+          0.016405504678964497
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "adaptation_index2"
+      },
+      {
+        "feature": "ISI_CV",
+        "val": [
+          0.40732999268012837,
+          0.10963590369002776
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "ISI_CV"
+      },
+      {
+        "feature": "ISI_log_slope",
+        "val": [
+          0.4741050987751889,
+          0.10081731154232612
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "ISI_log_slope"
+      },
+      {
+        "feature": "inv_time_to_first_spike",
+        "val": [
+          141.0296300733363,
+          8.000149459119788
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "inv_time_to_first_spike"
+      },
+      {
+        "feature": "inv_first_ISI",
+        "val": [
+          114.78883336866208,
+          19.50603456669289
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "inv_first_ISI"
+      },
+      {
+        "feature": "inv_second_ISI",
+        "val": [
+          50.622827894122054,
+          5.983332440710937
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "inv_second_ISI"
+      },
+      {
+        "feature": "inv_third_ISI",
+        "val": [
+          39.23855349390672,
+          3.21786320513674
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "inv_third_ISI"
+      },
+      {
+        "feature": "inv_fourth_ISI",
+        "val": [
+          33.27632189238575,
+          4.575691528374228
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "inv_fourth_ISI"
+      },
+      {
+        "feature": "inv_fifth_ISI",
+        "val": [
+          30.137793774604045,
+          3.4655303522913927
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "inv_fifth_ISI"
+      },
+      {
+        "feature": "AP_amplitude",
+        "val": [
+          65.18592681713707,
+          0.43328113153076403
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "AP_amplitude"
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
+          33.36920915947383,
+          1.6666454184139226
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "AHP_depth"
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
+          6.3051861471844735,
+          0.31802034398401835
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "AHP_time_from_peak"
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
+          -85.37631470784159,
+          1.1602573442981416
+        ],
+        "n": 4,
+        "efel_settings": {},
+        "efeature_name": "voltage_base"
+      },
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 4,
+        "efel_settings": {
+          "stim_start": 0.0,
+          "stim_end": 400
+        },
+        "efeature_name": "Spikecount_pre_step"
+      },
+      {
+        "feature": "Spikecount",
+        "val": [
+          0.0,
+          0.001
+        ],
+        "n": 4,
+        "efel_settings": {
+          "stim_start": 1850,
+          "stim_end": 2350
+        },
+        "efeature_name": "Spikecount_post_step"
+      }
+    ],
+    "MEA": [
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_to_valley_208",
+        "val": [
           -0.00035000000000000005,
           1.7500000000000002e-05
-        ],
-        "peak_to_valley_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_to_valley_21",
+        "val": [
           0.000355,
           1.775e-05
-        ],
-        "peak_to_valley_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_to_valley_1",
+        "val": [
           0.00034,
           1.7000000000000003e-05
-        ],
-        "peak_to_valley_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_to_valley_188",
+        "val": [
           0.00064,
           3.2000000000000005e-05
-        ],
-        "peak_to_valley_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_to_valley_90",
+        "val": [
           -0.00025,
           1.25e-05
-        ],
-        "peak_to_valley_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_to_valley_211",
+        "val": [
           -0.0008550000000000001,
           4.275000000000001e-05
-        ],
-        "peak_to_valley_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_to_valley_180",
+        "val": [
           0.00062,
           3.1e-05
-        ],
-        "peak_trough_ratio_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_trough_ratio_208",
+        "val": [
           0.6829140602568337,
           0.034145703012841686
-        ],
-        "peak_trough_ratio_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_trough_ratio_21",
+        "val": [
           1.0787568461028498,
           0.053937842305142494
-        ],
-        "peak_trough_ratio_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_trough_ratio_1",
+        "val": [
           2.356485649504586,
           0.1178242824752293
-        ],
-        "peak_trough_ratio_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_trough_ratio_188",
+        "val": [
           0.3978093631523297,
           0.019890468157616484
-        ],
-        "peak_trough_ratio_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_trough_ratio_90",
+        "val": [
           0.24007009345794392,
           0.012003504672897196
-        ],
-        "peak_trough_ratio_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_trough_ratio_211",
+        "val": [
           3.1788553389811547,
           0.15894276694905773
-        ],
-        "peak_trough_ratio_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "peak_trough_ratio_180",
+        "val": [
           0.29596370119993903,
           0.014798185059996952
-        ],
-        "halfwidth_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "halfwidth_208",
+        "val": [
           -0.0005700000000000001,
           2.8500000000000005e-05
-        ],
-        "halfwidth_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "halfwidth_21",
+        "val": [
           0.00016500000000000003,
           8.250000000000002e-06
-        ],
-        "halfwidth_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "halfwidth_1",
+        "val": [
           0.0005250000000000001,
           2.6250000000000004e-05
-        ],
-        "halfwidth_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "halfwidth_188",
+        "val": [
           0.0005300000000000001,
           2.6500000000000007e-05
-        ],
-        "halfwidth_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "halfwidth_90",
+        "val": [
           -0.002635,
           0.00013175
-        ],
-        "halfwidth_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "halfwidth_211",
+        "val": [
           -0.001175,
           5.8750000000000005e-05
-        ],
-        "halfwidth_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "halfwidth_180",
+        "val": [
           0.000375,
           1.8750000000000002e-05
-        ],
-        "repolarization_slope_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "repolarization_slope_208",
+        "val": [
           74058.96477453793,
           3702.9482387268968
-        ],
-        "repolarization_slope_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "repolarization_slope_21",
+        "val": [
           206223.5232481514,
           10311.176162407572
-        ],
-        "repolarization_slope_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "repolarization_slope_1",
+        "val": [
           177491.0936704944,
           8874.55468352472
-        ],
-        "repolarization_slope_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "repolarization_slope_188",
+        "val": [
           153790.0960447755,
           7689.5048022387755
-        ],
-        "repolarization_slope_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "repolarization_slope_90",
+        "val": [
           322942.4753651942,
           16147.123768259711
-        ],
-        "repolarization_slope_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "repolarization_slope_211",
+        "val": [
           7687.617909191017,
           384.38089545955086
-        ],
-        "repolarization_slope_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "repolarization_slope_180",
+        "val": [
           71725.45521145464,
           3586.2727605727323
-        ],
-        "recovery_slope_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "recovery_slope_208",
+        "val": [
           -14760.74638187102,
           738.0373190935511
-        ],
-        "recovery_slope_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "recovery_slope_21",
+        "val": [
           -55032.84773279323,
           2751.6423866396617
-        ],
-        "recovery_slope_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "recovery_slope_1",
+        "val": [
           -97186.37549562265,
           4859.318774781133
-        ],
-        "recovery_slope_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "recovery_slope_188",
+        "val": [
           -18490.698952239727,
           924.5349476119864
-        ],
-        "recovery_slope_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "recovery_slope_90",
+        "val": [
           19141.477815477152,
           957.0738907738577
-        ],
-        "recovery_slope_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "recovery_slope_211",
+        "val": [
           -39989.62479818872,
           1999.4812399094362
-        ],
-        "recovery_slope_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "recovery_slope_180",
+        "val": [
           -5282.712782231717,
           264.1356391115859
-        ],
-        "neg_peak_diff_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_diff_208",
+        "val": [
           0.000375,
           1.8750000000000002e-05
-        ],
-        "neg_peak_diff_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_diff_21",
+        "val": [
           -1.5e-05,
           7.5e-07
-        ],
-        "neg_peak_diff_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_diff_1",
+        "val": [
           -0.00014,
           7e-06
-        ],
-        "neg_peak_diff_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_diff_188",
+        "val": [
           0.00014,
           7e-06
-        ],
-        "neg_peak_diff_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_diff_90",
+        "val": [
           5e-05,
           2.5e-06
-        ],
-        "neg_peak_diff_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_diff_211",
+        "val": [
           0.000995,
           4.975e-05
-        ],
-        "neg_peak_diff_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_diff_180",
+        "val": [
           0.0002,
           1e-05
-        ],
-        "pos_peak_diff_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_diff_208",
+        "val": [
           -9.5e-05,
           4.75e-06
-        ],
-        "pos_peak_diff_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_diff_21",
+        "val": [
           0.00022,
           1.1000000000000001e-05
-        ],
-        "pos_peak_diff_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_diff_1",
+        "val": [
           8e-05,
           4.000000000000001e-06
-        ],
-        "pos_peak_diff_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_diff_188",
+        "val": [
           0.00066,
           3.3e-05
-        ],
-        "pos_peak_diff_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_diff_90",
+        "val": [
           -0.00032,
           1.6000000000000003e-05
-        ],
-        "pos_peak_diff_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_diff_211",
+        "val": [
           2e-05,
           1.0000000000000002e-06
-        ],
-        "pos_peak_diff_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_diff_180",
+        "val": [
           0.0007,
           3.5000000000000004e-05
-        ],
-        "neg_peak_relative_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_relative_208",
+        "val": [
           0.11753465337696863,
           0.0058767326688484315
-        ],
-        "neg_peak_relative_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_relative_21",
+        "val": [
           0.17448080054008225,
           0.008724040027004113
-        ],
-        "neg_peak_relative_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_relative_1",
+        "val": [
           0.12636915663854056,
           0.0063184578319270285
-        ],
-        "neg_peak_relative_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_relative_188",
+        "val": [
           0.27721706969515014,
           0.013860853484757508
-        ],
-        "neg_peak_relative_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_relative_90",
+        "val": [
           0.8164822586798931,
           0.040824112933994655
-        ],
-        "neg_peak_relative_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_relative_211",
+        "val": [
           0.03568792717337049,
           0.0017843963586685247
-        ],
-        "neg_peak_relative_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_peak_relative_180",
+        "val": [
           0.14908431896222815,
           0.007454215948111408
-        ],
-        "pos_peak_relative_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_relative_208",
+        "val": [
           0.14242409273557113,
           0.007121204636778557
-        ],
-        "pos_peak_relative_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_relative_21",
+        "val": [
           0.3339817119062538,
           0.01669908559531269
-        ],
-        "pos_peak_relative_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_relative_1",
+        "val": [
           0.5283933738612797,
           0.02641966869306399
-        ],
-        "pos_peak_relative_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_relative_188",
+        "val": [
           0.1956800027228673,
           0.009784000136143367
-        ],
-        "pos_peak_relative_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_relative_90",
+        "val": [
           0.34780537581195703,
           0.01739026879059785
-        ],
-        "pos_peak_relative_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_relative_211",
+        "val": [
           0.2012999028079155,
           0.010064995140395775
-        ],
-        "pos_peak_relative_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_peak_relative_180",
+        "val": [
           0.07829281204970025,
           0.003914640602485013
-        ],
-        "neg_image_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_image_208",
+        "val": [
           -0.07659290347195725,
           0.003829645173597863
-        ],
-        "neg_image_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_image_21",
+        "val": [
           0.17169019458222054,
           0.008584509729111027
-        ],
-        "neg_image_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_image_1",
+        "val": [
           -0.043876383059900805,
           0.0021938191529950403
-        ],
-        "neg_image_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_image_188",
+        "val": [
           0.15795497901564287,
           0.007897748950782144
-        ],
-        "neg_image_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_image_90",
+        "val": [
           0.7100343380389165,
           0.035501716901945826
-        ],
-        "neg_image_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_image_211",
+        "val": [
           -0.03853491033956505,
           0.0019267455169782524
-        ],
-        "neg_image_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "neg_image_180",
+        "val": [
           0.06819916062571538,
           0.003409958031285769
-        ],
-        "pos_image_208": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_image_208",
+        "val": [
           0.06715904352464915,
           0.0033579521762324574
-        ],
-        "pos_image_21": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_image_21",
+        "val": [
           -0.03134904674334263,
           0.0015674523371671314
-        ],
-        "pos_image_1": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_image_1",
+        "val": [
           0.4502310857639653,
           0.022511554288198267
-        ],
-        "pos_image_188": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_image_188",
+        "val": [
           -0.4848742569772755,
           0.024243712848863775
-        ],
-        "pos_image_90": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_image_90",
+        "val": [
           -1.2106636246064788,
           0.060533181230323946
-        ],
-        "pos_image_211": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_image_211",
+        "val": [
           0.1986801166449432,
           0.009934005832247161
-        ],
-        "pos_image_180": [
+        ]
+      },
+      {
+        "n": 1,
+        "efel_settings": {},
+        "feature": "pos_image_180",
+        "val": [
           -0.22032692358648934,
           0.011016346179324468
         ]
       }
-    },
-    "IV_-100": {
-      "soma": {
-        "Spikecount": [
+    ]
+  },
+  "IV_-100": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
           0.0,
           0.001
         ],
-        "voltage_base": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "Spikecount"
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
           -81.79989958528589,
           1.1441551270577661
         ],
-        "voltage_deflection": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "voltage_base"
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
           -19.083749795934423,
           3.8075174365535456
         ],
-        "voltage_deflection_begin": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "voltage_deflection"
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
           -20.12719210494883,
           3.824436731503457
         ],
-        "steady_state_voltage_stimend": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "voltage_deflection_begin"
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
           -101.12518819260545,
           4.578088458080138
         ],
-        "ohmic_input_resistance_vb_ssse": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "steady_state_voltage_stimend"
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
           58.24399601858572,
           3.0217532801670552
         ],
-        "sag_amplitude": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "ohmic_input_resistance_vb_ssse"
+      },
+      {
+        "feature": "sag_amplitude",
+        "val": [
           2.738071514979451,
           1.0567719146877337
         ],
-        "sag_ratio1": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "sag_amplitude"
+      },
+      {
+        "feature": "sag_ratio1",
+        "val": [
           0.12574824890360997,
           0.046941428534852364
         ],
-        "sag_ratio2": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "sag_ratio1"
+      },
+      {
+        "feature": "sag_ratio2",
+        "val": [
           0.8742517510963901,
           0.04694142853485237
         ],
-        "decay_time_constant_after_stim": [
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "sag_ratio2"
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
           7.546121512936132,
           1.0123321836831134
-        ]
+        ],
+        "n": 16,
+        "efel_settings": {},
+        "efeature_name": "decay_time_constant_after_stim"
       }
-    },
-    "IV_-20": {
-      "soma": {
-        "Spikecount": [
+    ]
+  },
+  "IV_-20": {
+    "soma": [
+      {
+        "feature": "Spikecount",
+        "val": [
           0.0,
           0.001
         ],
-        "voltage_base": [
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "Spikecount"
+      },
+      {
+        "feature": "voltage_base",
+        "val": [
           -81.7070471084569,
           0.8267172628332372
         ],
-        "voltage_deflection": [
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "voltage_base"
+      },
+      {
+        "feature": "voltage_deflection",
+        "val": [
           -3.399037127686281,
           2.7726074034744896
         ],
-        "voltage_deflection_begin": [
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "voltage_deflection"
+      },
+      {
+        "feature": "voltage_deflection_begin",
+        "val": [
           -3.6406312121786057,
           2.9400394759090953
         ],
-        "steady_state_voltage_stimend": [
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "voltage_deflection_begin"
+      },
+      {
+        "feature": "steady_state_voltage_stimend",
+        "val": [
           -85.13578496369372,
           2.960875961648277
         ],
-        "ohmic_input_resistance_vb_ssse": [
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "steady_state_voltage_stimend"
+      },
+      {
+        "feature": "ohmic_input_resistance_vb_ssse",
+        "val": [
           57.87426036147227,
           4.876435929643501
         ],
-        "decay_time_constant_after_stim": [
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "ohmic_input_resistance_vb_ssse"
+      },
+      {
+        "feature": "decay_time_constant_after_stim",
+        "val": [
           13.386582903529131,
           13.417992506445545
-        ]
+        ],
+        "n": 12,
+        "efel_settings": {},
+        "efeature_name": "decay_time_constant_after_stim"
       }
-    },
-    "APWaveform_290": {
-      "soma": {
-        "AP_amplitude": [
+    ]
+  },
+  "APWaveform_290": {
+    "soma": [
+      {
+        "feature": "AP_amplitude",
+        "val": [
           73.50807647706307,
           2.4400301600352012
         ],
-        "AP1_amp": [
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AP_amplitude"
+      },
+      {
+        "feature": "AP1_amp",
+        "val": [
           108.30054299932672,
           1.2289218986242827
         ],
-        "AP2_amp": [
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AP1_amp"
+      },
+      {
+        "feature": "AP2_amp",
+        "val": [
           58.76972311604614,
           0.971335918166252
         ],
-        "AP_duration_half_width": [
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AP2_amp"
+      },
+      {
+        "feature": "AP_duration_half_width",
+        "val": [
           1.1000000000002501,
           0.28498294295942467
         ],
-        "AP_begin_width": [
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AP_duration_half_width"
+      },
+      {
+        "feature": "AP_begin_width",
+        "val": [
           4.428125000001007,
           0.29936093680731274
         ],
-        "AP_begin_voltage": [
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AP_begin_width"
+      },
+      {
+        "feature": "AP_begin_voltage",
+        "val": [
           -53.67700525731547,
           1.6418301041028065
         ],
-        "AHP_depth": [
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AP_begin_voltage"
+      },
+      {
+        "feature": "AHP_depth",
+        "val": [
           33.2022480222802,
           1.522592920363057
         ],
-        "AHP_time_from_peak": [
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AHP_depth"
+      },
+      {
+        "feature": "AHP_time_from_peak",
+        "val": [
           3.402083333334107,
           0.20752970001642768
-        ]
+        ],
+        "n": 8,
+        "efel_settings": {},
+        "efeature_name": "AHP_time_from_peak"
       }
-    }
+    ]
   }
 }
