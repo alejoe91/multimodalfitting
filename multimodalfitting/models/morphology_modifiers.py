@@ -119,7 +119,7 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
 
 
 def replace_axon_with_hillock_ais(sim=None, icell=None, l_hillock=10, l_ais=40,
-                                  l_myelin=1000, d_myelin=0.2, seg_len=5, myelin_nseg=5):
+                                  l_myelin=1000, d_myelin=1, seg_len=5, myelin_nseg=5):
     """Replace axon by an hillock and an AIS while keeping the 3d informations of the sections"""
 
     ''' In this first part, we will increase the number of 3d informations in all the axonal sections in order to 
@@ -281,7 +281,7 @@ def replace_axon_with_hillock_ais(sim=None, icell=None, l_hillock=10, l_ais=40,
 
 
 def replace_axon_with_ais(sim=None, icell=None, l_ais=35, ais_seg_len=5,
-                          l_myelin=1000, d_myelin=0.2, myelin_nseg=5):
+                          l_myelin=1000, d_myelin=1, myelin_nseg=5):
     """Replace axon by an AIS while keeping the 3d informations of the sections"""
 
     ''' In this first part, we will increase the number of 3d informations in all the axonal sections in order to 
