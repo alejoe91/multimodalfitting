@@ -54,6 +54,7 @@ def convert_all_features(features_dict, protocols_dict, std_from_mean=0.05,
         # Convert the format of the efeatures
         efeatures_def = {}
         for loc_name, features in in_efeatures[protocol_name].items():
+            
             for feature in features:
                 add_feature = True
                 if exclude_features is not None:
