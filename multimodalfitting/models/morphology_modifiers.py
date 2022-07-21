@@ -46,8 +46,8 @@ def fix_morphology_exp(sim=None, icell=None, nseg_ais=50, abd=False):
 
         # delete original apical section
         sim.neuron.h.pt3dclear(sec=sec)
-        sim.neuron.h.delete_section(sec=sec)
         sim.neuron.h.disconnect(sec=sec)
+        sim.neuron.h.delete_section(sec=sec)
 
         # this should fix the morphology issue
         sim.neuron.h.pt3dconst(1, sec=sec_ais)
