@@ -109,7 +109,7 @@ def extra_recordings_from_positions(cell, sim, positions, position_names,
     # instantiate lfpycell
     cell.freeze({})
     cell.instantiate(sim)
-    lfpycell = cell.LFPyCell
+    lfpycell = cell.lfpy_cell
 
     positions = np.array(positions)
 
@@ -265,7 +265,7 @@ def simulate_BAC_responses(cell, params, sim, pulse_delay=15, pulse_amp=1, pulse
     # instantiate
     cell.freeze(param_dict=params)
     cell.instantiate(sim=sim)
-    lfpy_cell = cell.LFPyCell
+    lfpy_cell = cell.lfpy_cell
 
     # define args for stimuli
     soma_args = {
