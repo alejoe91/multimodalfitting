@@ -835,8 +835,9 @@ def create_evaluator(
         **extra_kwargs
     )
 
+
     if simulator.lower() == "lfpy":
-        sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
+        sim = ephys.simulators.LFPySimulator(cvode_active=True, electrode=probe,
                                              mechanisms_directory=cell_model_folder)
     else:
         sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,

@@ -594,9 +594,9 @@ def plot_cell(cell, sim, ax=None, detailed=False, param_values={}, **kwargs):
     cell.freeze(param_values)
     cell.instantiate(sim=sim)
     if detailed:
-        nplt.plot_detailed_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)
+        nplt.plot_detailed_neuron(cell.lfpy_cell, ax=ax, plane="xy", **kwargs)
     else:
-        nplt.plot_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)
+        nplt.plot_neuron(cell.lfpy_cell, ax=ax, plane="xy", **kwargs)
     cell.unfreeze(param_values)
     cell.destroy(sim=sim)
     ax.axis("off")

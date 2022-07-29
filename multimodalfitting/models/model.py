@@ -382,7 +382,7 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
 
 
 def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              extracellularmech=False, **morph_kwargs):
+                              extracellularmech=False, electrode=None, **morph_kwargs):
     """Create ground-truth model
 
     Parameters
@@ -454,7 +454,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
-        model_kwargs = {'v_init': v_init}
+        model_kwargs = {'v_init': v_init, "electrode": electrode}
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}
@@ -473,7 +473,8 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
 
 
 def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              extracellularmech=False, abd=False, optimize_ra=False, **morph_kwargs):
+                              extracellularmech=False, abd=False, optimize_ra=False, 
+                              electrode=None, **morph_kwargs):
     """Create experimental cell model
 
     Parameters
@@ -560,7 +561,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
-        model_kwargs = {'v_init': v_init}
+        model_kwargs = {'v_init': v_init, "electrode": electrode}
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}

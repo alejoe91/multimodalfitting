@@ -1,4 +1,4 @@
-from bluepyopt.ephys.stimuli import Stimulus
+from bluepyopt.ephys.stimuli import LFPStimulus
 from bluepyopt.ephys.recordings import Recording
 from bluepyopt.ephys.responses import Response
 
@@ -71,7 +71,7 @@ default_ecode_params = {
 }
 
 
-class sAHP(Stimulus):
+class sAHP(LFPStimulus):
     """sAHP current clamp injection"""
 
     def __init__(self,
@@ -204,7 +204,7 @@ class sAHP(Stimulus):
                    self.location)
 
 
-class HyperDepol(Stimulus):
+class HyperDepol(LFPStimulus):
     """HyperDepol Protocol"""
 
     def __init__(self,
@@ -314,7 +314,7 @@ class HyperDepol(Stimulus):
             self.location)
 
 
-class PosCheops(Stimulus):
+class PosCheops(LFPStimulus):
     """PosCheops Protocol"""
 
     def __init__(self,
@@ -448,7 +448,7 @@ class PosCheops(Stimulus):
             self.location)
 
 
-class NoiseOU3(Stimulus):
+class NoiseOU3(LFPStimulus):
     """NoiseOU3 injection"""
 
     def __init__(self,
