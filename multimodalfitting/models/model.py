@@ -283,15 +283,15 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False,
             if len(seclist_loc) > 0:
                 str_loc = "_".join(e for e in param_config['sectionlist'])
                 name = f"{param_config['param_name']}_{str_loc}"
-                param_dependancies = param_config.get("dependencies", None)
+                param_dependencies = param_config.get("dependencies", None)
             else:
                 name = param_config['param_name']
-                param_dependancies = param_config.get("dependencies", None)
+                param_dependencies = param_config.get("dependencies", None)
 
             if param_config["type"] == "section":
                 for sec in seclist_loc:
                     name = f"{param_config['param_name']}_{sec}"
-                    param_dependancies = param_config.get("dependencies", None)
+                    param_dependencies = param_config.get("dependencies", None)
 
                     parameters.append(
                         ephys.parameters.NrnSectionParameter(
@@ -302,7 +302,7 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False,
                             frozen=frozen,
                             bounds=bounds,
                             locations=seclist_loc,
-                            param_dependancies=param_dependancies
+                            param_dependencies=param_dependencies
                         )
                     )
 
@@ -316,7 +316,7 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False,
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
-                        param_dependancies=param_dependancies
+                        param_dependencies=param_dependencies
                     )
                 )
             elif param_config["type"] == "meta":
