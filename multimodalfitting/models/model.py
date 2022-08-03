@@ -382,7 +382,7 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
 
 
 def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              extracellularmech=False, **morph_kwargs):
+                              extracellularmech=False, electrode=None, **morph_kwargs):
     """Create ground-truth model
 
     Parameters
@@ -403,6 +403,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
     extracellularmech : bool
         If True, extracellular mechanism is inserted into the model for recording i_membrane
         Default is False
+    electrode: MEAutility.MEA object
     **morph_kwargs: kwargs for morphology modifiers
 
     Returns
@@ -454,7 +455,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
-        model_kwargs = {'v_init': v_init}
+        model_kwargs = {'v_init': v_init, 'electrode': electrode}
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}
@@ -473,7 +474,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
 
 
 def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              extracellularmech=False, abd=False, optimize_ra=False, **morph_kwargs):
+                              extracellularmech=False, abd=False, optimize_ra=False, electrode=None, **morph_kwargs):
     """Create experimental cell model
 
     Parameters
@@ -499,6 +500,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
     optimize_ra: bool
         If True, the Ra for axon_bering_dendrite and axon_initial_segment is a free parameter to optimize. 
         If False, it Ra is fixed. Default False
+    electrode: MEAutility.MEA object
     **morph_kwargs: kwargs for morphology modifiers
 
     Returns
@@ -539,7 +541,6 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
     assert len(morphology_files) == 1, (f"Make sure you have a single morphology "
                                         f"file in the model folder {cell_model_folder}")
     morphology_file = morphology_files[0]
-
     morphology = ephys.morphologies.NrnFileMorphology(
         str(morphology_file),
         morph_modifiers=morph_modifiers,
@@ -560,7 +561,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
-        model_kwargs = {'v_init': v_init}
+        model_kwargs = {'electrode': electrode, 'v_init': v_init}
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}
