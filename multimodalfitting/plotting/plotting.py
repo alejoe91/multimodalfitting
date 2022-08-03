@@ -218,10 +218,12 @@ def plot_multiple_responses(responses_list, max_rows=6, protocol_names=None,
             r = np.mod(index, nrows)
             # print(resp_name)
             response = responses[resp_name]
+
             if titles is not None:
-                title = [t for t in titles if t in resp_name][0]
+                title = titles[index]
             else:
                 title = resp_name
+
             if response is not None:
                 if ncols > 1:
                     axes[r, c].plot(response['time'], response['voltage'], label=label, color=color)
@@ -239,11 +241,12 @@ def plot_multiple_responses(responses_list, max_rows=6, protocol_names=None,
                     min_v = np.min(response['voltage'])
                 if label:
                     ax.legend()
-                ax.set_title(title)
+                ax.set_title(title, fontsize = 20)
                 ax.spines['right'].set_visible(False)
                 ax.spines['top'].set_visible(False)
-                ax.set_ylabel("$V_m$ (mV)", fontsize=12)
-                ax.set_xlabel("$time$ (ms)", fontsize=12)
+                ax.set_ylabel("$V_m$ (mV)", fontsize=18)
+                if r == nrows - 1:
+                    ax.set_xlabel("$time$ (ms)", fontsize=18)
 
         if ncols > 1:
             for ax in axes[r + 1:, c]:
@@ -312,11 +315,11 @@ def plot_multiple_eaps(responses_list, protocols, probe, protocol_name="Step1", 
 
     eaps = []
     for i, fitted in enumerate(responses_list):
-        try:
-            eap = calculate_eap(fitted, protocol_name, protocols, sweep_id=sweep_id,
-                                fs=resample_rate_khz, **eap_kwargs)
-        except:
-            eap = np.zeros(eaps[-1].shape)
+        #try:
+        eap = calculate_eap(fitted, protocol_name, protocols, sweep_id=sweep_id,
+                            fs=resample_rate_khz, **eap_kwargs)
+        #except:
+        #    eap = np.zeros(eaps[-1].shape)
         if norm:
             eap = eap / np.max(np.abs(eap), 1, keepdims=True)
         eaps.append(eap)
@@ -594,9 +597,9 @@ def plot_cell(cell, sim, ax=None, detailed=False, param_values={}, **kwargs):
     cell.freeze(param_values)
     cell.instantiate(sim=sim)
     if detailed:
-        nplt.plot_detailed_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)
+        nplt.plot_detailed_neuron(cell.lfpy_cell, ax=ax, plane="xy", **kwargs)
     else:
-        nplt.plot_neuron(cell.LFPyCell, ax=ax, plane="xy", **kwargs)
+        nplt.plot_neuron(cell.lfpy_cell, ax=ax, plane="xy", **kwargs)
     cell.unfreeze(param_values)
     cell.destroy(sim=sim)
     ax.axis("off")
