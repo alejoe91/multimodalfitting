@@ -35,24 +35,16 @@ simulations
 - [BluePyEfe](https://github.com/BlueBrain/BluePyEfe): Blue Brain library for feature extraction 
 - [neuroplotlib](https://github.com/LFPy/neuroplotlib): plotting library built on top of LFPy
 
+## Installation
 
-## Authors
+If you want to use the present package, you first need to install NEURON with Python support on your machine.
 
-This project is a collaboration between the BEL Lab @ ETH-BSSE  and the Blue Brain Project @ EPFL:
+And then the package itself:
 
-#### Modeling
+```
+    git clone https://github.com/alejoe91/multimodalfitting
+    pip install -e multimodalfitting
+```
 
-- Alessio Buccino (ETH)
-- Tanguy Damart (BBP)
-- Darshan Mandge (BBP)
-- Mickael Zbili (BBP)
-- Werner Van Geit (BBP)
-
-#### Experiments
-
-- Alessio Buccino (ETH)
-- Julian Bartram (ETH)
-- Xiaohan Xue (ETH)
-
-
+## Funding & Acknowledgement
 

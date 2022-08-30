@@ -1,0 +1,15 @@
+This project is a collaboration between the BEL Lab @ ETH-BSSE  and the Blue Brain Project @ EPFL:
+
+#### Modeling
+
+- Alessio Buccino (ETH)
+- Tanguy Damart (BBP)
+- Darshan Mandge (BBP)
+- Mickael Zbili (BBP)
+- Werner Van Geit (BBP)
+
+#### Experiments
+
+- Alessio Buccino (ETH)
+- Julian Bartram (ETH)
+- Xiaohan Xue (ETH)
