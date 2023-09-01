@@ -53,7 +53,7 @@ def plot_responses(responses, protocol_names=None,
     """
     resp_no_mea = {}
     for (resp_name, response) in sorted(responses.items()):
-        if 'MEA' not in resp_name and ".v" in resp_name:
+        if 'MEA' not in resp_name and ".v" in resp_name or "i_membrane" in resp_name:
             resp_no_mea[resp_name] = response
 
     if protocol_names is not None:
@@ -69,6 +69,11 @@ def plot_responses(responses, protocol_names=None,
     protocol_keys = list(resp_to_plot.keys())
     if protocol_names is None:
         protocol_keys.sort(key=natural_keys)
+        protocol_names = [p.split(".")[0] for p in protocol_keys]
+    if len(np.unique(protocol_names)) == 1:
+        sharex = True
+    else:
+        sharex = False
 
     if len(resp_to_plot) <= max_rows:
         nrows = len(resp_to_plot)
@@ -77,23 +82,42 @@ def plot_responses(responses, protocol_names=None,
         nrows = max_rows
         ncols = int(np.ceil(len(resp_to_plot) / max_rows))
 
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize, sharex=sharex)
 
     max_v = -200
     min_v = 200
+
+    resps_voltage = []
+    resps_current = []
+    
 
     for index, (resp_name) in enumerate(protocol_keys):
         c = index // nrows
         r = np.mod(index, nrows)
         response = responses[resp_name]
+        if isinstance(response, dict):
+            columns = response.keys()
+        elif isinstance(response.response, dict):
+            columns = response.response.keys()
+        else:
+            columns = response.response.columns
+        if "voltage" in columns:
+            values = response['voltage']
+            resps_voltage.append(index)
+            label = "$V_m$ (mV)"
+        elif "current" in columns:
+            values = response['current']
+            resps_current.append(index)
+            label = "$I_m$ (nA)"
+        
         if ncols > 1:
-            axes[r, c].plot(response['time'], response['voltage'], label=resp_name, color=color)
+            axes[r, c].plot(response['time'], values, label=resp_name, color=color)
             ax = axes[r, c]
         elif ncols == 1 and nrows == 1:
-            axes.plot(response['time'], response['voltage'], label=resp_name, color=color)
+            axes.plot(response['time'], values, label=resp_name, color=color)
             ax = axes
         else:
-            axes[r].plot(response['time'], response['voltage'], label=resp_name, color=color)
+            axes[r].plot(response['time'], values, label=resp_name, color=color)
             ax = axes[r]
         if titles is not None:
             title = [t for t in titles if t in resp_name][0]
@@ -102,19 +126,39 @@ def plot_responses(responses, protocol_names=None,
             ax.set_title(resp_name, fontsize=15)
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
-        ax.set_ylabel("$V_m$ (mV)", fontsize=12)
+        ax.set_ylabel(label, fontsize=12)
         ax.set_xlabel("$time$ (ms)", fontsize=12)
-        if np.max(response['voltage']) > max_v:
-            max_v = np.max(response['voltage'])
-        if np.min(response['voltage']) < min_v:
-            min_v = np.min(response['voltage'])
+
+    # limits
+    min_v = max_v = min_i = max_i = None
+    for index in resps_voltage:
+        v = responses[protocol_keys[index]]["voltage"]
+        curr_min = min(v)
+        curr_max = max(v)
+        if min_v is None:
+            min_v = curr_min
+        else:
+            min_v = min(min_v, curr_min)
+        if max_v is None:
+            max_v = curr_max
+        else:
+            max_v = max(max_v, curr_max)
+    for index in resps_current:
+        i = responses[protocol_keys[index]]["current"]
+        curr_min = min(i)
+        curr_max = max(i)
+        if min_i is None:
+            min_i = curr_min
+        else:
+            min_i = min(min_i, curr_min)
+        if max_i is None:
+            max_i = curr_max
+        else:
+            max_i = max(max_i, curr_max)
 
     if ncols > 1:
         for ax in axes[r + 1:, c]:
             ax.axis("off")
-        for axr in axes:
-            for ax in axr:
-                ax.set_ylim(min_v - 10, max_v + 10)
     elif ncols == 1 and nrows == 1:
         axes.axis("off")
         axes.set_ylim(min_v - 10, max_v + 10)
@@ -123,9 +167,15 @@ def plot_responses(responses, protocol_names=None,
             ax.axis("off")
         for ax in axes:
             ax.set_ylim(min_v - 10, max_v + 10)
+    for index, ax in enumerate(axes.flatten()):
+        if index in resps_voltage:
+            ptp = max_v - min_v
+            ax.set_ylim(min_v - 0.1 * ptp, max_v + 0.1 * ptp)
+        elif index in resps_current:
+            ptp = max_i - min_i
+            ax.set_ylim(min_i  - 0.1 * ptp, max_i + 0.1 * ptp)
 
     fig.subplots_adjust(hspace=0.8)
-    fig.show()
 
     if return_fig:
         return fig

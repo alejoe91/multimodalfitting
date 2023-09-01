@@ -26,6 +26,11 @@ for the optimization.
 
 This module contains scripts to clean up experimentally-obtained cell reconstructions.
 
+
+## Notebooks
+
+The `notebooks` folder contains all analysis notebooks to reproduce the manuscript figure.
+
 ## Requirements
 
 - [neuron](https://www.neuron.yale.edu/neuron/): widely used simulator for multicompartment models
@@ -54,5 +59,19 @@ This project is a collaboration between the BEL Lab @ ETH-BSSE  and the Blue Bra
 - Julian Bartram (ETH)
 - Xiaohan Xue (ETH)
 
+### Cite
 
+For further information please refer to the preprint on [bioRxiv]( https://doi.org/10.1101/2022.08.03.502468)
+
+If you use the software, please cite:
+```
+@article{buccino2022multi,
+  title={A multi-modal fitting approach to construct single-neuron models with patch clamp and high-density microelectrode arrays},
+  author={Buccino, Alessio Paolo and Damart, Tanguy and Bartram, Julian and Mandge, Darshan and Xue, Xiaohan and Zbili, Mickael and G{\"a}nswein, Tobias and Jaquier, Aur{\'e}lien and Emmenegger, Vishalini and Markram, Henry and others},
+  journal={bioRxiv},
+  pages={2022--08},
+  year={2022},
+  publisher={Cold Spring Harbor Laboratory}
+}
+```
 

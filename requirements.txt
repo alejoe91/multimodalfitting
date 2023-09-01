@@ -11,3 +11,5 @@ neuroplotlib
 probeinterface
 pandas
 seaborn
+statsmodels
+scikit_posthocs

@@ -217,8 +217,13 @@ def define_recordings(protocol_name, protocol_definition, electrode=None, extra_
                     )
 
                 var = recording_definition["var"]
+                if var == "v":
+                    recording_class = ephys.recordings.CompRecording
+                elif var == "i_membrane":
+                    from ..bpopt_ext import CompCurrentRecording
+                    recording_class = CompCurrentRecording
                 recordings.append(
-                    ephys.recordings.CompRecording(
+                    recording_class(
                         name="%s.%s.%s" % (protocol_name, location.name, var),
                         location=location,
                         variable=recording_definition["var"],

@@ -104,10 +104,10 @@ def get_extra_kwargs():
 
 
 def extra_recordings_from_positions(cell, sim, positions, position_names,
-                                    with_currents=False):
+                                    with_currents=False, params={}):
     extra_recordings = []
     # instantiate lfpycell
-    cell.freeze({})
+    cell.freeze(params)
     cell.instantiate(sim)
     lfpycell = cell.LFPyCell
 
@@ -757,7 +757,16 @@ def _interpolate_response(response, fs=20.0, tmin=None, tmax=None):
     from scipy.interpolate import interp1d
 
     x = response["time"]
-    y = response["voltage"]
+
+    if isinstance(response.response, dict):
+        columns = response.response.keys()
+    else:
+        columns = response.response.columns
+    if "voltage" in columns:
+        key = "voltage"
+    elif "current" in columns:
+        key = "current"
+    y = response[key]
     if len(y.shape) > 1:
         axis = 1
     else:
@@ -772,7 +781,7 @@ def _interpolate_response(response, fs=20.0, tmin=None, tmax=None):
 
     response_new = {}
     response_new["time"] = xnew
-    response_new["voltage"] = ynew
+    response_new[key] = ynew
 
     return response_new
 
@@ -890,3 +899,4 @@ def _get_waveforms(response, peak_times, snippet_len_ms, align_extra=False):
         waveforms[i] = waveform
 
     return waveforms
+
