@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH --constraint=cpu
-#SBATCH --ntasks=20
+#SBATCH --ntasks=40
 #SBATCH --partition=prod
-#SBATCH --job-name=LFPy
+#SBATCH --job-name=LF_MMF
 #SBATCH --time=24:00:00
 #SBATCH --error=./logs/%A.stdout
 #SBATCH --output=./logs/%A.stdout
@@ -24,6 +24,7 @@ ipcontroller --init --ip='*' --ping=30000 --profile=${IPYTHON_PROFILE} &
 sleep 30
 srun --mpi=none ipengine --timeout=300 --profile=${IPYTHON_PROFILE} &
 sleep 30
+echo "IPython cluster started"
 
 python3 run_optimizations.py \
                              --ipyparallel                            \
@@ -34,4 +35,5 @@ python3 run_optimizations.py \
                              --opt-folder=${OPT_FOLDER}               \
                              --sim=${SIM}                             \
                              --abd=${OPT_ABD}                         \
-                             --ra=${OPT_RA}
+                             --ra=${OPT_RA}                           \
+                             --cm_ra=${OPT_CM_RA}                    
