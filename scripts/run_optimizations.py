@@ -1,5 +1,7 @@
 import argparse
 import logging
+from multiprocessing import pool
+
 import os
 import sys
 import json
@@ -7,6 +9,8 @@ from pathlib import Path
 from datetime import datetime
 
 import bluepyopt
+import multiprocessing
+
 
 import multimodalfitting as mf
 from multimodalfitting.utils import _extra_kwargs
@@ -35,9 +39,11 @@ def get_parser():
                         help="the simulator to be used ('lfpy' - 'neuron')")
     parser.add_argument("--ipyparallel", action="store_true", default=False,
                         help="If True ipyparallel is used to parallelize computations (default False)")
+    parser.add_argument("--multiprocessing", action="store_true", default=False,
+                        help="If True multiprocessing is used to parallelize computations (default False)")
     parser.add_argument("--opt-folder", type=str, default=None, required=True,
                         help="The folder containing the results of optimization "
-                             "(default is parent of ./optimization_results)")
+                            "(default is parent of ./optimization_results)")
     parser.add_argument("--abd", type=int, default=0,
                         help="If True and model is 'experimental', the ABD section is used")
     parser.add_argument("--ra", type=int, default=0,
@@ -48,8 +54,35 @@ def get_parser():
                         help="The maximum number of generations - default 600")
     parser.add_argument("--timeout", type=int, default=900,
                         help="Maximum run time for a protocol (in seconds)")
+    parser.add_argument("--cm_ra", type=int, default=0,
+                        help="If 1 and model is 'experimental' and cm (seperately) and Ra (global) is is optimized")
 
     return parser
+
+
+class NoDaemonProcess(multiprocessing.Process):
+    """Class that represents a non-daemon process"""
+
+    # pylint: disable=dangerous-default-value
+
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}):
+        """Ensures group=None, for macosx."""
+        super().__init__(group=None, target=target, name=name, args=args, kwargs=kwargs)
+
+    def _get_daemon(self):
+        """Get daemon flag"""
+        return False
+
+    def _set_daemon(self, value):
+        """Set daemon flag"""
+
+    daemon = property(_get_daemon, _set_daemon)
+
+
+class NestedPool(pool.Pool):  # pylint: disable=abstract-method
+    """Class that represents a MultiProcessing nested pool"""
+
+    Process = NoDaemonProcess
 
 
 def get_mapper(args):
@@ -69,11 +102,16 @@ def get_mapper(args):
             return ret
 
         return mapper
-    else:
-        return None
+    
+    elif args.multiprocessing:
+
+        nested_pool = NestedPool()
+        return nested_pool.map
+
+    return None
 
 
-def get_cp_filename(opt_folder, model, strategy, seed, abd, ra):
+def get_cp_filename(opt_folder, model, strategy, seed, abd, ra, cm_ra):
 
     cp_name = f'model={model}_strategy={strategy}'
 
@@ -81,6 +119,8 @@ def get_cp_filename(opt_folder, model, strategy, seed, abd, ra):
         cp_name = cp_name + "_abd"
     if ra:
         cp_name = cp_name + "_ra"
+    if cm_ra:
+        cp_name = cp_name + "_cm_ra"
 
     cp_name = cp_name + f"_seed={seed}"
 
@@ -101,7 +141,8 @@ def save_evaluator_configuration(
     cp_filename,
     simulator,
     abd,
-    optimize_ra
+    optimize_ra,
+    cm_ra
 ):
 
     eva_args = dict(model_name=model_name,
@@ -112,6 +153,7 @@ def save_evaluator_configuration(
                     timeout=timeout,
                     simulator=simulator,
                     abd=abd,
+                    cm_ra=cm_ra,
                     optimize_ra=optimize_ra)
     eva_args.update(_extra_kwargs)
 
@@ -148,6 +190,7 @@ def main():
         simulator=args.sim,
         abd=args.abd,
         optimize_ra=args.ra,
+        cm_ra=args.cm_ra,
         **_extra_kwargs
     )
 
@@ -161,7 +204,7 @@ def main():
     )
 
     cp_filename = get_cp_filename(
-        opt_folder, args.model, args.strategy, args.seed, args.abd, args.ra
+        opt_folder, args.model, args.strategy, args.seed, args.abd, args.ra, args.cm_ra
     )
 
     if cp_filename.is_file():
@@ -180,7 +223,8 @@ def main():
         cp_filename=cp_filename,
         simulator=args.sim,
         abd=args.abd,
-        optimize_ra=args.ra
+        optimize_ra=args.ra,
+        cm_ra=args.cm_ra
     )
 
     opt.run(max_ngen=args.maxgen, cp_filename=str(cp_filename), continue_cp=continue_cp)
