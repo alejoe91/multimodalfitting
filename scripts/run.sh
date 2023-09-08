@@ -9,6 +9,8 @@ export CELL_FOLDER="../cell_models"
 export OPT_ABD=0
 # if RA is true, the Ra for AIS and ABD are optimized separately
 export OPT_RA=0
+#if CM_RA then, cm is optimised for all sections seperately and Ra as global
+export OPT_CM_RA=0
 
 for strategy in 'all' 'single' 'sections'; do
       export OPT_STRATEGY=${strategy}
