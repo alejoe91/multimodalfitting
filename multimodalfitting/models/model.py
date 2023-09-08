@@ -22,7 +22,6 @@ def define_mechanisms(cell_model_folder, abd=False, extracellularmech=False):
         If True, the axon-bearing dendrite (ABD) parameters are added, by default False
     extracellularmech : bool, optional
         If True, the 'extracellular' mechanism is added to all sections, by default False
-
     Returns
     -------
     mechanism: list
@@ -157,7 +156,7 @@ def define_electrode(
 
 
 def define_parameters(cell_model_folder, parameter_file=None, release=False,
-                      abd=False, optimize_ra=False):
+                      abd=False, optimize_ra=False, cm_ra=False):
     """
     Defines parameters
 
@@ -194,6 +193,8 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False,
             param_file_name += "_abd"
             if optimize_ra:
                 param_file_name += "_ra"
+        if cm_ra:
+            param_file_name += "_cm_ra"
 
         param_configs = json.load(
             open(path_params / f"{param_file_name}.json"))
@@ -283,15 +284,15 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False,
             if len(seclist_loc) > 0:
                 str_loc = "_".join(e for e in param_config['sectionlist'])
                 name = f"{param_config['param_name']}_{str_loc}"
-                param_dependancies = param_config.get("dependencies", None)
+                param_dependencies = param_config.get("dependencies", None)
             else:
                 name = param_config['param_name']
-                param_dependancies = param_config.get("dependencies", None)
+                param_dependencies = param_config.get("dependencies", None)
 
             if param_config["type"] == "section":
                 for sec in seclist_loc:
                     name = f"{param_config['param_name']}_{sec}"
-                    param_dependancies = param_config.get("dependencies", None)
+                    param_dependencies = param_config.get("dependencies", None)
 
                     parameters.append(
                         ephys.parameters.NrnSectionParameter(
@@ -302,7 +303,7 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False,
                             frozen=frozen,
                             bounds=bounds,
                             locations=seclist_loc,
-                            param_dependancies=param_dependancies
+                            param_dependencies=param_dependencies
                         )
                     )
 
@@ -316,7 +317,7 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False,
                         frozen=frozen,
                         bounds=bounds,
                         locations=seclist_loc,
-                        param_dependancies=param_dependancies
+                        param_dependencies=param_dependencies
                     )
                 )
             elif param_config["type"] == "meta":
@@ -382,7 +383,7 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
 
 
 def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              extracellularmech=False, **morph_kwargs):
+                              extracellularmech=False, electrode=None, **morph_kwargs):
     """Create ground-truth model
 
     Parameters
@@ -454,7 +455,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
-        model_kwargs = {'v_init': v_init}
+        model_kwargs = {'v_init': v_init, 'electrode': electrode}
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}
@@ -473,7 +474,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
 
 
 def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              extracellularmech=False, abd=False, optimize_ra=False, **morph_kwargs):
+                              extracellularmech=False, abd=False, cm_ra=False, optimize_ra=False, electrode=None, **morph_kwargs):
     """Create experimental cell model
 
     Parameters
@@ -496,6 +497,8 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
         Default is False
     abd: bool
         If True, the axon-bearing-dendrite section is used. Default False
+    cm_ra: bool
+        If True, the cm and Ra parameters are optimised in the model. Default False
     optimize_ra: bool
         If True, the Ra for axon_bering_dendrite and axon_initial_segment is a free parameter to optimize. 
         If False, it Ra is fixed. Default False
@@ -539,7 +542,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
     assert len(morphology_files) == 1, (f"Make sure you have a single morphology "
                                         f"file in the model folder {cell_model_folder}")
     morphology_file = morphology_files[0]
-
+    print(morphology_file)
     morphology = ephys.morphologies.NrnFileMorphology(
         str(morphology_file),
         morph_modifiers=morph_modifiers,
@@ -550,7 +553,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
     mechs = define_mechanisms(
         cell_model_folder, abd=abd, extracellularmech=extracellularmech)
     params = define_parameters(
-        cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra)
+        cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra, cm_ra=cm_ra)
 
     assert "v_init" in [param.name for param in params], ("Couldn't find v_init in the parameters. "
                                                           "Add it as a global parameter")
@@ -560,7 +563,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
-        model_kwargs = {'v_init': v_init}
+        model_kwargs = {'electrode': electrode, 'v_init': v_init}
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}
