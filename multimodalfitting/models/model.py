@@ -157,7 +157,7 @@ def define_electrode(
 
 
 def define_parameters(cell_model_folder, parameter_file=None, release=False,
-                      abd=False, optimize_ra=False):
+                      abd=False, optimize_ra=False, cm_ra=False):
     """
     Defines parameters
 
@@ -194,6 +194,8 @@ def define_parameters(cell_model_folder, parameter_file=None, release=False,
             param_file_name += "_abd"
             if optimize_ra:
                 param_file_name += "_ra"
+        if cm_ra:
+            param_file_name += "_cm_ra"
 
         param_configs = json.load(
             open(path_params / f"{param_file_name}.json"))
@@ -381,7 +383,8 @@ def define_morphology(cell_model_folder, morph_modifiers, do_replace_axon, **mor
     )
 
 
-def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
+def create_ground_truth_model(model_name, cell_folder=None, release=False, v_init=None, 
+                              electrode=None, model_type="LFPy",
                               extracellularmech=False, **morph_kwargs):
     """Create ground-truth model
 
@@ -454,7 +457,7 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
-        model_kwargs = {'v_init': v_init}
+        model_kwargs = {'v_init': v_init, 'electrode': electrode}
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}
@@ -472,8 +475,9 @@ def create_ground_truth_model(model_name, cell_folder=None, release=False, v_ini
     return cell
 
 
-def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, model_type="LFPy",
-                              extracellularmech=False, abd=False, optimize_ra=False, **morph_kwargs):
+def create_experimental_model(model_name, cell_folder=None, release=False, v_init=None, 
+                              electrode=None, model_type="LFPy",
+                              extracellularmech=False, abd=False, optimize_ra=False, cm_ra=False, **morph_kwargs):
     """Create experimental cell model
 
     Parameters
@@ -499,6 +503,8 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
     optimize_ra: bool
         If True, the Ra for axon_bering_dendrite and axon_initial_segment is a free parameter to optimize. 
         If False, it Ra is fixed. Default False
+    cm_ra: bool
+        If True, the cm and Ra parameters are optimised in the model. Default False
     **morph_kwargs: kwargs for morphology modifiers
 
     Returns
@@ -550,7 +556,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
     mechs = define_mechanisms(
         cell_model_folder, abd=abd, extracellularmech=extracellularmech)
     params = define_parameters(
-        cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra)
+        cell_model_folder, release=release, abd=abd, optimize_ra=optimize_ra, cm_ra=cm_ra)
 
     assert "v_init" in [param.name for param in params], ("Couldn't find v_init in the parameters. "
                                                           "Add it as a global parameter")
@@ -560,7 +566,7 @@ def create_experimental_model(model_name, cell_folder=None, release=False, v_ini
 
     if model_type.lower() == "lfpy":
         model_class = ephys.models.LFPyCellModel
-        model_kwargs = {'v_init': v_init}
+        model_kwargs = {'v_init': v_init, 'electrode': electrode}
     else:
         model_class = ephys.models.CellModel
         model_kwargs = {}

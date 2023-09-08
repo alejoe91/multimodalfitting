@@ -715,6 +715,7 @@ def create_evaluator(
         release=False,
         timeout=900.,
         abd=False,
+        cm_ra=False,
         extracellularmech=False,
         optimize_ra=False,
         simulator="lfpy",
@@ -763,6 +764,8 @@ def create_evaluator(
         Timeout in seconds
     abd: bool
         If True and model is 'experimental', the ABD section is used
+    cm_ra: bool
+        If True and abd is True, cm(sectionwise) and Ra (global) are also oprimized
     extracellularmech: bool
         If True, extracellular mechanism is inserted into the model for recording i_membrane
         Default is False
@@ -787,12 +790,6 @@ def create_evaluator(
     probe = None
     if strategy:
         assert strategy in ["soma", "all", "sections", "single", "validation"]
-    if model_name not in ['hay', 'hay_ais', 'hay_ais_hillock']:
-        cell = create_experimental_model(model_name=model_name, abd=abd, optimize_ra=optimize_ra, 
-                                         model_type=simulator, extracellularmech=extracellularmech)
-    else:
-        cell = create_ground_truth_model(model_name=model_name, release=release, model_type=simulator,
-                                         extracellularmech=extracellularmech)
 
     if cell_folder is None:
         cell_folder = cell_models_folder
@@ -800,12 +797,22 @@ def create_evaluator(
     fitting_folder = cell_model_folder / "fitting"
     efeatures_folder = fitting_folder / "efeatures"
 
-    assert efeatures_folder.is_dir(), f"Couldn't find fitting folder {efeatures_folder}"
-
     if strategy in ["all", "sections", "single", "validation"]:
         probe_file = efeatures_folder / "probe_BPO.json"
         assert probe_file.is_file() is not None, f"Couldn't find probe file {probe_file}"
         probe = define_electrode(probe_file=probe_file)
+
+    if model_name not in ['hay', 'hay_ais', 'hay_ais_hillock']:
+        cell = create_experimental_model(model_name=model_name, abd=abd, cm_ra=cm_ra, 
+                                         optimize_ra=optimize_ra, electrode=probe,
+                                         model_type=simulator, extracellularmech=extracellularmech)
+    else:
+        cell = create_ground_truth_model(model_name=model_name, release=release, 
+                                         electrode=probe, model_type=simulator,
+                                         extracellularmech=extracellularmech)
+
+
+    assert efeatures_folder.is_dir(), f"Couldn't find fitting folder {efeatures_folder}"
 
     if not all_protocols:
         features_file = efeatures_folder / f"features_BPO_{strategy}.json"
@@ -841,11 +848,10 @@ def create_evaluator(
     )
 
     if simulator.lower() == "lfpy":
-        sim = ephys.simulators.LFPySimulator(cell, cvode_active=True, electrode=probe,
-                                             mechanisms_directory=cell_model_folder)
+        sim_class = ephys.simulators.LFPySimulator
     else:
-        sim = ephys.simulators.NrnSimulator(dt=None, cvode_active=True,
-                                            mechanisms_directory=cell_model_folder)
+        sim_class = ephys.simulators.NrnSimulator    
+    sim = sim_class(cvode_active=True, mechanisms_directory=cell_model_folder) # cell
 
     return ephys.evaluators.CellEvaluator(
         cell_model=cell,

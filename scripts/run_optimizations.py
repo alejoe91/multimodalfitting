@@ -48,6 +48,8 @@ def get_parser():
                         help="The maximum number of generations - default 600")
     parser.add_argument("--timeout", type=int, default=900,
                         help="Maximum run time for a protocol (in seconds)")
+    parser.add_argument("--cm_ra", type=int, default=0,
+                        help="If 1 and model is 'experimental' and cm (separately) and Ra (global) is is optimized")
 
     return parser
 
@@ -73,7 +75,7 @@ def get_mapper(args):
         return None
 
 
-def get_cp_filename(opt_folder, model, strategy, seed, abd, ra):
+def get_cp_filename(opt_folder, model, strategy, seed, abd, ra, cm_ra)):
 
     cp_name = f'model={model}_strategy={strategy}'
 
@@ -81,6 +83,8 @@ def get_cp_filename(opt_folder, model, strategy, seed, abd, ra):
         cp_name = cp_name + "_abd"
     if ra:
         cp_name = cp_name + "_ra"
+    if cm_ra:
+        cp_name = cp_name + "_cm_ra"
 
     cp_name = cp_name + f"_seed={seed}"
 
@@ -101,7 +105,8 @@ def save_evaluator_configuration(
     cp_filename,
     simulator,
     abd,
-    optimize_ra
+    optimize_ra,
+    cm_ra
 ):
 
     eva_args = dict(model_name=model_name,
@@ -112,7 +117,8 @@ def save_evaluator_configuration(
                     timeout=timeout,
                     simulator=simulator,
                     abd=abd,
-                    optimize_ra=optimize_ra)
+                    optimize_ra=optimize_ra.
+                    cm_ra=cm_ra)
     eva_args.update(_extra_kwargs)
 
     eva_file = cp_filename.parent / f"{cp_filename.stem}.json"
@@ -148,6 +154,7 @@ def main():
         simulator=args.sim,
         abd=args.abd,
         optimize_ra=args.ra,
+        cm_ra=args.cm_ra,
         **_extra_kwargs
     )
 
@@ -161,7 +168,7 @@ def main():
     )
 
     cp_filename = get_cp_filename(
-        opt_folder, args.model, args.strategy, args.seed, args.abd, args.ra
+        opt_folder, args.model, args.strategy, args.seed, args.abd, args.ra, args.cm_ra
     )
 
     if cp_filename.is_file():
@@ -180,7 +187,8 @@ def main():
         cp_filename=cp_filename,
         simulator=args.sim,
         abd=args.abd,
-        optimize_ra=args.ra
+        optimize_ra=args.ra,
+        cm_ra=args.cm_ra
     )
 
     opt.run(max_ngen=args.maxgen, cp_filename=str(cp_filename), continue_cp=continue_cp)

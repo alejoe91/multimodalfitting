@@ -34,4 +34,5 @@ python3 run_optimizations.py \
                              --opt-folder=${OPT_FOLDER}               \
                              --sim=${SIM}                             \
                              --abd=${OPT_ABD}                         \
-                             --ra=${OPT_RA}
+                             --ra=${OPT_RA}                           \
+                             --cm_ra=${OPT_CM_RA}

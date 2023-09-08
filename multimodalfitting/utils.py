@@ -109,7 +109,7 @@ def extra_recordings_from_positions(cell, sim, positions, position_names,
     # instantiate lfpycell
     cell.freeze(params)
     cell.instantiate(sim)
-    lfpycell = cell.LFPyCell
+    lfpycell = cell.lfpy_cell
 
     positions = np.array(positions)
 
@@ -265,7 +265,7 @@ def simulate_BAC_responses(cell, params, sim, pulse_delay=15, pulse_amp=1, pulse
     # instantiate
     cell.freeze(param_dict=params)
     cell.instantiate(sim=sim)
-    lfpy_cell = cell.LFPyCell
+    lfpy_cell = cell.lfpy_cell
 
     # define args for stimuli
     soma_args = {
@@ -647,15 +647,19 @@ def load_checkpoint(checkpoint_path):
         model = "hay"
     elif "experimental" in chkp_name:
         model = "experimental"
+    elif "cell1_211006_3148" in chkp_name:
+        model = "cell1_211006_3148"
+    elif "cell1_211011_3436" in chkp_name:
+        model = "cell1_211011_3436"
     else:
         raise Exception("Unknown model!!!")
 
     feature_set = [e.replace('featureset=', '') for e in chkp_name_split if "featureset=" in e][0]
     seed = int([e.replace('seed=', '') for e in chkp_name_split if "seed=" in e][0])
     if "strategy" in chkp_name:
-        extra_strategy = [e.replace('strategy=', '') for e in chkp_name_split if "strategy=" in e][0]
+        strategy = [e.replace('strategy=', '') for e in chkp_name_split if "strategy=" in e][0]
     else:
-        extra_strategy = None
+        strategy = None
 
     run = {
         "nevals": np.cumsum(run['logbook'].select("nevals")),
@@ -664,7 +668,7 @@ def load_checkpoint(checkpoint_path):
         "logbook": run['logbook'],
         "model": model,
         "seed": seed,
-        "extra_strategy": extra_strategy,
+        "strategy": strategy,
         "feature_set": feature_set,
         "best_fitness": np.sum(run['halloffame'][0].fitness.values),
         "best_scores": list(run['halloffame'][0].fitness.values),
