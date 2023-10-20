@@ -5,7 +5,7 @@ In particular, we the use patch-clamp data and HD-MEA recordings.
 
 ## Organization of the repository
 
-The repo is divided in different folders with different purposes:
+The `multimodalfitting` folder is divided in different folders with different purposes:
 
 ### models
 
@@ -27,9 +27,14 @@ for the optimization.
 This module contains scripts to clean up experimentally-obtained cell reconstructions.
 
 
+## Scripts
+
+The `scripts` folder contain the executable files to run the optimization jobs.
+
 ## Notebooks
 
-The `notebooks` folder contains all analysis notebooks to reproduce the manuscript figure.
+The `notebooks` folder contains all analysis notebooks to reproduce the manuscript figure. They should be run in order, 
+based on the number of the file name. Check out the `notebooks/README.md` for more details.
 
 ## Requirements
 
@@ -52,12 +57,15 @@ This project is a collaboration between the BEL Lab @ ETH-BSSE  and the Blue Bra
 - Darshan Mandge (BBP)
 - Mickael Zbili (BBP)
 - Werner Van Geit (BBP)
+- Aurlien Jaquier
 
 #### Experiments
 
 - Alessio Buccino (ETH)
 - Julian Bartram (ETH)
 - Xiaohan Xue (ETH)
+- Vishalini Emmenegger (ETH)
+- Tobias Gänswein 
 
 ### Cite
 
@@ -74,4 +82,9 @@ If you use the software, please cite:
   publisher={Cold Spring Harbor Laboratory}
 }
 ```
+
+### Ackowledgments
+
+The study associated to this repo was supported by the ETH Zurich Postdoctoral Fellowship 19-2 FEL-17 (APB), the ERC Advanced Grant 694829 "neuroXscales" (JB, XX, TG, VE, AH), the China Scholarship Council (XX), by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government’s ETH Board of the Swiss Federal Institutes of Technology (TD, DM, MZ, AJ, HM, WVG), and by the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3) (TD, AJ). 
+
 
