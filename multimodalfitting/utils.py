@@ -5,6 +5,7 @@ from copy import deepcopy
 import time
 import pickle
 from pathlib import Path
+import warnings
 
 import bluepyopt.ephys as ephys
 import LFPy
@@ -608,8 +609,12 @@ def calculate_eap(responses, protocol_name, protocols, sweep_id=0, fs=20, fcut=1
             print('filter disabled')
         response_filter = response_interp
 
-    ewf = _get_waveforms(response_filter, peak_times, ms_cut, align_extra)
-    mean_wf = np.mean(ewf, axis=0)
+    if len(peak_times) == 0:
+        warnings.warn(f"No spikes found in {response_name}")
+        mean_wf = np.zeros((response_filter['voltage'].shape[0], np.sum(ms_cut)*fs))
+    else:
+        ewf = _get_waveforms(response_filter, peak_times, ms_cut, align_extra)
+        mean_wf = np.mean(ewf, axis=0)
 
     return mean_wf
 
@@ -654,7 +659,6 @@ def load_checkpoint(checkpoint_path):
     else:
         raise Exception("Unknown model!!!")
 
-    feature_set = [e.replace('featureset=', '') for e in chkp_name_split if "featureset=" in e][0]
     seed = int([e.replace('seed=', '') for e in chkp_name_split if "seed=" in e][0])
     if "strategy" in chkp_name:
         strategy = [e.replace('strategy=', '') for e in chkp_name_split if "strategy=" in e][0]
@@ -669,13 +673,13 @@ def load_checkpoint(checkpoint_path):
         "model": model,
         "seed": seed,
         "strategy": strategy,
-        "feature_set": feature_set,
         "best_fitness": np.sum(run['halloffame'][0].fitness.values),
         "best_scores": list(run['halloffame'][0].fitness.values),
         "best_params": list(run['halloffame'][0]),
         "path": checkpoint_path,
         "ra": "ra" in chkp_name,
-        "abd": "abd" in chkp_name
+        "abd": "abd" in chkp_name,
+        "cm_ra": "cm_ra" in chkp_name
     }
 
     return run
@@ -798,7 +802,7 @@ def _filter_response(response, fcut=[0.5, 6000], order=2, filt_type="lfilter"):
 
     trace = response["voltage"]
 
-    if isinstance(fcut, (float, int, np.float, np.integer)):
+    if isinstance(fcut, (float, int, np.integer)):
         btype = "highpass"
         band = fcut / fn
     else:

@@ -1,4 +1,4 @@
-from bluepyopt.ephys.stimuli import Stimulus
+from bluepyopt.ephys.stimuli import Stimulus, LFPStimulus
 from bluepyopt.ephys.recordings import Recording
 from bluepyopt.ephys.responses import Response
 
@@ -71,7 +71,7 @@ default_ecode_params = {
 }
 
 
-class sAHP(Stimulus):
+class sAHP(LFPStimulus):
     """sAHP current clamp injection"""
 
     def __init__(self,
@@ -115,7 +115,7 @@ class sAHP(Stimulus):
         self.iclamp = None
         self.persistent = []
 
-    def instantiate(self, sim=None, icell=None, LFPyCell=None):
+    def instantiate(self, sim=None, lfpy_cell=None):
         """Run stimulus"""
         from bluepyopt.ephys.locations import NrnSomaDistanceCompLocation
 
@@ -123,8 +123,8 @@ class sAHP(Stimulus):
             sec_index = self.location.sec_index
         elif isinstance(self.location, NrnSomaDistanceCompLocation):
             # compute sec_index closest to soma_distance
-            cell_seg_locs = np.array([LFPyCell.xmid, LFPyCell.ymid, LFPyCell.zmid]).T
-            soma_loc = LFPyCell.somapos
+            cell_seg_locs = np.array([lfpy_cell.xmid, lfpy_cell.ymid, lfpy_cell.zmid]).T
+            soma_loc = lfpy_cell.somapos
             dist_from_soma = np.array([np.linalg.norm(loc - soma_loc) for loc in cell_seg_locs])
             sec_index = np.argmin(np.abs(dist_from_soma - self.location.soma_distance))
         else:
@@ -167,13 +167,13 @@ class sAHP(Stimulus):
         times.append(self.total_duration)
         amps.append(self.holding_amplitude)
 
-        self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
+        self.iclamp = LFPy.StimIntElectrode(cell=lfpy_cell,
                                             idx=sec_index,
                                             pptype='IClamp',
                                             dur=self.total_duration,
                                             record_current=True)
 
-        stim = LFPyCell._hoc_stimlist[0]
+        stim = lfpy_cell._hoc_stimlist[0]
 
         # play the above current amplitudes into the current clamp
         amps.play(stim._ref_amp, times, 1)  # pylint: disable=W0212
@@ -204,7 +204,7 @@ class sAHP(Stimulus):
                    self.location)
 
 
-class HyperDepol(Stimulus):
+class HyperDepol(LFPStimulus):
     """HyperDepol Protocol"""
 
     def __init__(self,
@@ -240,7 +240,7 @@ class HyperDepol(Stimulus):
         self.iclamp = None
         self.persistent = []
 
-    def instantiate(self, sim=None, icell=None, LFPyCell=None):
+    def instantiate(self, sim=None, lfpy_cell=None):
         """Run stimulus"""
         from bluepyopt.ephys.locations import NrnSomaDistanceCompLocation
 
@@ -248,8 +248,8 @@ class HyperDepol(Stimulus):
             sec_index = self.location.sec_index
         elif isinstance(self.location, NrnSomaDistanceCompLocation):
             # compute sec_index closest to soma_distance
-            cell_seg_locs = np.array([LFPyCell.xmid, LFPyCell.ymid, LFPyCell.zmid]).T
-            soma_loc = LFPyCell.somapos
+            cell_seg_locs = np.array([lfpy_cell.xmid, lfpy_cell.ymid, lfpy_cell.zmid]).T
+            soma_loc = lfpy_cell.somapos
             dist_from_soma = np.array([np.linalg.norm(loc - soma_loc) for loc in cell_seg_locs])
             sec_index = np.argmin(np.abs(dist_from_soma - self.location.soma_distance))
         else:
@@ -282,13 +282,13 @@ class HyperDepol(Stimulus):
         times.append(self.total_duration)
         amps.append(self.holding_amplitude)
 
-        self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
+        self.iclamp = LFPy.StimIntElectrode(cell=lfpy_cell,
                                             idx=sec_index,
                                             pptype='IClamp',
                                             dur=self.total_duration,
                                             record_current=True)
 
-        stim = LFPyCell._hoc_stimlist[0]
+        stim = lfpy_cell._hoc_stimlist[0]
 
         amps.play(
             stim._ref_amp,  # pylint:disable=W0212
@@ -314,7 +314,7 @@ class HyperDepol(Stimulus):
             self.location)
 
 
-class PosCheops(Stimulus):
+class PosCheops(LFPStimulus):
     """PosCheops Protocol"""
 
     def __init__(self,
@@ -357,7 +357,7 @@ class PosCheops(Stimulus):
         self.iclamp = None
         self.persistent = []
 
-    def instantiate(self, sim=None, icell=None, LFPyCell=None):
+    def instantiate(self, sim=None, lfpy_cell=None):
         """Run stimulus"""
         from bluepyopt.ephys.locations import NrnSomaDistanceCompLocation
 
@@ -365,8 +365,8 @@ class PosCheops(Stimulus):
             sec_index = self.location.sec_index
         elif isinstance(self.location, NrnSomaDistanceCompLocation):
             # compute sec_index closest to soma_distance
-            cell_seg_locs = np.array([LFPyCell.xmid, LFPyCell.ymid, LFPyCell.zmid]).T
-            soma_loc = LFPyCell.somapos
+            cell_seg_locs = np.array([lfpy_cell.xmid, lfpy_cell.ymid, lfpy_cell.zmid]).T
+            soma_loc = lfpy_cell.somapos
             dist_from_soma = np.array([np.linalg.norm(loc - soma_loc) for loc in cell_seg_locs])
             sec_index = np.argmin(np.abs(dist_from_soma - self.location.soma_distance))
         else:
@@ -412,12 +412,12 @@ class PosCheops(Stimulus):
         time_vec.append(self.total_duration)
         current_vec.append(self.holding_amplitude)
 
-        self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
+        self.iclamp = LFPy.StimIntElectrode(cell=lfpy_cell,
                                             idx=sec_index,
                                             pptype='IClamp',
                                             dur=self.total_duration,
                                             record_current=True)
-        stim = LFPyCell._hoc_stimlist[0]
+        stim = lfpy_cell._hoc_stimlist[0]
 
         current_vec.play(
             stim._ref_amp,  # pylint:disable=W0212
@@ -448,7 +448,7 @@ class PosCheops(Stimulus):
             self.location)
 
 
-class NoiseOU3(Stimulus):
+class NoiseOU3(LFPStimulus):
     """NoiseOU3 injection"""
 
     def __init__(self,
@@ -470,7 +470,7 @@ class NoiseOU3(Stimulus):
         self.iclamp = None
         self.persistent = []
 
-    def instantiate(self, sim=None, icell=None, LFPyCell=None):
+    def instantiate(self, sim=None, lfpy_cell=None):
         """Run stimulus"""
         from bluepyopt.ephys.locations import NrnSomaDistanceCompLocation
 
@@ -478,8 +478,8 @@ class NoiseOU3(Stimulus):
             sec_index = self.location.sec_index
         elif isinstance(self.location, NrnSomaDistanceCompLocation):
             # compute sec_index closest to soma_distance
-            cell_seg_locs = np.array([LFPyCell.xmid, LFPyCell.ymid, LFPyCell.zmid]).T
-            soma_loc = LFPyCell.somapos
+            cell_seg_locs = np.array([lfpy_cell.xmid, lfpy_cell.ymid, lfpy_cell.zmid]).T
+            soma_loc = lfpy_cell.somapos
             dist_from_soma = np.array([np.linalg.norm(loc - soma_loc) for loc in cell_seg_locs])
             sec_index = np.argmin(np.abs(dist_from_soma - self.location.soma_distance))
         else:
@@ -495,13 +495,13 @@ class NoiseOU3(Stimulus):
         # amps = noisearray[:,1]
         # times = noisearray[:,0]
 
-        self.iclamp = LFPy.StimIntElectrode(cell=LFPyCell,
+        self.iclamp = LFPy.StimIntElectrode(cell=lfpy_cell,
                                             idx=sec_index,
                                             pptype='IClamp',
                                             dur=self.total_duration,
                                             record_current=True)
 
-        stim = LFPyCell._hoc_stimlist[0]
+        stim = lfpy_cell._hoc_stimlist[0]
 
         # play the above current amplitudes into the current clamp
         amps.play(stim._ref_amp, times, 1)  # pylint: disable=W0212
@@ -606,7 +606,7 @@ class StimRecording(Recording):
             self.name, self.tvector, self.cell.pointprocesses[0].i
         )
 
-    def instantiate(self, sim=None, icell=None, LFPyCell=None):
+    def instantiate(self, sim=None, lfpy_cell=None):
         import LFPy
 
         """Instantiate recording"""
@@ -616,9 +616,9 @@ class StimRecording(Recording):
         )
 
         assert isinstance(
-            LFPyCell, LFPy.Cell
+            lfpy_cell, LFPy.Cell
         ), "LFPRecording is only available for LFPCellModel"
-        self.cell = LFPyCell
+        self.cell = lfpy_cell
         self.tvector = None
         self.instantiated = True
 
