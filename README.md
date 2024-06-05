@@ -69,17 +69,18 @@ This project is a collaboration between the BEL Lab @ ETH-BSSE  and the Blue Bra
 
 ### Cite
 
-For further information please refer to the preprint on [bioRxiv]( https://doi.org/10.1101/2022.08.03.502468)
+For further information please refer to the paper in [Neural Computation]( https://doi.org/10.1162/neco_a_01672)
 
 If you use the software, please cite:
+
 ```
-@article{buccino2022multi,
-  title={A multi-modal fitting approach to construct single-neuron models with patch clamp and high-density microelectrode arrays},
+@article{buccino2024multimodal,
+  title={A Multimodal Fitting Approach to Construct Single-Neuron Models with Patch Clamp and High-Density Microelectrode Arrays},
   author={Buccino, Alessio Paolo and Damart, Tanguy and Bartram, Julian and Mandge, Darshan and Xue, Xiaohan and Zbili, Mickael and G{\"a}nswein, Tobias and Jaquier, Aur{\'e}lien and Emmenegger, Vishalini and Markram, Henry and others},
-  journal={bioRxiv},
-  pages={2022--08},
-  year={2022},
-  publisher={Cold Spring Harbor Laboratory}
+  journal={Neural Computation},
+  pages={1--46},
+  year={2024},
+  publisher={MIT Press 255 Main Street, 9th Floor, Cambridge, Massachusetts 02142, USA~…}
 }
 ```
 
