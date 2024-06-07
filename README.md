@@ -89,4 +89,4 @@ If you use the software, please cite:
 The study associated to this repo was supported by the ETH Zurich Postdoctoral Fellowship 19-2 FEL-17 (APB), the ERC Advanced Grant 694829 "neuroXscales" (JB, XX, TG, VE, AH), the China Scholarship Council (XX), by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government’s ETH Board of the Swiss Federal Institutes of Technology (TD, DM, MZ, AJ, HM, WVG), and by the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3) (TD, AJ).
 
 
-Copyright (c) 2022-2024 Blue Brain Project/EPFL
+Copyright (c) 2022-2024 ETH and Blue Brain Project/EPFL
