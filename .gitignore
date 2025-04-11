@@ -1,4 +1,6 @@
 x86_64/
+arm64/
+**/arm64/
 models/config/params/
 models/config/features/
 .ipython/
