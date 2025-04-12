@@ -167,6 +167,10 @@ def plot_responses(responses, protocol_names=None,
             ax.axis("off")
         for ax in axes:
             ax.set_ylim(min_v - 10, max_v + 10)
+    
+    if not isinstance(axes, np.ndarray):
+        axes = np.array([axes])
+
     for index, ax in enumerate(axes.flatten()):
         if index in resps_voltage:
             ptp = max_v - min_v
